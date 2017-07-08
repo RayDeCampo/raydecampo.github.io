@@ -1,0 +1,145 @@
+---
+layout: post
+title: Ruby, Day 2
+date: '2012-07-15T17:45:00.000-04:00'
+author: Raymond DeCampo
+tags:
+- 7languages7weeks
+- ruby
+modified_time: '2012-07-16T20:09:07.232-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-5653385048878372199
+blogger_orig_url: http://labnotes.decampo.org/2012/07/ruby-day-2.html
+redirect_from: /2012/07/ruby-day-2.html
+excerpt_separator: <br />
+
+---
+
+My notes on day 2 of Ruby from <i>Seven Languages in Seven Weeks</i> by Bruce Tate. <br />
+<br />
+Most of the section focuses elsewhere, but my curiosity was piqued by the brief note about functions at the beginning.  It looks like Ruby has the equivalent of C's function pointers.  Also, like everything else functions are first class objects in Ruby with methods, etc. <br />
+<br />
+The convention with code blocks is too use {} for one-liner and do-end otherwise.  There's no do-end example, let's try to make one: <br />
+<br />
+<div class="code">irb(main):006:0> 3.times
+=> #<Enumerator: 3:times>
+irb(main):007:0> 3.times do
+irb(main):008:1* puts 'tastes great'
+irb(main):009:1> puts 'less filling'
+irb(main):010:1> end
+tastes great
+less filling
+tastes great
+less filling
+tastes great
+less filling
+=> 3</div><br />
+In case you haven't realized, I'm showing how the sausage gets made by leaving in my mistaken guesses. <br />
+<br />
+The yield feature looks pretty interesting, let's try to do something with it. &nbsp;I ran into some issues by putting an extraneous do after my whiles but there's the end result: <br />
+<br />
+<div class="code">irb(main):103:0> class Fixnum
+irb(main):104:1>   def calculate
+irb(main):105:2>     n = 0
+irb(main):106:2>     while n < self
+irb(main):107:3>       n = n + 1
+irb(main):108:3>       yield n
+irb(main):109:3>     end
+irb(main):110:2>   end
+irb(main):111:1> end
+=> nil
+irb(main):112:0> x = 0
+=> 0
+irb(main):113:0> 3.calculate {|n| x = x + n }
+=> nil
+irb(main):114:0> x
+=> 6
+irb(main):115:0> x = 0
+=> 0
+irb(main):116:0> 1000.calculate {|n| x = x + n }
+=> nil
+irb(main):117:0> x
+=> 500500
+irb(main):118:0> x = 1
+=> 1
+irb(main):119:0> 10.calculate {|n| x = x * n }
+=> nil
+irb(main):120:0> x
+=> 3628800</div><br />
+Figure 2.1 could use a little work, it is not exactly kosher UML. &nbsp;But if you are confused, the lefts leading left are the "is a" relationship, i.e. Numeric is a Class and the arrows leading up are the "extends" relationship, i.e. Fixnum extends Integer. &nbsp;Which begs the question, what about floating point numbers? <br />
+<br />
+<div class="code">irb(main):121:0> 3.14149.superclass
+NoMethodError: undefined method `superclass' for 3.14149:Float
+        from (irb):121
+        from /usr/bin/irb:12:in `<main>'
+irb(main):122:0> 3.14149.class
+=> Float
+irb(main):123:0> 3.14149.class.superclass
+=> Numeric</div><br />
+Of course upon further reading I see that there is a simple way to do what I tried to do with the calculate &nbsp;example above using inject. &nbsp;I suppose that's the point of Ruby, there's always an elegant way. <br />
+<br />
+Time to take on the exercises. &nbsp;First, accessing files with and without code blocks. &nbsp;Using File.open with a code block has the clear advantage of closing the file when the block completes. &nbsp;An elegant solution for Ruby again. <br />
+<br />
+Given that the Hash class has a to_a method for converting it to an array, that might be the way to go. &nbsp;There is also Hash.keys and Hash.values. &nbsp;In the other direction, I don't see an obvious method on Array so how about: <br />
+<br />
+<div class="code">irb(main):124:0> a = ['b','e','m','u','s']
+=> ["b", "e", "m", "u", "s"]
+irb(main):125:0> h = {}
+=> {}
+irb(main):126:0> a.each_index {|i| h[i] = a[i]}
+=> ["b", "e", "m", "u", "s"]
+irb(main):127:0> h
+=> {0=>"b", 1=>"e", 2=>"m", 3=>"u", 4=>"s"}</div><br />
+Doing 4 at a time using each_slice is doable: <br />
+<br />
+<div class="code">irb(main):141:0> a.each_slice(4) do |x|
+irb(main):142:1*   x.each {|y| print y, ' '}
+irb(main):143:1>   puts
+irb(main):144:1> end
+0 1 2 3 
+4 5 6 7 
+8 9 10 11 
+12 13 14 15 </div><br />
+But I'm not sure I see how to do it with just Array.each. &nbsp;With Array.each_index it is not hard: <br />
+<br />
+<div class="code">irb(main):149:0> a.each_index do |i|
+irb(main):150:1*   print a[i], ' '
+irb(main):151:1>   puts if (i + 1) % 4 == 0
+irb(main):152:1> end
+0 1 2 3 
+4 5 6 7 
+8 9 10 11 
+12 13 14 15 </div><br />
+I suppose I could do it if I kept track of the index manually but then why am I using each?<br />
+<br />
+<div class="code">irb(main):003:0> i = 0
+=> 0
+irb(main):004:0> a.each do |x|
+irb(main):005:1*   print x, ' '
+irb(main):006:1>   puts if (i + 1) % 4 == 0
+irb(main):007:1>   i += 1
+irb(main):008:1> end
+0 1 2 3 
+4 5 6 7 
+8 9 10 11 
+12 13 14 15 
+=> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]</div><br />
+In any case, here's my modified Tree initializer, this was pretty straightforward:<br />
+<br />
+<div class="code">def initialize(name, nodes)
+    @node_name = name
+    @children = []
+    nodes.each {|key,value| @children.push(Tree.new(key, value))}
+  end</div><br />
+A simple grep clone wasn't too bad either, although I wouldn't call it robust in its current form: <br />
+<br />
+<div class="code">#!/usr/bin/env ruby
+re = Regexp.new(ARGV[0])
+ARGV.slice(1,ARGV.length).each do |filename|
+  File.open(filename) do |file|
+    line_no = 1
+    file.readlines.each do |line|
+      puts "#{filename}(#{line_no}):#{line}" if re.match(line)
+      line_no += 1
+    end
+  end
+end</div>

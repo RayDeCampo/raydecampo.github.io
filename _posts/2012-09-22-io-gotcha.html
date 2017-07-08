@@ -1,0 +1,67 @@
+---
+layout: post
+title: Io Gotcha
+date: '2012-09-22T18:02:00.000-04:00'
+author: Raymond DeCampo
+tags:
+- 7languages7weeks
+- gotcha
+- Io
+modified_time: '2012-09-22T18:02:36.933-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-6636089558145816045
+blogger_orig_url: http://labnotes.decampo.org/2012/09/io-gotcha.html
+redirect_from: /2012/09/io-gotcha.html
+excerpt_separator: </p>
+---
+
+ <p>As you are probably aware, I am working my way through <em>Seven Languages in Seven Days</em> by Bruce Tate.  (And if you have ever googled basic questions on the Io language, you will know that I am not the first person to have this idea.)  In any case, I am on Day of Io, but before I get to anything specific there, I wanted to share a gotcha of Io that I encountered.</p>
+<p>Coming from an object-oriented background (like Java) you might find yourself writing code like the following:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>Gotcha <font color="#990000">:=</font> Object clone <b><font color="#0000FF">do</font></b><font color="#990000">(</font><br />
+    conspirators <font color="#990000">::=</font> <b><font color="#000000">list</font></b><font color="#990000">()</font><br />
+<br />
+    conspire <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font>c<font color="#990000">,</font><br />
+        conspirators <b><font color="#000000">push</font></b><font color="#990000">(</font>c<font color="#990000">)</font><br />
+        <b><font color="#0000FF">return</font></b> self<br />
+    <font color="#990000">)</font><br />
+<font color="#990000">)</font><br />
+<br />
+walter <font color="#990000">:=</font> Gotcha clone<br />
+walter <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"jesse"</font><font color="#990000">)</font><br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<br />
+gus <font color="#990000">:=</font> Gotcha clone<br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"mike"</font><font color="#990000">)</font><br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"victor"</font><font color="#990000">)</font><br />
+<br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<font color="#990000">(</font><font color="#FF0000">"   gus: "</font> <font color="#990000">..</font> gus conspirators<font color="#990000">)</font> println</tt></pre></td></tr></table><p>Everything seems fine, we initialize a list and then start adding elements to it.  But here is the output:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">walter: list(jesse)<br />
+walter: list(jesse, mike, victor)<br />
+   gus: list(jesse, mike, victor)</pre></td></tr></table><p>Somehow in the process of creating <tt>gus</tt> and adding his <tt>conspirators</tt> has caused the list of <tt>conspirators</tt> for <tt>walt</tt> to grow.  What is happening here is that <tt>conspirators</tt> is a slot on Gotcha that is never overridden by the clones <tt>walt</tt> and <tt>gus</tt>.  So they are all sharing the same conspirator list.  (Fans of Breaking Bad will realize that this situation cannot be allowed!)</p>
+<p>The solution (well, one solution, there are probably others) is to use the <tt>init</tt> method to set the <tt>conspirators</tt> slot:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>Fixed <font color="#990000">:=</font> Object clone <b><font color="#0000FF">do</font></b><font color="#990000">(</font><br />
+    conspirators <font color="#990000">::=</font> nil<br />
+<br />
+    init <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font><br />
+        <b><font color="#000000">setConspirators</font></b><font color="#990000">(</font><b><font color="#000000">list</font></b><font color="#990000">())</font><br />
+    <font color="#990000">)</font><br />
+<br />
+    conspire <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font>c<font color="#990000">,</font><br />
+        conspirators <b><font color="#000000">push</font></b><font color="#990000">(</font>c<font color="#990000">)</font><br />
+        <b><font color="#0000FF">return</font></b> self<br />
+    <font color="#990000">)</font><br />
+<font color="#990000">)</font><br />
+<br />
+walter <font color="#990000">:=</font> Fixed clone<br />
+walter <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"jesse"</font><font color="#990000">)</font><br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<br />
+gus <font color="#990000">:=</font> Fixed clone<br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"mike"</font><font color="#990000">)</font><br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"victor"</font><font color="#990000">)</font><br />
+<br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<font color="#990000">(</font><font color="#FF0000">"   gus: "</font> <font color="#990000">..</font> gus conspirators<font color="#990000">)</font> println</tt></pre></td></tr></table><p>Now <tt>walt</tt> and <tt>gus</tt> maintain a separate list of <tt>conspirators</tt> (as Vince Gilligan intended):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">walter: list(jesse)<br />
+walter: list(jesse)<br />
+   gus: list(mike, victor)</pre></td></tr></table><p>If you find yourself making these kinds of gaffes, re-read the Io style guide at <a href="http://en.wikibooks.org/wiki/Io_Programming/Io_Style_Guide">http://en.wikibooks.org/wiki/Io_Programming/Io_Style_Guide</a>.</p>

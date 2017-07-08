@@ -1,0 +1,158 @@
+---
+layout: post
+title: Liferay 6.2 Portal on JBoss 7.2.0
+date: '2013-11-10T09:30:00.000-05:00'
+author: Raymond DeCampo
+tags:
+- JBoss
+- Liferay
+- JEE
+- portal
+- PostgreSQL
+- modules
+- standalone-full.xml
+- JDBC
+modified_time: '2013-11-10T09:30:00.576-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-3145524801626152309
+blogger_orig_url: http://labnotes.decampo.org/2013/11/liferay-62-portal-on-jboss-720.html
+redirect_from: /2013/11/liferay-62-portal-on-jboss-720.html
+excerpt_separator: </p>
+---
+
+<p><a href="http://www.liferay.com">Liferay</a> is a <a href="http://www.jcp.org/en/jsr/detail?id=286">JSR-286</a> (also known as Portal 2.0) compliant portal (and a whole lot more).  Since I am in the market for a portal server for an upcoming project, I figured I needed to check Liferay out.  The folks at Liferay have bundled version 6.2 with a number of different open-source application servers, including JBoss 7.1.1, but what fun would it be to simply download a bundle?  Liferay is also available as a war download for deployment on existing (and closed-source) application servers.  So let&#8217;s see if we can get Liferay running on the JBoss 7.2.0 server <a href="/2013/10/build-and-install-jboss-720-on-centos-64.html">we built previously</a>.</p>
+<p>We will need the Liferay war (<tt>liferay-portal-6.2.0-ce-ga1-20131101192857659.war</tt>) and the Liferay dependencies package (<tt>liferay-portal-dependencies-6.2.0-ce-ga1-20131101192857659.zip</tt>) available from the <a href="http://www.liferay.com/downloads/liferay-portal/additional-files">Additional Files</a> tab on the Liferay download page.  I will be using a PostgreSQL database as well, so I&#8217;ll need the <a href="http://jdbc.postgresql.org/download.html">PostgreSQL JDBC driver</a> (<tt>postgresql-9.3-1100.jdbc4.jar</tt>) as well.  Feel free to substitute the driver for your favorite DBMS.</p>
+<p>First, Liferay will be using the directory above the JBoss installation as a installation directory, so let&#8217;s create that directory and extract JBoss:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ mkdir liferay<br />
+$ cd liferay<br />
+$ unzip -q <font color="#990000">..</font>/jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>zip</tt></pre></td></tr></table><p>Liferay requires that you install the dependencies at the application server level; for JBoss that means creating a module for Liferay.  The Liferay installation instructions bundle the JDBC driver with the Liferay module.  That feels wrong to me, so we&#8217;ll create a separate module for the JDBC driver. In this case I am using PostgreSQL, but this can easily be adapted for any driver.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ cd jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final/modules<br />
+$ mkdir -p org/postgresql/main<br />
+$ cp <font color="#990000">../../..</font>/postgresql-<font color="#993399">9.3</font>-<font color="#993399">1100</font><font color="#990000">.</font>jdbc4<font color="#990000">.</font>jar org/postgresql/main<font color="#990000">/</font><br />
+$ mkdir -p com/liferay/portal/main<br />
+$ cd com/liferay/portal/main<br />
+$ unzip -q <font color="#990000">\</font><br />
+<font color="#990000">../../../../../../..</font>/liferay-portal-dependencies-<font color="#993399">6.2</font><font color="#990000">.</font><font color="#993399">0</font>-ce-ga<font color="#993399">1</font>-<font color="#993399">20131101192857659</font><font color="#990000">.</font>zip<br />
+$ mv liferay-portal-dependencies-<font color="#993399">6.2</font><font color="#990000">.</font><font color="#993399">0</font>-ce-ga<font color="#993399">1</font><font color="#990000">/*</font> <font color="#990000">./</font><br />
+$ rmdir liferay-portal-dependencies-<font color="#993399">6.2</font><font color="#990000">.</font><font color="#993399">0</font>-ce-ga<font color="#993399">1</font><br />
+$ cd <font color="#990000">../../../../../..</font></tt></pre></td></tr></table><p>Next you&#8217;ll need to create the two <tt>module.xml</tt> files.  First, for PostgreSQL create the file <tt>jboss-as-7.2.0.Final/modules/org/postgresql/main/module.xml</tt> with contents:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b><br />
+<b><font color="#0000FF">&lt;module</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"urn:jboss:module:1.0"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"org.postgresql"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;resources&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;resource-root</font></b> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"postgresql-9.3-1100.jdbc4.jar"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/resources&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;dependencies&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.transaction.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/dependencies&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/module&gt;</font></b></tt></pre></td></tr></table><p>Next for the Liferay module, note that we will be adding a dependency on the PostgreSQL module.  The file is <tt>jboss-as-7.2.0.Final/modules/com/liferay/portal/main/module.xml</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b><br />
+<b><font color="#0000FF">&lt;module</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"urn:jboss:module:1.0"</font> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"com.liferay.portal"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;resources&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;resource-root</font></b> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"hsql.jar"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;resource-root</font></b> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"portal-service.jar"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;resource-root</font></b> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"portlet.jar"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/resources&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;dependencies&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.mail.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.servlet.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.servlet.jsp.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"javax.transaction.api"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+       <b><font color="#0000FF">&lt;module</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"org.postgresql"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/dependencies&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/module&gt;</font></b></tt></pre></td></tr></table><p>While we are mucking around with the modules, it seems like a good time to make the Liferay-recommended changes to the system modules of JBoss.  Open up <tt>jboss-as-7.2.0.Final/modules/system/layers/base/sun/jdk/main/module.xml</tt> and add the following <tt>&lt;path&gt;</tt> tags under the existing <tt>&lt;paths&gt;</tt> tag:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;path</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"com/sun/crypto"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;path</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"com/sun/org/apache/xml/internal/resolver"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;path</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"com/sun/org/apache/xml/internal/resolver/tools"</font> <b><font color="#0000FF">/&gt;</font></b></tt></pre></td></tr></table><p>The <a href="https://www.liferay.com/documentation/liferay-portal/6.2/user-guide/-/ai/installing-liferay-on-jboss-7-liferay-portal-6-2-user-guide-15-en">Liferay documentation</a> at this point indicates there are some steps to do to work around <a href="https://issues.jboss.org/browse/JBPAPP6-932">JBPAPP6-932</a>.  However, that bug only affects environments using the IBM JDK, which I am not planning on doing.  Further, I am using JBoss 7.2.0 and the patch is for 7.1.x; it is not clear if the bug exists in 7.2.0 or if the patch is appropriate for 7.2.0.  The upshot is I am skipping that step but you may want to consider if you need it.</p>
+<p>Next up are some edits to the JBoss configuration file, <tt>standalone-full.xml</tt>.  (I typically configure my servers to use <tt>standalone-full.xml</tt> instead of just <tt>standalone.xml</tt>, YMMV.)  We&#8217;ll start by adding some system properties following the <tt>&lt;extensions&gt;</tt> tag:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;system-properties&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;property</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"org.apache.catalina.connector.URI_ENCODING"</font><br />
+    <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#0000FF">/&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;property</font></b><br />
+    <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"org.apache.catalina.connector.USE_BODY_ENCODING_FOR_QUERY_STRING"</font><br />
+    <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"true"</font><b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/system-properties&gt;</font></b></tt></pre></td></tr></table><p>We also need a to set a timeout for the deployment scanner by adding the <tt>deployment-timeout</tt> attribute to the existing <tt>deployment-scanner</tt> tag:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;subsystem</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"urn:jboss:domain:deployment-scanner:1.1"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;deployment-scanner</font></b> <font color="#009900">path</font><font color="#990000">=</font><font color="#FF0000">"deployments"</font> <font color="#009900">relative-to</font><font color="#990000">=</font><font color="#FF0000">"jboss.server.base.dir"</font><br />
+    <font color="#009900">scan-interval</font><font color="#990000">=</font><font color="#FF0000">"5000"</font> <font color="#009900">deployment-timeout</font><font color="#990000">=</font><font color="#FF0000">"240"</font><b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/subsystem&gt;</font></b></tt></pre></td></tr></table><p>Next we need to configure the Liferay login system.  Add a <tt>&lt;security-domain&gt;</tt>tag to the existing <tt>&lt;security-domains&gt;</tt> tag in the existing <tt>&lt;subsystem xmlns="urn:jboss:domain:security:1.2"&gt;</tt> tag</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;security-domain</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"PortalRealm"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;authentication&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;login-module</font></b> <font color="#009900">code</font><font color="#990000">=</font><font color="#FF0000">"com.liferay.portal.security.jaas.PortalLoginModule"</font><br />
+      <font color="#009900">flag</font><font color="#990000">=</font><font color="#FF0000">"required"</font><b><font color="#0000FF">/&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;/authentication&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/security-domain&gt;</font></b></tt></pre></td></tr></table><p>We will be replacing the standard JBoss welcome application with Liferay later, so we need to set the <tt>enable-welcome-root</tt> attribute to false on the existing <tt>&lt;virtual-server&gt;</tt> tag.  We will also set the JSP mode to development by adding <tt>&lt;configuration&gt;</tt> and <tt>&lt;jsp-configuration&gt;</tt> tags in the web <tt>&lt;subsystem&gt;</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;subsystem</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"urn:jboss:domain:web:1.4"</font> <font color="#009900">default-virtual-server</font><font color="#990000">=</font><font color="#FF0000">"default-host"</font> <font color="#009900">native</font><font color="#990000">=</font><font color="#FF0000">"false"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;configuration&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;jsp-configuration</font></b> <font color="#009900">development</font><font color="#990000">=</font><font color="#FF0000">"true"</font><b><font color="#0000FF">/&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;/configuration&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;connector</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"http"</font> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"HTTP/1.1"</font> <font color="#009900">scheme</font><font color="#990000">=</font><font color="#FF0000">"http"</font><br />
+    <font color="#009900">socket-binding</font><font color="#990000">=</font><font color="#FF0000">"http"</font><b><font color="#0000FF">/&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;virtual-server</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"default-host"</font> <font color="#009900">enable-welcome-root</font><font color="#990000">=</font><font color="#FF0000">"false"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;alias</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"localhost"</font><b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;alias</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"example.com"</font><b><font color="#0000FF">/&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;/virtual-server&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/subsystem&gt;</font></b></tt></pre></td></tr></table><p>While we are here, let&#8217;s create a mail session for Liferay to use by modifying the existing <tt>&lt;mail-session&gt;</tt> tag in the <tt>&lt;subsystem xmlns="urn:jboss:domain:mail:1.0"&gt;</tt> tag:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;subsystem</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"urn:jboss:domain:mail:1.0"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;mail-session</font></b><br />
+    <font color="#009900">jndi-name</font><font color="#990000">=</font><font color="#FF0000">"java:/mail/MailSession"</font><br />
+    <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"MAIL_ADDRESS"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;smtp-server</font></b> <font color="#009900">outbound-socket-binding-ref</font><font color="#990000">=</font><font color="#FF0000">"mail-smtp"</font><b><font color="#0000FF">&gt;</font></b><br />
+      <b><font color="#0000FF">&lt;login</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"MAIL_USER"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"MAIL_PASSWORD"</font><b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/smtp-server&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;/mail-session&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/subsystem&gt;</font></b></tt></pre></td></tr></table><p>We also need to tell JBoss that the socket binding <tt>mail-smtp</tt> should talk to the right mail server.  Change the <tt>host</tt> attribute of the existing <tt>&lt;remote-destination&gt;</tt> tag for the <tt>mail-smtp</tt> socket binding:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;outbound-socket-binding</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"mail-smtp"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;remote-destination</font></b> <font color="#009900">host</font><font color="#990000">=</font><font color="#FF0000">"MAIL_HOST"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"25"</font><b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/outbound-socket-binding&gt;</font></b></tt></pre></td></tr></table><p>Of course, replace the <tt>MAIL_ADDRESS</tt>, <tt>MAIL_HOST</tt>, <tt>MAIL_USER</tt> and <tt>MAIL_PASSWORD</tt> tokens in the above with the proper values for your environment.</p>
+<p>Finally we create a JDBC data source for Liferay to use in two steps.  First, add a <tt>&lt;datasource&gt;</tt> tag to the existing <tt>&lt;datasources&gt;</tt> in the         <tt>&lt;subsystem xmlns="urn:jboss:domain:datasources:1.1"&gt;</tt> subsystem:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;datasource</font></b> <font color="#009900">jta</font><font color="#990000">=</font><font color="#FF0000">"true"</font> <font color="#009900">jndi-name</font><font color="#990000">=</font><font color="#FF0000">"java:/jdbc/LiferayPool"</font><br />
+  <font color="#009900">pool-name</font><font color="#990000">=</font><font color="#FF0000">"LiferayPool"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"true"</font> <font color="#009900">use-java-context</font><font color="#990000">=</font><font color="#FF0000">"true"</font> <font color="#009900">use-ccm</font><font color="#990000">=</font><font color="#FF0000">"true"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;connection-url&gt;</font></b>jdbc:postgresql://DB_SERVER:5432/DB_DATABASE<b><font color="#0000FF">&lt;/connection-url&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;driver&gt;</font></b>postgresql<b><font color="#0000FF">&lt;/driver&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;pool&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;min-pool-size&gt;</font></b>1<b><font color="#0000FF">&lt;/min-pool-size&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;max-pool-size&gt;</font></b>20<b><font color="#0000FF">&lt;/max-pool-size&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;prefill&gt;</font></b>true<b><font color="#0000FF">&lt;/prefill&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;/pool&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;security&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;user-name&gt;</font></b>DB_USERNAME<b><font color="#0000FF">&lt;/user-name&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;password&gt;</font></b>DB_PASSWORD<b><font color="#0000FF">&lt;/password&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;/security&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;validation&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;valid-connection-checker</font></b> <font color="#009900">class-name</font><font color="#990000">=</font><font color="#FF0000">"org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker"</font><b><font color="#0000FF">/&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;validate-on-match&gt;</font></b>false<b><font color="#0000FF">&lt;/validate-on-match&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;background-validation&gt;</font></b>false<b><font color="#0000FF">&lt;/background-validation&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/validation&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;statement&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;prepared-statement-cache-size&gt;</font></b>16<b><font color="#0000FF">&lt;/prepared-statement-cache-size&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;share-prepared-statements&gt;</font></b>true<b><font color="#0000FF">&lt;/share-prepared-statements&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/statement&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/datasource&gt;</font></b></tt></pre></td></tr></table><p>Then add a <tt>&lt;driver&gt;</tt> tag to the existing <tt>&lt;drivers&gt;</tt> tag within the <tt>&lt;datasources&gt;</tt> tag:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;driver</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"org.postgresql"</font><b><font color="#0000FF">&gt;</font></b><br />
+  <b><font color="#0000FF">&lt;xa-datasource-class&gt;</font></b>org.postgresql.xa.PGXADataSource<b><font color="#0000FF">&lt;/xa-datasource-class&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/driver&gt;</font></b></tt></pre></td></tr></table><p>Again, replace the <tt>DB_SERVER</tt>, <tt>DB_DATABASE</tt>, <tt>DB_USERNAME</tt> and <tt>DB_PASSWORD</tt> tokens with the correct values for your environment.  If you are using a different database server, you&#8217;ll have to change the <tt>&lt;connection-url&gt;</tt>, the <tt>class-name</tt> for the <tt>&lt;validation-connection-checker&gt;</tt> and the <tt>&lt;xa-datasource-class&gt;</tt> as well, but you knew that already.  For the database, use an empty schema and Liferay will populate it when it first starts.</p>
+<p>Liferay requires certain system properties to be set when JBoss is started.  Use your favorite mechanism to ensure the following values are set:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">-Dfile.encoding=UTF-8<br />
+-Djava.net.preferIPv4Stack=true<br />
+-Djava.security.manager<br />
+-Djava.security.policy=$JBOSS_HOME\bin\server.policy<br />
+-Djboss.home.dir=$JBOSS_HOME</pre></td></tr></table><p>If you are developing on Windows, use the <tt>standalone/standalone.conf.bat</tt> file.  If you have set up JBoss on CentOS per <a href="/2013/10/build-and-install-jboss-720-on-centos-64.html">my instructions</a>, you can use the <tt>/etc/jboss-as/jboss-as.properties</tt> file (drop the <tt>-D</tt> prefixes of course).</p>
+<p>Don&#8217;t forget to set the set the <tt>-Xmx</tt> and <tt>-XX:MaxPermSize</tt> options while you are editing files in the <tt>bin</tt> directory.  Liferay recommends <tt>-Xmx1024m -XX:MaxPermSize=256m</tt>.</p>
+<p>The Liferay documentation suggests setting the <tt>user.timezone</tt> property to GMT as well.  I encountered problems with that setting when deploying JSP changes.  The Liferay deployer left the JSP timestamped with GMT time value on the file system; since these were always in the past for me the JSPs always looked older than their last compile time from JBoss&#8217;s point of view.  So they did not get recompiled.  So I have skipped that setting.</p>
+<p>While we are fooling around with the JBoss start-up mechanism, it seems like a good time to create the <tt>server.policy</tt> file in <tt>jboss-as-7.2.0.Final/bin</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">grant {<br />
+    permission java.security.AllPermission;<br />
+};</pre></td></tr></table><p>Next we need to define the <tt>portal-ext.properties</tt> file in the <tt>liferay</tt> directory.  We tell Liferay where in the JNDI to find our data source and mail session.  We also disable the mechanism where it tries to launch a browser every time it starts.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#009900">jdbc.default.jndi.name</font><font color="#990000">=</font>java:/jdbc/LiferayPool<br />
+<font color="#009900">mail.session.jndi.name</font><font color="#990000">=</font>java:/mail/MailSession<br />
+<font color="#009900">browser.launcher.url</font><font color="#990000">=</font></tt></pre></td></tr></table><p>Something to note here is that the Liferay documentation omits the first slash in the JNDI names which causes issues on JBoss 7.2.0.  Include the slash and make sure your names are consistent between the <tt>portal-ext.properties</tt> and <tt>standalone-full.xml</tt> files.</p>
+<p>OK, we are to install Liferay itself.  We extract the contents of the Liferay war download into a new directory under <tt>deployments</tt>.  Then we need to delete the <tt>eclipselink.jar</tt> from the <tt>lib</tt> directory.  Finally we create a <tt>.dodeploy</tt> file to trigger the deployment:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ cd jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final/standalone/deployments<font color="#990000">/</font><br />
+$ mkdir liferay-portal<font color="#990000">.</font>war<br />
+$ cd liferay-portal<font color="#990000">.</font>war<br />
+$ jar xf <font color="#990000">../../../../..</font>/liferay-portal-<font color="#993399">6.2</font><font color="#990000">.</font><font color="#993399">0</font>-ce-ga<font color="#993399">1</font>-<font color="#993399">20131101192857659</font><font color="#990000">.</font>war<br />
+$ rm WEB-INF/lib/eclipselink<font color="#990000">.</font>jar<br />
+$ cd <font color="#990000">..</font><br />
+$ touch liferay-portal<font color="#990000">.</font>war<font color="#990000">.</font>dodeploy</tt></pre></td></tr></table><p>Note that we are differing from the Liferay instructions again, mainly because JBoss 7.2.0 does not have a <tt>ROOT.war</tt> deployment to clear out.  Instead we use the much clearer name <tt>liferay-portal.war</tt>.</p>
+<p>At this point you are ready to go.  Fire up JBoss and enjoy your Liferay portal at <a href="http://localhost:8080/">http://localhost:8080/</a>.  Don&#8217;t forget that we used the <tt>standalone-full.xml</tt> file, not the default <tt>standalone.xml</tt> file when you start your application server.</p>

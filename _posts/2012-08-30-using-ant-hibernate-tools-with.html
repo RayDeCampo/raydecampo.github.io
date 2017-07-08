@@ -1,0 +1,33 @@
+---
+layout: post
+title: Using ANT Hibernate Tools with Hibernate 4
+date: '2012-08-30T23:16:00.001-04:00'
+author: Raymond DeCampo
+tags:
+- jasypt
+- hibernate
+- hibernate tools
+- ant
+- slf4j
+- java
+modified_time: '2012-08-30T23:16:28.330-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-7808450402165443439
+blogger_orig_url: http://labnotes.decampo.org/2012/08/using-ant-hibernate-tools-with.html
+redirect_from: /2012/08/using-ant-hibernate-tools-with.html
+excerpt_separator: </p>
+---
+
+ <p>Recently I have been upgrading a JEE application to the latest versions of the libraries used.  In particular I was upgrading from Hibernate 3 to Hibernate 4.</p>
+<p>In this particular application, we maintained Hibernate mapping files and used Hibernate Tools to generate the schema via an ANT task.  At first glance, it seemed that Hibernate Tools had been completely absorbed into JBoss Tools for Eclipse.  It also appeared that Hibernate Tools did not support Hibernate 4.  However, it turned out I was able to get what I needed.</p>
+<p>So the first trick was locating Hibernate Tools.  From the download page for JBoss Tools (<a href="http://www.jboss.org/tools/download/">http://www.jboss.org/tools/download/</a>), drill into the download link at the bottom for the version of JBoss Core Tools you want.  In my case the latest was 3.3.  On this page you will find separate downloads for JBoss Tools and Hibernate Tools.  I downloaded the zip for Hibernate Tools.</p>
+<p>From here you will find that the download consists of plugins for Eclipse.  But if we tear apart the right one we can get to the <tt>hibernate-tools.jar</tt> file needed for the ANT task. In this case the right jar was <tt>plugins/org.jboss.tools.hibernate4_0_3.5.1.v20120715-0252-H98-Final.jar</tt>.</p>
+<p>After exploding the jar I found the <tt>hibernate-tools.jar</tt> in the <tt>lib/tools</tt> subdirectory.  Unfortunately my fun was not over.  I soon ran into this problem:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>java<font color="#990000">.</font>lang<font color="#990000">.</font>NoClassDefFoundError<font color="#990000">:</font> org<font color="#990000">/</font>slf4j<font color="#990000">/</font>LoggerFactory</tt></pre></td></tr></table><p>I needed to include the jars from the <tt>lib/required</tt> directory as well.  But we were still not quite there:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#990000">[</font>hibernatetool<font color="#990000">]</font> SLF4J<font color="#990000">:</font> Failed to <font color="#008080">load</font> <b><font color="#0000FF">class</font></b> <font color="#FF0000">"org.slf4j.impl.StaticLoggerBinder"</font><font color="#990000">.</font><br />
+<font color="#990000">[</font>hibernatetool<font color="#990000">]</font> SLF4J<font color="#990000">:</font> <font color="#008080">See</font> http<font color="#990000">:</font><i><font color="#9A1900">//www.slf4j.org/codes.html#StaticLoggerBinder for further details.</font></i><br />
+<br />
+BUILD FAILED<br />
+c<font color="#990000">:\</font>eng<font color="#990000">\</font>projects<font color="#990000">\</font>sc<font color="#990000">\</font>build<font color="#990000">.</font>xml<font color="#990000">:</font><font color="#993399">83</font><font color="#990000">:</font> java<font color="#990000">.</font>lang<font color="#990000">.</font>NoClassDefFoundError<font color="#990000">:</font> org<font color="#990000">/</font>slf4j<font color="#990000">/</font>impl<font color="#990000">/</font>StaticLoggerBinder</tt></pre></td></tr></table><p>Luckily the error message at the indicated URL was informative.  I downloaded a implementation of slf4j and included the <tt>slf4f-nop.jar</tt> in the classpath.  (Note that using the slf4j-log4j jar from the <tt>lib</tt> directory caused all the useful output from the <tt>hibernatetool</tt> ANT task to be suppressed.  And I did not want to set up a log4j configuration just for this.  Have I mentioned how frustrating all these logging frameworks are?)</p>
+<p>As a bonus, here&#8217;s one more issue I encountered while upgrading Hibernate Tools:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>org<font color="#990000">.</font>hibernate<font color="#990000">.</font>MappingException<font color="#990000">:</font> Could not determine <font color="#008080">type</font> <b><font color="#0000FF">for</font></b><font color="#990000">:</font> org<font color="#990000">.</font>jasypt<font color="#990000">.</font>hibernate4<font color="#990000">.</font>type<font color="#990000">.</font>EncryptedStringType</tt></pre></td></tr></table><p>Hibernate Tools was having issues with the properties configured to be encrypted via jasypt.  (An excellent way to include encrypted data into a database transparently, by the way.)  The trick turned out to be to define the <tt>sql-type</tt> attribute on the <tt>column</tt> element under <tt>property</tt> element in the mapping file.</p>
+<p>In case you were wondering, I was able to get Hibernate Tools to generate POJOs, documentation and mapping files.  I&#8217;m not using anything specific to Hibernate 4 so I don&#8217;t know if I can declare Hibernate Tools completely compatible with it, but it seems a great deal of functionality is available, if you work a little.</p>

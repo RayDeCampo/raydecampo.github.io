@@ -1,0 +1,32 @@
+---
+layout: post
+title: Installing Ubuntu 12.10 on an SSD, Part 3
+date: '2012-12-09T09:30:00.000-05:00'
+author: Raymond DeCampo
+tags:
+- ubuntu
+- tmp
+- ssd
+modified_time: '2012-12-09T09:30:00.082-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-2404724397518584753
+blogger_orig_url: http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-3.html
+redirect_from: /2012/12/installing-ubuntu-1210-on-ssd-part-3.html
+excerpt_separator: </p>
+---
+
+<p>Recently I took the plunge and put an SSD drive into my desktop.  Since I needed to re-install the OS, I figured I would install the latest Ubuntu, version 12.10.  I went over my trials and tribulations of getting the OS installed in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-1.html">part 1</a>, and dealt with swap in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-2.html">part 2</a>.  Today we finish up the tweaks for the SSD.</p>
+<p>First we add <tt>noatime</tt> and <tt>discard</tt> to the <tt>/etc/fstab</tt> options for the drive:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">UUID=abc...    /     ext4    errors=remount-ro,noatime,discard 0       1</pre></td></tr></table><p>(Note I cut my UUID for brevity.  Yours should be much longer.)  The <tt>noatime</tt> option keeps the OS from updating the access time of a file every time it is read.  This reduces the number of writes to the SSD drive.  The <tt>discard</tt> option enables the TRIM command on the file system.  There are some details to delve into for this depending on your particular SSD, read about it at <a href="https://wiki.archlinux.org/index.php/Solid_State_Drives">https://wiki.archlinux.org/index.php/Solid_State_Drives</a>.  For most drives you&#8217;ll want it enabled.</p>
+<p>Next we change the I/O scheduler to use the deadline algorithm instead of elevator algorithm.  For a traditional hard disk drive, the data is read from the platter by a head.  The head must be moved to the correct position to read the desired data.  The disk spins, which means the head need only move in one dimension, radially.  For this reason, the scheduling algorithms for hard disk drives are referred to as elevator algorithms.</p>
+<p>The SSD does not have the same limitations as the HDD.  There is no head to move into position in order to read or write the data.  So it is not really important what order the I/O is scheduled.  There is no reason to force some I/O operations to wait while others, requested later, are served as would happen in the elevator algorithm.  So instead we use the deadline algorithm, where each operation is assigned a deadline.</p>
+<p>Since we have a mixed environment, we cannot just set it system wide via grub kernel options.  That is, we can&#8217;t just use the elevator or deadline algorithm for all disks since we have both HDDs and SSDs.  In order to use the correct algorithm with the proper drive type, create a file in /etc/udev/rules.d with contents:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;"># set deadline scheduler for non-rotating disks<br />
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="deadline"<br />
+<br />
+# set cfq scheduler for rotating disks<br />
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="cfq"</pre></td></tr></table><p>I named mine <tt>99-scheduler.rules</tt>.  The files in this directory are automatically processed by <tt>udev</tt>, the device manager for the kernel.  Note that <tt>cfq</tt>, or Completely Fair Queuing, is the default.  For more information, go to <a href="http://en.wikipedia.org/wiki/CFQ">http://en.wikipedia.org/wiki/CFQ</a>.</p>
+<p>The next tweak to make is to do something about the <tt>/tmp</tt> directory.  This is another change that is designed to reduce writes to the SSD (an overblown concern) but you might appreciate the effects on your system in any case.  I decided to mount the <tt>/tmp</tt> directory in RAM.  Add the following to <tt>/etc/fstab</tt> (or replace any existing mount for <tt>/tmp</tt>):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">none /tmp tmpfs defaults 0 0</pre></td></tr></table><p>By default this uses about half the RAM for <tt>/tmp</tt>.  If you want more control, you can use a line like:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">tmpfs /tmp tmpfs nodev,nosuid,size=7G 0 0</pre></td></tr></table><p>Keep in mind that certain operations that write large files to <tt>/tmp</tt> might be adversely affected; for example, burning a large DVD.</p>
+<p>Resources:</p>
+<ul><li><a href="https://wiki.archlinux.org/index.php/Solid_State_Drives">https://wiki.archlinux.org/index.php/Solid_State_Drives</a></li><li><a href="http://forums.fedoraforum.org/showthread.php?t=256068">http://forums.fedoraforum.org/showthread.php?t=256068</a></li><li><a href="https://help.ubuntu.com/community/Boot-Repair">https://help.ubuntu.com/community/Boot-Repair</a></li><li><a href="http://en.wikipedia.org/wiki/BIOS_Boot_partition">http://en.wikipedia.org/wiki/BIOS_Boot_partition</a></li><li><a href="https://help.ubuntu.com/community/SwapFaq">https://help.ubuntu.com/community/SwapFaq</a></li><li><a href="http://www.kernel.org/doc/Documentation/sysctl/vm.txt">http://www.kernel.org/doc/Documentation/sysctl/vm.txt</a></li></ul>

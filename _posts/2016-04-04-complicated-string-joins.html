@@ -1,0 +1,23 @@
+---
+layout: post
+title: Complicated String Joins
+date: '2016-04-04T07:00:00.000-04:00'
+author: Raymond DeCampo
+tags:
+- functional
+- streams
+- java
+- lambda
+modified_time: '2016-04-04T07:00:12.250-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-1292741886762234964
+blogger_orig_url: http://labnotes.decampo.org/2016/04/complicated-string-joins.html
+redirect_from: /2016/04/complicated-string-joins.html
+excerpt_separator: </p>
+---
+
+<p>So if you have not been under a rock and have used Java 8, you are surely aware of the new String.join() method and the Collectors.joining() method to concatenate arrays or streams of Strings.  Sometimes however, a simple concatenation with a delimiter is not quite up to the job. </p>
+<p>Consider the following method for example: </p>
+<script src="https://gist.github.com/RayDeCampo/12b98878b0b08fdd60ed23bdd250b90c.js"></script><p>Here our plans for a simple invocation of Collectors.joining() is complicated by the intermediate String literals and the particular format desired for the string representation of the entry. </p>
+<p>At first blush you might attempt to change this to functional style using something like this: </p>
+<script src="https://gist.github.com/RayDeCampo/68768dde668461aa8b68a23f5dc50cfc.js"></script><p>If you are an old salt at Java however, I'm sure your hair is standing on end considering all those temporary String objects being created.  Fortunately, using Stream.of() and Stream.flatMap() there is another way: </p>
+<script src="https://gist.github.com/RayDeCampo/3a2cea7738b74d8ee240eb040bcd8a53.js"></script><p>If you want to play around with this code, it is available on GitHub at <a href="https://github.com/RayDeCampo/lab-notes/blob/23bfa214f8fd830a27529aa9f195013f448998a9/lab-notes/src/main/java/org/decampo/examples/functional/StringJoin.java">StringJoin.java</a></p>

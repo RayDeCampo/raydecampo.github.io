@@ -1,0 +1,75 @@
+---
+layout: post
+title: Trac on CentOS 6.3, Part 2
+date: '2013-01-27T09:30:00.000-05:00'
+author: Raymond DeCampo
+tags:
+- SELinux
+- Red Hat
+- RHEL
+- Apache
+- httpd
+- installation
+- CentOS
+- WSGI
+- Trac
+modified_time: '2014-12-04T09:49:19.711-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-3004479792833694903
+blogger_orig_url: http://labnotes.decampo.org/2013/01/trac-on-centos-63-part-2.html
+redirect_from: /2013/01/trac-on-centos-63-part-2.html
+excerpt_separator: </p>
+---
+
+<p>Recently I had the need to set up a <a href="http://trac.edgewall.org/trac">Trac</a> instance on a 64-bit machine running CentOS 6.3.  In <a href="/2013/01/trac-on-centos-63-part-1.html">part 1</a> I installed some prerequisite software and Trac itself.  In part 2, I will be installing Apache as a front end to Trac.  In <a href="/2013/02/trac-on-centos-63-part-3.html">part 3</a>, I will configure Trac to use an Active Directory domain for authentication.</p>
+<p>First we need to install Apache.  We will be using WSGI within Apache to execute Trac&#8217;s python code.  We will also need to open the firewall for HTTP traffic.  <strong>Warning:</strong>  Don&#8217;t mess with your firewall unless you know what you are doing.  If your server has a GUI, there are straightforward GUI tools for opening the firewall for HTTP, use those instead of command line configurations below.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>yum install httpd mod_wsgi<br />
+<i><font color="#9A1900"># Set Apache to start on boot</font></i><br />
+chkconfig httpd on<br />
+<i><font color="#9A1900"># Open HTTP port on firewall</font></i><br />
+<i><font color="#9A1900"># Figure out the value for line below by using the highest line number</font></i><br />
+<i><font color="#9A1900"># output from "iptables -t INPUT -L --line-numbers"&gt;</font></i><br />
+<font color="#009900">line</font><font color="#990000">=</font>aNumber<br />
+iptables --insert INPUT <font color="#009900">$line</font> <font color="#990000">\</font><br />
+         --match state <font color="#990000">\</font><br />
+         --state NEW <font color="#990000">\</font><br />
+         --protocol tcp <font color="#990000">\</font><br />
+         --destination-port <font color="#993399">80</font> <font color="#990000">\</font><br />
+         --source <font color="#993399">172.26</font><font color="#990000">.</font><font color="#993399">245.0</font><font color="#990000">/</font><font color="#993399">24</font> <font color="#990000">\</font><br />
+         --jump ACCEPT<br />
+<i><font color="#9A1900"># Check that the firewall state is as you want it before saving!</font></i><br />
+iptables -t INPUT -L --line-numbers<br />
+<i><font color="#9A1900"># If your firewall is screwed up use "service iptables restart" to restore it</font></i><br />
+<i><font color="#9A1900"># instead of saving it</font></i><br />
+service iptables save</tt></pre></td></tr></table><p>Now we will configure Apache with a virtual server for our Trac instance.  First, comment out the <tt>NameVirtualHost</tt> directive in <tt>/etc/httpd/conf/httpd.conf</tt>.  Then create a new file in <tt>/etc/httpd/conf.d</tt> called <tt>myproject.mydomain.tld.conf</tt>, where <em>myproject.mydomain.tld</em> is the domain name you want to use for the trac server.  (The name of the file isn&#8217;t important, except for the <tt>.conf</tt> sufix, but a good naming scheme will make your life easier.)  The contents should like like this:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">&lt;VirtualHost *:80&gt;<br />
+    DocumentRoot /var/www/myproject.mydomain.tld/html<br />
+    ServerName myproject.mydomain.tld<br />
+<br />
+    ErrorLog logs/myproject.mydomain.tld-error_log<br />
+    CustomLog logs/myproject.mydomain.tld-access_log common<br />
+&lt;/VirtualHost&gt;</pre></td></tr></table><p>Then create the root directory:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>mkdir -p /var/www/myproject<font color="#990000">.</font>mydomain<font color="#990000">.</font>tld/html</tt></pre></td></tr></table><p>This is a good point to make a dummy file in the directory (say index.html) and test the server:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>echo <font color="#FF0000">'&lt;html&gt;&lt;body&gt;Hello!&lt;/body&gt;&lt;/html&gt;'</font> <font color="#990000">&gt;</font>/var/www/myproject<font color="#990000">.</font>mydomain<font color="#990000">.</font>tld/html/index<font color="#990000">.</font>html<br />
+service httpd start<br />
+wget http<font color="#990000">:</font>//myproject<font color="#990000">.</font>mydomain<font color="#990000">.</font>tld/index<font color="#990000">.</font>html</tt></pre></td></tr></table><p>At this point we are ready to export scripts and static resources from Trac and set permissions for Apache:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>trac-admin /var/trac/myproject deploy /tmp/deploy<br />
+mv /tmp/deploy /var/trac/myproject/deploy<br />
+<br />
+chown -R apache<font color="#990000">:</font>apache /var/trac/myproject</tt></pre></td></tr></table><p>Now we copy in the Trac WSGI script into Apache&#8217;s cgilib directory:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>cp /var/trac/myproject/deploy/cgi-bin/trac<font color="#990000">.</font>wsgi /var/www/cgi-bin/myproject<font color="#990000">.</font>trac<font color="#990000">.</font>wsgi</tt></pre></td></tr></table><p>Then edit <tt>/etc/httpd/conf.d/myproject.mydomain.tld.conf</tt> and add the following within the virtual server definition:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">    WSGIScriptAlias /trac /var/www/cgi-bin/myproject.trac.wsgi<br />
+<br />
+    &lt;Directory /var/www/cgi-bin&gt;<br />
+        WSGIApplicationGroup %{GLOBAL}<br />
+        Order deny,allow<br />
+        Allow from all<br />
+    &lt;/Directory&gt;</pre></td></tr></table><p>Now if you restart Apache (<tt>service httpd restart</tt>) and browse to http://myproject.mydomain.tld/trac/, you will get the following error:</p>
+<blockquote>TracError: No Trac environment found at /var/trac/myproject [Errno 13] Permission denied: <em>/var/trac/myproject/VERSION</em><p align="right"></p>
+</blockquote><p>Now we are getting into some CentOS 6 specific territory.  The problem is that CentOS includes SELinux, which adds a much more detailed and configurable security structure on top of the standard Linux security infrastructure inherited from Unix.  Fortunately the fix is easy, when you know what to do:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>chcon -R -t httpd_sys_content_t /var/trac/myproject<br />
+chcon -R -t httpd_sys_script_rw_t /var/trac/myproject<br />
+setsebool -P httpd_can_network_connect on</tt></pre></td></tr></table><p>Now you should be able to connect to your Trac instance at http://myproject.mydomain.tld/trac/.</p>
+<p>Finally, we can map the static resources we exported.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>cp -r /var/trac/myproject/deploy/htdocs /var/www/myproject<font color="#990000">.</font>mydomain<font color="#990000">.</font>tld/trac<font color="#990000">/</font></tt></pre></td></tr></table><p>Edit <tt>/etc/httpd/conf.d/myproject.mydomain.tld.conf</tt> adding the following <strong>before</strong> the <tt>WSGIScriptAlias</tt> directive:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">    Alias /chrome/common /var/www/myproject.mydomain.tld/trac/htdocs/common<br />
+    Alias /chrome/site /var/www/myproject.mydomain.tld/trac/htdocs/site</pre></td></tr></table><p>In <a href="/2013/02/trac-on-centos-63-part-3.html">part 3</a>, I will configure Trac to use an Active Directory instance for authentication.</p>

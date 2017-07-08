@@ -1,0 +1,137 @@
+---
+layout: post
+title: Ruby Play List Copier, Take 2
+date: '2012-08-06T22:35:00.000-04:00'
+author: Raymond DeCampo
+tags:
+- taglib
+- mp3
+- ruby
+- m3u
+modified_time: '2012-08-06T22:35:42.126-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-4157288363017935827
+blogger_orig_url: http://labnotes.decampo.org/2012/08/ruby-play-list-copier-take-2.html
+redirect_from: /2012/08/ruby-play-list-copier-take-2.html
+excerpt_separator: </p>
+---
+
+<p>I finally got back to my little Ruby project over the weekend.  The idea was to write a tool to copy an m3u play list and associated files to my mp3 player since Rhythmbox and Banshee were not up to the task.  I used the ruby-taglib library from <a href="http://robinst.github.com/taglib-ruby/">http://robinst.github.com/taglib-ruby/</a> to access mp3 tags.</p>
+<p>My first attempt was turning out a little too much like an enterprisey Java project so I decided to back up and try to make it a little lighter and more Ruby-esque.  I decided on a module for parsing play lists would allow for the best re-use for that functionality while simple classes would represent play lists and play list entries.  With the library written the main script became the following:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900">#!/usr/bin/env ruby</font></i><br />
+<i><font color="#9A1900">#</font></i><br />
+<b><font color="#000080">require</font></b> <font color="#FF0000">'fileutils'</font><br />
+<b><font color="#000080">require</font></b> <font color="#FF0000">'./playlist-parser'</font><br />
+<br />
+dest_dir <font color="#990000">=</font> File<font color="#990000">::</font>expand_path<font color="#990000">(</font>ARGV<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])</font><br />
+source <font color="#990000">=</font> PlayList<font color="#990000">.</font>new<font color="#990000">(</font>ARGV<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">])</font><br />
+dest <font color="#990000">=</font> PlayList<font color="#990000">.</font>new<font color="#990000">(</font>File<font color="#990000">::</font>join<font color="#990000">(</font>dest_dir<font color="#990000">,</font> File<font color="#990000">::</font>basename<font color="#990000">(</font>source<font color="#990000">.</font>to_s<font color="#990000">)))</font><br />
+<br />
+source<font color="#990000">.</font>read_playlist <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>entry<font color="#990000">|</font><br />
+  basename <font color="#990000">=</font> PlayListEntry<font color="#990000">::</font>sanitize<font color="#990000">(</font>entry<font color="#990000">.</font>artist <font color="#990000">+</font> <font color="#FF0000">' - '</font> <font color="#990000">+</font> entry<font color="#990000">.</font>album <font color="#990000">+</font><br />
+    <font color="#FF0000">' - '</font> <font color="#990000">+</font> entry<font color="#990000">.</font>track <font color="#990000">+</font> <font color="#FF0000">' - '</font> <font color="#990000">+</font> entry<font color="#990000">.</font>title <font color="#990000">+</font> <font color="#FF0000">'.mp3'</font><font color="#990000">)</font><br />
+  dest_entry <font color="#990000">=</font> PlayListEntry<font color="#990000">.</font>new<font color="#990000">(</font>basename<font color="#990000">)</font><br />
+  dest<font color="#990000">.</font>playlist_entries <font color="#990000">&lt;&lt;</font> dest_entry<br />
+  dest_file <font color="#990000">=</font> File<font color="#990000">::</font>join<font color="#990000">(</font>dest_dir<font color="#990000">,</font> dest_entry<font color="#990000">.</font>to_s<font color="#990000">)</font><br />
+  <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> File<font color="#990000">::</font>exists?<font color="#990000">(</font>dest_file<font color="#990000">)</font> <b><font color="#0000FF">then</font></b><br />
+    puts <font color="#FF0000">"#{entry.source} =&gt; #{dest_file}"</font><br />
+    FileUtils<font color="#990000">.</font>copy_file<font color="#990000">(</font>entry<font color="#990000">.</font>source<font color="#990000">,</font> dest_file<font color="#990000">)</font><br />
+  <b><font color="#0000FF">else</font></b><br />
+    puts <font color="#FF0000">"#{dest_file} exists"</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<b><font color="#0000FF">end</font></b><br />
+<br />
+dest<font color="#990000">.</font>write_playlist</tt></pre></td></tr></table><p>This script is pretty simple.  It opens the given play list and iterates over the entries, creating a new play list based on the passed destination directory.  The file is copied over as Rhythmbox and Banshee do, using the tag information to determine the file name.  Then when we are done we write out the new play list.</p>
+<p>The library file is little longer.  It includes a module named <tt>PlayListParser</tt> which had the parsing functionality (such as it is, a play list file is not really very complicated; if you are reading this far open one up in a text editor and you&#8217;ll figure it out no problem).  Then we have the <tt>PlayList</tt> class which includes the parser module and provides a <tt>write_playlist</tt> method.  Finally the <tt>PlayListEntry</tt> which makes tag access convenient.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># http://robinst.github.com/taglib-ruby/</font></i><br />
+<b><font color="#000080">require</font></b> <font color="#FF0000">'taglib'</font><br />
+<br />
+<b><font color="#0000FF">module</font></b> PlayListParser<br />
+<br />
+  attr_accessor <font color="#990000">:</font>playlist<font color="#990000">,</font> <font color="#990000">:</font>playlist_entries<br />
+<br />
+  <b><font color="#0000FF">def</font></b> parse_playlist<font color="#990000">(</font>playlist<font color="#990000">,</font> <font color="#990000">&amp;</font>block<font color="#990000">)</font><br />
+    <font color="#009900">@playlist</font> <font color="#990000">=</font> playlist<br />
+    <font color="#009900">@playlist_entries</font> <font color="#990000">=</font> <font color="#990000">[]</font><br />
+    save_dir <font color="#990000">=</font> Dir<font color="#990000">::</font>pwd<br />
+    Dir<font color="#990000">::</font>chdir<font color="#990000">(</font>File<font color="#990000">::</font>dirname<font color="#990000">(</font>playlist<font color="#990000">))</font><br />
+    File<font color="#990000">.</font>open<font color="#990000">(</font>playlist<font color="#990000">)</font> <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>file<font color="#990000">|</font><br />
+      file<font color="#990000">.</font>readlines<font color="#990000">.</font>each <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>line<font color="#990000">|</font><br />
+        line <font color="#990000">=</font> line<font color="#990000">.</font>strip<br />
+        <b><font color="#0000FF">if</font></b> line<font color="#990000">.</font>empty? <b><font color="#0000FF">or</font></b> line<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">==</font> <font color="#FF0000">'#'</font> <b><font color="#0000FF">then</font></b><br />
+          <b><font color="#0000FF">next</font></b><br />
+        <b><font color="#0000FF">end</font></b><br />
+        <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> File<font color="#990000">.</font>exists?<font color="#990000">(</font>line<font color="#990000">)</font> <b><font color="#0000FF">then</font></b><br />
+          puts <font color="#FF0000">"WARN: File #{line} does not exist in play list #{@playlist}"</font><br />
+        <b><font color="#0000FF">end</font></b><br />
+        entry <font color="#990000">=</font>  PlayListEntry<font color="#990000">.</font>new<font color="#990000">(</font>line<font color="#990000">)</font><br />
+        <font color="#009900">@playlist_entries</font> <font color="#990000">&lt;&lt;</font> entry<br />
+        block<font color="#990000">.</font>call<font color="#990000">(</font>entry<font color="#990000">)</font> <b><font color="#0000FF">unless</font></b> block <font color="#990000">==</font> <b><font color="#0000FF">nil</font></b><br />
+      <b><font color="#0000FF">end</font></b><br />
+    <b><font color="#0000FF">end</font></b><br />
+    Dir<font color="#990000">::</font>chdir<font color="#990000">(</font>save_dir<font color="#990000">)</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">class</font></b> PlayList<br />
+<br />
+  <b><font color="#0000FF">include</font></b> PlayListParser<br />
+<br />
+  <b><font color="#0000FF">def</font></b> initialize<font color="#990000">(</font>playlist<font color="#990000">)</font><br />
+    <font color="#009900">@playlist</font> <font color="#990000">=</font> playlist<br />
+    <font color="#009900">@playlist_entries</font> <font color="#990000">=</font> <font color="#990000">[]</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> read_playlist<font color="#990000">(&amp;</font>block<font color="#990000">)</font><br />
+    parse_playlist<font color="#990000">(</font>playlist<font color="#990000">,</font> <font color="#990000">&amp;</font>block<font color="#990000">)</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> write_playlist<br />
+    File<font color="#990000">::</font>open<font color="#990000">(</font>playlist<font color="#990000">,</font> <font color="#FF0000">'w'</font><font color="#990000">)</font> <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>file<font color="#990000">|</font><br />
+      file<font color="#990000">.</font>puts<font color="#990000">(</font><font color="#FF0000">'#EXTM3U'</font><font color="#990000">)</font><br />
+      file<font color="#990000">.</font>puts<font color="#990000">(</font><font color="#009900">@playlist_entries</font><font color="#990000">)</font><br />
+    <b><font color="#0000FF">end</font></b><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> to_s<br />
+    <b><font color="#0000FF">return</font></b> <font color="#009900">@playlist</font><font color="#990000">.</font>to_s<br />
+  <b><font color="#0000FF">end</font></b><br />
+<b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">class</font></b> PlayListEntry<br />
+<br />
+  <b><font color="#0000FF">def</font></b> <b><font color="#0000FF">self</font></b><font color="#990000">.</font>pad_track<font color="#990000">(</font>track<font color="#990000">)</font><br />
+    <b><font color="#0000FF">return</font></b> <font color="#990000">(</font> track <font color="#990000">&lt;</font> <font color="#993399">10</font> <font color="#990000">?</font> <font color="#FF0000">'0'</font> <font color="#990000">+</font> track<font color="#990000">.</font>to_s <font color="#990000">:</font> track<font color="#990000">.</font>to_s<font color="#990000">)</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> <b><font color="#0000FF">self</font></b><font color="#990000">.</font>sanitize<font color="#990000">(</font>source<font color="#990000">)</font><br />
+    <b><font color="#0000FF">return</font></b> source<font color="#990000">.</font>gsub<font color="#990000">(</font><font color="#FF6600">/[":\?]/</font><font color="#990000">,</font> <font color="#FF0000">'_'</font><font color="#990000">)</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  attr_accessor <font color="#990000">:</font>source<font color="#990000">,</font> <font color="#990000">:</font>album<font color="#990000">,</font> <font color="#990000">:</font>artist<font color="#990000">,</font> <font color="#990000">:</font>comment<font color="#990000">,</font> <font color="#990000">:</font>genre<font color="#990000">,</font> <font color="#990000">:</font>title<font color="#990000">,</font> <font color="#990000">:</font>track<font color="#990000">,</font> <font color="#990000">:</font>year<br />
+<br />
+  <b><font color="#0000FF">def</font></b> initialize<font color="#990000">(</font>source<font color="#990000">)</font><br />
+    <font color="#009900">@source</font> <font color="#990000">=</font> source<br />
+    read_tags<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> read_tags<br />
+    <b><font color="#0000FF">if</font></b> File<font color="#990000">.</font>exists?<font color="#990000">(</font>source<font color="#990000">)</font> <b><font color="#0000FF">then</font></b><br />
+      TagLib<font color="#990000">::</font>FileRef<font color="#990000">.</font>open<font color="#990000">(</font>source<font color="#990000">)</font> <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>fileref<font color="#990000">|</font><br />
+        tag <font color="#990000">=</font> fileref<font color="#990000">.</font>tag<br />
+        <font color="#009900">@album</font> <font color="#990000">=</font> tag<font color="#990000">.</font>album<br />
+        <font color="#009900">@artist</font> <font color="#990000">=</font> tag<font color="#990000">.</font>artist<br />
+        <font color="#009900">@comment</font> <font color="#990000">=</font> tag<font color="#990000">.</font>comment<br />
+        <font color="#009900">@genre</font> <font color="#990000">=</font> tag<font color="#990000">.</font>genre<br />
+        <font color="#009900">@title</font> <font color="#990000">=</font> tag<font color="#990000">.</font>title<br />
+        <font color="#009900">@track</font> <font color="#990000">=</font> PlayListEntry<font color="#990000">::</font>pad_track<font color="#990000">(</font>tag<font color="#990000">.</font>track<font color="#990000">)</font><br />
+        <font color="#009900">@year</font> <font color="#990000">=</font> tag<font color="#990000">.</font>year <b><font color="#0000FF">unless</font></b> tag<font color="#990000">.</font>year <font color="#990000">==</font> <font color="#993399">0</font><br />
+      <b><font color="#0000FF">end</font></b><br />
+    <b><font color="#0000FF">end</font></b><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> to_s<br />
+    <b><font color="#0000FF">return</font></b> <font color="#009900">@source</font><font color="#990000">.</font>to_s<br />
+  <b><font color="#0000FF">end</font></b><br />
+<b><font color="#0000FF">end</font></b></tt></pre></td></tr></table><p>One drawback of the parser is the use of the current working directory to handle relative paths in the play list file.  This construct makes the <tt>parse_playlist</tt> method not thread-safe.  (I can&#8217;t help but think about these things after working on servers; but I left it that way since this is supposed to be a simple script.)</p>
+<p>In the end I learned a few useful things along the way, like the difference between <tt>sub</tt> and <tt>gsub</tt> as well as some of the characters that are escaped by Rhythmbox and Banshee when making file names.  Also how to split up a Ruby project into more than one file.  And I ended up with something I can actually use.  All in all a successful excursion into Ruby.</p>
