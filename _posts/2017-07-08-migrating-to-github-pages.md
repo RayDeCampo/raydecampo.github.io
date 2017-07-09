@@ -9,7 +9,7 @@ tags:
 - ruby
 ---
 
-Finally took the plunge to migrate my old Blogger blog to the more convenient GitHub Pages.  Like everybody discovered, it wasn't as easy as it seemed at first.
+I finally took the plunge to migrate my old Blogger blog to the more convenient GitHub Pages.  Like everybody else I found when googling this topic discovered, it wasn't as easy as it seemed at first.
 
 Using the jekyll-importer on the exported data from Blogger was straightforward and fast.
 
@@ -40,4 +40,4 @@ feed:
   path: /feeds/posts/default
 ```
 
-Once this is up and running I will figure out how to use a custom domain.
+Once this is up and running I will figure out how to use a custom domain.  UPDATE: Using a custom domain turned out to be pretty easy, just a change in the GitHub project Settings and update my DNS and all set.
