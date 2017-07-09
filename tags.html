@@ -14,7 +14,7 @@ https://codinfox.github.io/dev/2015/03/06/use-tags-and-categories-in-your-jekyll
 The purpose of this snippet is to list all the tags you have in your site.
 =======================
 {% endcomment %}
-<div class="alltags tags">
+<div class="alltags">
 {% for tag in tags %}
 	<a href="#{{ tag | slugify }}">{{ tag }}</a>
 {% endfor %}

@@ -3,12 +3,30 @@
 
 @import "{{ site.theme }}";
 
+/* Theme has changes at 960px and 720px */
+$width-small: 960px;
+$width-smaller: 720px;
+
 .alltags {
   column-count: 4;
+  font-size: smaller;
   a {
       display: block;
   }
 }
+
+@media(max-width: $width-small) {
+  .alltags {
+    column-count: 3;
+  }
+}
+
+@media(max-width: $width-smaller) {
+  .alltags {
+    column-count: 2;
+  }
+}
+
 
 .tags {
   text-align: right;
@@ -27,6 +45,32 @@ header {
     
     &:hover {
       text-decoration: none;
+    }
+  }
+}
+
+@media(max-width: $width-small) {
+  header {
+    ul {
+      width: 160px;
+      right: 120px;
+    }
+    li {
+      display: inline-block;
+      width: 61px;
+    }
+  }
+}
+
+@media(max-width: $width-smaller) {
+  header {
+    ul {
+      position: static;
+      width: 100%;
+    }
+    li {
+      display: inline-block;
+      width: 61px;
     }
   }
 }
