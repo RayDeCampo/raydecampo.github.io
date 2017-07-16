@@ -14,7 +14,7 @@ Changes here need to be duplicated in home.html unless you fix that.
 
   <div class="tags">
   {% for tag in page.tags %}
-    <a href="tags.html#{{ tag | slugify }}">{{ tag }}</a>
+    <a href="{{ site.baseurl }}/tags.html#{{ tag | slugify }}">{{ tag }}</a>
   {% endfor %}
   </div>
   
