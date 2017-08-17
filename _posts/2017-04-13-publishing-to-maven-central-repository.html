@@ -18,13 +18,29 @@ excerpt_separator: </p>
 
 <p>As an exercise in creating a Java library and submitting it to the Central Repository, I created an implementation of the xirr (irregular internal rate of return) function in Java. </p>
 
-<p>If you are interested in what needs to be done to publish to the Maven Central Repository, check out the <a href="https://github.com/RayDeCampo/java-xirr/blob/def7c2ce96654e21c7f41636aab5112cfb20a2da/pom.xml">pom.xml</a> for starters.  The <code>distributionManagement</code> section contains configuration for pointing to the Nexus Repository Manager at oss.sonatype.org.  This Nexus installation is used as a staging platform for the Central Repository. </p>
+<p>If you are interested in what needs to be done to publish to the Maven Central Repository, check out the <a href="https://github.com/RayDeCampo/java-xirr/blob/def7c2ce96654e21c7f41636aab5112cfb20a2da/pom.xml">xirr pom.xml</a> for starters.  The <code>distributionManagement</code> section contains configuration for pointing to the Nexus Repository Manager at oss.sonatype.org.  This Nexus installation is used as a staging platform for the Central Repository. </p>
 <p>Next in the <code>plugins</code> section we include the <code>maven-source-plugin</code> and <code>maven-javadoc-plugin</code> in order to generate the source and javadoc jars for the repository.  Your library will not be accepted without these. </p>
 <p>Next there is the <code>maven-gpg-plugin</code> for generating signature files for the artifacts.  In order to generate the signature files, you will need to have a GPG key and placed the public key on a keyserver.  If you don't have this already, google for some GPG tutorials.  More about this in a moment. </p>
 <p>Finally in the <code>pom.xml</code> we have the <code>nexus-staging-maven-plugin</code> plugin configuration.  This plugin overrides the standard deploy plugin to interact with the Nexus Repository Manager. </p>
 <p>Both the oss.sonatype.org and the GPG key have authentication credentials which need to be managed as part of the build process.  To begin, you need to create a maven master password if you have not already done so.  If you are not sure, look for the <code>~/.m2/settings-security.xml</code> file to see if it has a <code>master</code> element.  All the passwords for maven configuration can be encrypted.  To generate an encrypted master password, issue the command <code>mvn --encrypt-master-password</code> and then place the result in your <code>~/.m2/settings-security.xml</code>: </p>
 <script src="https://gist.github.com/RayDeCampo/fa0135b4a8c3615cbc435779dbd428f7.js"></script><p>Then you need to encrypt your passwords using <code>mvn --encrypt-password</code> and put them in your <code>~/.m2/settings.xml</code>: </p>
 <script src="https://gist.github.com/RayDeCampo/f3ead6e3f054028d896f5ba251ed4598.js"></script><p>Note that the first <code>server id</code> corresponds with the <code>id</code> in the <code>distributionManagement</code> section of the <code>pom.xml</code>.  The second <code>server id</code> is used by the <code>maven-gpg-plugin</code> by default.  Of course that can be changed by configuration, see the documentation of that plugin for details. </p>
-<p>Finally, there is a pretty cool <a href="https://github.com/RayDeCampo/java-xirr/blob/def7c2ce96654e21c7f41636aab5112cfb20a2da/src/main/java/org/decampo/xirr/Xirr.java">implementation of the xirr</a> function in there as well.  Not to mention a <a href="https://github.com/RayDeCampo/java-xirr/blob/def7c2ce96654e21c7f41636aab5112cfb20a2da/src/main/java/org/decampo/xirr/NewtonRaphson.java#L85">concise implementation of Newton-Raphson</a> using Java 8 features. </p>
+<p>When configuring the <code>nexus-staging-maven-plugin</code> in your <code></code>
+set the <code>autoReleaseAfterClose</code> property to false.  This will allow 
+you to examine the artifacts on the <a href="https://oss.sonatype.org">Sonatype 
+OSSRH server</a> before pushing to the Central Repository.  After issuing 
+<code>mvn clean deploy</code> verify the artifacts and then use 
+<code>mvn nexus-staging:release</code> to move forward
+or <code>mvn nexus-staging:drop</code> to start over.</p>
+<p>Again, you can see this in action at the 
+<a href="https://github.com/RayDeCampo/java-xirr">java-xirr</a> on GitHub.
+Also, there is a pretty cool 
+<a href="https://github.com/RayDeCampo/java-xirr/blob/def7c2ce96654e21c7f41636aab5112cfb20a2da/src/main/java/org/decampo/xirr/Xirr.java">implementation 
+of the xirr</a> function in there as well if you are into that kind of thing.  
+Not to mention a 
+<a href="https://github.com/RayDeCampo/java-xirr/blob/def7c2ce96654e21c7f41636aab5112cfb20a2da/src/main/java/org/decampo/xirr/NewtonRaphson.java#L85">concise 
+implementation of Newton-Raphson</a> using Java 8 features. </p>
 <p>Additional Resources:</p>
-<ul><li><a href="http://central.sonatype.org/pages/apache-maven.html">http://central.sonatype.org/pages/apache-maven.html</a></li><li><a href="https://oss.sonatype.org/">https://oss.sonatype.org/</a></li></ul>
+<ul>
+<li><a href="http://central.sonatype.org/pages/apache-maven.html">http://central.sonatype.org/pages/apache-maven.html</a></li>
+<li><a href="https://oss.sonatype.org/">https://oss.sonatype.org/</a></li></ul>
