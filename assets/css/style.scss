@@ -15,6 +15,12 @@ $width-smaller: 720px;
   }
 }
 
+@media(min-width:$width-small) {
+  section {
+    width: 700px;
+  }
+}
+
 @media(max-width: $width-small) {
   .alltags {
     column-count: 3;
