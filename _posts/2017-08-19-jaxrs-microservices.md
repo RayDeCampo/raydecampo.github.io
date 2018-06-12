@@ -63,7 +63,7 @@ For the return value, we could have just returned a `double`, and that would hav
 
 ### Error Handling
 
-Finally you might notice we are catching the `IllegalArgumentException`s throws by the xirr library and converting them into a custom exception, `ServiceException`.  This allows us to define an [ExceptionMapper](https://docs.oracle.com/javaee/7/api/javax/ws/rs/ext/ExceptionMapper.html) to handle the errors ([full source](https://github.com/RayDeCampo/rest-xirr/blob/63d284b800c16df35c67fff4c372d446f26a427e/server/src/main/java/org/decampo/rest/ServiceExceptionMapper.java#L13)):
+Finally you might notice we are catching the `IllegalArgumentException`s thrown by the xirr library and converting them into a custom exception, `ServiceException`.  This allows us to define an [ExceptionMapper](https://docs.oracle.com/javaee/7/api/javax/ws/rs/ext/ExceptionMapper.html) to handle the errors ([full source](https://github.com/RayDeCampo/rest-xirr/blob/63d284b800c16df35c67fff4c372d446f26a427e/server/src/main/java/org/decampo/rest/ServiceExceptionMapper.java#L13)):
 
 ```java
 @Provider
