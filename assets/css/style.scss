@@ -6,6 +6,8 @@
 /* Theme has changes at 960px and 720px */
 $width-small: 960px;
 $width-smaller: 720px;
+// Not from the theme
+$width-smallest: 580px;
 
 .alltags {
   column-count: 4;
@@ -118,11 +120,15 @@ div .code {
 
 pre {
   width: max-content;
-  min-width: 650px;
 }
 
-p {
-  width: 650px;
+@media(min-width: $width-smaller) {
+  p {
+    width: 650px
+  }
+  pre {
+    min-width: 650px;
+  }
 }
 
 @media(min-width: $width-small) {
@@ -159,11 +165,9 @@ header li {
 
 header ul {
   padding: 10px 10px 0 0;
-  // position: absolute;
-  // right: 50px;
-  // top: 36px;
   float: right;
   width: unset;
+  margin-bottom: 0;
 }
 
 @media(max-width: $width-small) {
@@ -174,7 +178,19 @@ header ul {
   }
 }
 
+@media(max-width: $width-smallest) {
+  header ul {
+    float: unset;
+    display: block;
+    height: 42px;
+  }
+}
+
 footer {
   float: unset;
   right: 50px;
+
+  a {
+    display: inline;
+  }
 }
