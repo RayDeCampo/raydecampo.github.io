@@ -35,14 +35,15 @@ $ more jwtRS256.key.pub
 Here we configure Wildfly to enforce the presence of a bearer token for secure application resources.  Start the WildFly admin command line interface:
 
 ```bash
-$ cd $WILDFLY_HOME/bin
-$ ./jboss-cli.sh --connect
+cd $WILDFLY_HOME/bin
+./jboss-cli.sh --connect
 ```
 
 The remaining commands in this section are input for the WildFly admin CLI.
 
 Add a new token security realm to elytron for authentication using JWTs, using the public key that was generated.  Replace the fake key below with the key from your `jwtRS256.key.pub` file:
 
+```none
     /subsystem=elytron/token-realm=jwt-realm:add( \
         jwt={ \
             issuer=["my-application-issuer"], \
@@ -62,18 +63,22 @@ Add a new token security realm to elytron for authentication using JWTs, using t
     7ZFoJOusLdXxfouD8WGy5oMCAwEAAQ==
     -----END PUBLIC KEY-----" \
         },principal-claim="sub")
+```
 
 Add a new security domain, which uses the jwt security realm:
 
+```none
     /subsystem=elytron/security-domain=jwt-domain:add( \
         realms=[{ \
             realm=jwt-realm, \
             role-decoder=groups-to-roles \
         }],permission-mapper=default-permission-mapper, \
         default-realm=jwt-realm)
+```
 
 Create http authentication factory that uses BEARER_TOKEN authentication:
 
+```none
     /subsystem=elytron/http-authentication-factory=jwt-http-authentication:add( \
         security-domain=jwt-domain, \
         http-server-mechanism-factory=global, \
@@ -82,11 +87,14 @@ Create http authentication factory that uses BEARER_TOKEN authentication:
             mechanism-realm-configurations=[{ \
                 realm-name="jwt-realm" \
         }]}])
+```
 
 Configure Undertow to use our http authentication factory for authentication:
-    
+
+```none
     /subsystem=undertow/application-security-domain=other:add( \
         http-authentication-factory=jwt-http-authentication)
+```
 
 ## Configure the Web Application
 
@@ -174,7 +182,7 @@ Next we make a producer method for the `PrivateKey` instance:
     }
 ```
 
-Now the code to create the token using the [Nimbus + JOSE library](https://connect2id.com/products/nimbus-jose-jwt): 
+Now the code to create the token using the [Nimbus + JOSE library](https://connect2id.com/products/nimbus-jose-jwt):
 
 ```java
     @Inject
