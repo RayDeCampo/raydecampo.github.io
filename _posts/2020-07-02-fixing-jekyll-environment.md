@@ -18,13 +18,13 @@ The error I was getting when running jekyll (actually `bundle exec jekyll serve`
 
 The library belonged to the commonmark gem.  I tried reinstalling it via `bundle` and via `gem` both as a regular user and as root.  No luck, it refused to find the shared library that was right where it claimed to be looking for it.
 
-So I figured I'd burn the whole thing down and try again.  First thing was to 
+So I figured I'd burn the whole thing down and try again.  First thing was to
 uninstall all gems using `gem`.  User-level gems were not much of a problem, I just used `gem uninstall -aIx`.  For system-level gems I had to repeatedly alternate between these commands until there were no more gems remaining:
 
 ```shell
 sudo gem uninstall -aIx
-sudo gem uninstall -i /usr/local/share/gems -aIx 
-sudo gem uninstall -i /usr/share/gems -aIx 
+sudo gem uninstall -i /usr/local/share/gems -aIx
+sudo gem uninstall -i /usr/share/gems -aIx
 ```
 
 With all the gems annihilated from the system, time to reinstall ruby:
@@ -49,8 +49,8 @@ bundle install
 # Verify it works
 bundle exec jekyll serve
 # commit the Gemfile changes
-git add Gemfile Gemfile.lock 
-git commit 
+git add Gemfile Gemfile.lock
+git commit
 git push
 ```
 
