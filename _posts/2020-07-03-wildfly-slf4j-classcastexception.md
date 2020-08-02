@@ -5,8 +5,8 @@ date: '2020-07-03T14:00:00.000-04:00'
 author: Raymond DeCampo
 tags:
 - slf4j
-- wildfly
-- jboss
+- WildFly
+- JBoss
 - shibboleth
 ---
 
