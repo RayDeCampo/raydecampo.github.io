@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf ./_site",
-    "build": "npm run clean && eleventy",
+    "build": "npm run clean && npm run sass && eleventy",
+    "sass": "sass assets/css/style.scss assets/css/style.css",
     "start": "eleventy --serve --watch"
   },
   "repository": {

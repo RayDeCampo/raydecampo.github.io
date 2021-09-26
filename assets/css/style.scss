@@ -1,7 +1,4 @@
----
----
-
-@import "{{ site.theme }}";
+/** @import "{{ site.theme }}"; */
 
 /* Theme has changes at 960px and 720px */
 $width-small: 960px;

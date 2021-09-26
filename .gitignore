@@ -4,3 +4,5 @@ _site
 _drafts
 src/_drafts
 node_modules
+assets/css/style.css
+assets/css/style.css.map
