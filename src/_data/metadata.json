@@ -10,7 +10,10 @@
         "id": "http://labnotes.decampo.org/"
     },
     "author": {
-        "name": "Raymond DeCampo",
-        "email": "ray@decampo.org"
+        "name": "Ray DeCampo",
+        "email": "ray@decampo.org",
+        "github": "https://github.com/RayDeCampo",
+        "twitter": "https://twitter.com/iamdoingitwrong",
+        "linkedin": "https://www.linkedin.com/in/raymonddecampo/"
     }
 }
