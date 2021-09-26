@@ -16,12 +16,14 @@ you do not need to manually collect your tags to a place.
 Produces: rawtags
 =======================
 {% endcomment %}
+{% comment %}
 {% assign rawtags = "" %}
 {% for post in site.posts %}
 	{% assign ttags = post.tags | join:',' | append:',' %}
 	{% assign rawtags = rawtags | append:ttags %}
 {% endfor %}
 {% assign rawtags = rawtags | split:',' %}
+{% endcomment %}
 
 {% comment %}
 =======================
@@ -31,6 +33,7 @@ the rawtags variable and generates alltags.
 Produces: alltags, lowertags
 =======================
 {% endcomment %}
+{% comment %}
 {% assign alltags = "" %}
 {% for tag in rawtags %}
 	{% if tag != "" %}
@@ -43,6 +46,7 @@ Produces: alltags, lowertags
 	{% endif %}
 {% endfor %}
 {% assign lowertags = alltags | join:',' | downcase | split:',' | sort %}
+{% endcomment %}
 
 {% comment %}
 =======================
@@ -51,6 +55,7 @@ Match up original tag with lower tag, preserving lower tag order
 Produces: tags
 =======================
 {% endcomment %}
+{% comment %}
 {% assign tags = "" %}
 {% for lowertag in lowertags %}
 	{% if lowertag != "" %}
@@ -66,3 +71,4 @@ Produces: tags
 	{% endif %}
 {% endfor %}
 {% assign tags = tags | split:',' %}
+{% endcomment %}
