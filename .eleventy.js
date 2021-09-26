@@ -1,6 +1,10 @@
+const pluginRss = require("@11ty/eleventy-plugin-rss");
+
 module.exports = (eleventyConfig) => {
   // Copy the "assets" directory to the compiled "_site" folder.
   eleventyConfig.addPassthroughCopy('assets');
+
+  eleventyConfig.addPlugin(pluginRss);
 
   eleventyConfig.addCollection('posts', function(collection) {
     return collection.getFilteredByGlob('src/_posts/*').reverse();
@@ -12,6 +16,10 @@ module.exports = (eleventyConfig) => {
 
   eleventyConfig.addCollection('otherPosts', function(collections) {
     return collections.getFilteredByGlob('src/_posts/*').reverse().slice(1);
+  });
+
+  eleventyConfig.addCollection('rssPosts', function(collections) {
+    return collections.getFilteredByGlob('src/_posts/*').reverse().slice(0, 10);
   });
 
   eleventyConfig.setFrontMatterParsingOptions({
