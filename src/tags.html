@@ -16,7 +16,7 @@ The purpose of this snippet is to list all the tags you have in your site.
 =======================
 {% endcomment %}
 <div class="alltags">
-{% for tag in tags %}
+{% for tag in collections.tags %}
 	<a href="#{{ tag | slugify }}">{{ tag }}</a>
 {% endfor %}
 </div>
@@ -26,16 +26,16 @@ The purpose of this snippet is to list all the tags you have in your site.
 The purpose of this snippet is to list all your posts posted with a certain tag.
 =======================
 {% endcomment %}
-{% for tag in tags %}
+{% for tag in collections.tags %}
 	<h2 id="{{ tag | slugify }}">{{ tag }}</h2>
 	<ul>
-	 {% for post in site.posts %}
-		 {% if post.tags contains tag %}
+	 {% for post in collections.posts %}
+		 {% if post.data.tags contains tag %}
 		 <li>
        <small style="float: right">{{ post.date | date: "%B %e, %Y" }}</small>
        <h3>
          <a href="{{ post.url }}">
-         {{ post.title }}
+         {{ post.data.title }}
          </a>
        </h3>
 		 </li>
