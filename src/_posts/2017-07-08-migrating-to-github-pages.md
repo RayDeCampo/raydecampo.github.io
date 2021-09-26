@@ -11,6 +11,7 @@ tags:
 ---
 
 I finally took the plunge to migrate my old Blogger blog to the more convenient GitHub Pages.  Like everybody else I found when googling this topic discovered, it wasn't as easy as it seemed at first.
+<!-- excerpt -->
 
 Using the jekyll-importer on the exported data from Blogger was straightforward and fast.
 

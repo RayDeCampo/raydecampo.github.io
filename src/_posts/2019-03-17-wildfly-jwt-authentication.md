@@ -12,6 +12,7 @@ tags:
 ---
 
 In this post we describe how to configure WildFly to access JSON Web Tokens (JWT) via the Authentication header using the Bearer schema.  This allows you to install stateless authenticated REST services on WildFly.
+<!-- excerpt -->
 
 **NOTE:** Another way to accomplish this is to use the KeyCloak server and install its components in your WildFly server.  For large deployments that is the better approach.  This approach is more suitable to a small deployment where KeyCloak would be overkill.
 

@@ -1,0 +1,20 @@
+  <article class="post">
+
+    <h3><a href="{{ site.baseurl }}{{ post.url }}">{{ post.data.title }}</a></h3>
+    
+    <div class="date">
+      {{ post.date | date: "%B %e, %Y" }}
+    </div>
+    
+    <div class="tags">
+    {% for tag in post.data.tags %}
+      <a href="tags.html#{{ tag | slugify }}">{{ tag }}</a>
+    {% endfor %}
+    </div>
+
+    <div class="entry">
+      {{ post.data.page.excerpt | safe }}
+    </div>
+
+    <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Read More</a>
+  </article>

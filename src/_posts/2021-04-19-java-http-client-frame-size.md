@@ -11,6 +11,7 @@ tags:
 ---
 
 If you hit this error when using the HTTP client built into Java:
+<!-- excerpt -->
 
 ```text
 Caused by: java.io.IOException: protocol error: Frame type(80) length(4740180) exceeds MAX_FRAME_SIZE(16384)

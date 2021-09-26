@@ -10,6 +10,7 @@ tags:
 ---
 
 GitHub Pages famously does not support the [`sort_natural`](https://shopify.github.io/liquid/filters/sort_natural/) filter from the [Liquid](https://shopify.github.io/liquid/) templating language used by [Jekyll](https://jekyllrb.com/docs/templates/).  So some chicanery is needed to get a list of tags sorted without regard to case.
+<!-- excerpt -->
 
 I haven't seen a complete solution on the internet which satisfied me.  Originally I settled on the partial solution by codeinfox: <https://codinfox.github.io/dev/2015/03/06/use-tags-and-categories-in-your-jekyll-based-github-pages/>.  But I realized we could do better with a little effort.
 

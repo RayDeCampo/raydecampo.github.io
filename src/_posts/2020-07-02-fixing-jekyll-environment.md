@@ -14,6 +14,7 @@ tags:
 ---
 
 So after a couple of updates and who knows what else, I found myself with an environment (Fedora 32 if you were wondering) that would no longer run jekyll.  This really caused by blogging level to stop completely since I couldn't preview any of the posts.  As the potential posts piled up in my drafts folder, I eventually carved out some time to take care of this.
+<!-- excerpt -->
 
 The error I was getting when running jekyll (actually `bundle exec jekyll serve`) was downright perplexing.  It would complain that a shared library for one of the dependent gems was missing.  The error message gave the full path to the file.  The perplexing thing is that the file existed and my user had permissions to read it.
 

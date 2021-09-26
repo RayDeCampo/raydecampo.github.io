@@ -12,6 +12,7 @@ tags:
 ---
 
 If you are getting the following error on WildFly or JBoss:
+<!-- excerpt -->
 
 > Caused by: java.lang.ClassCastException: class org.slf4j.impl.Slf4jLoggerFactory cannot be cast to class ch.qos.logback.classic.LoggerContext (org.slf4j.impl.Slf4jLoggerFactory is in unnamed module of loader 'org.slf4j.impl@1.0.4.GA' @604f2c4f; ch.qos.logback.classic.LoggerContext is in unnamed module of loader 'deployment.idp.war' @4206bf50)"
 

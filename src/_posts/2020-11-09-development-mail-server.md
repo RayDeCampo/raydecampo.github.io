@@ -17,6 +17,7 @@ tags:
 ---
 
 As you are probably aware, any sufficiently developed software application will eventually grow until it implements email.  A frequent stepping stone along that evolutionary path is for an application to gain the ability to send email.  If your application sends email, at a certain point it will become inconvenient to continue to use real email addresses and servers when developing and testing the application.  The solution is to set up a development mail server.
+<!-- excerpt -->
 
 An important note about the development mail server is that it should NOT participate in the delivery or relay of real email.  If you configure it wrong and create an open relay for spam, expect an angry communication from your ISP, usually invoking your name in vain and threatening termination of services.
 

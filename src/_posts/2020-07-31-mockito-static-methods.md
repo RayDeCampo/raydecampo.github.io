@@ -10,6 +10,7 @@ tags:
 ---
 
 Mockito has been able to mock static methods since version 3.4.0 but the documentation doesn't explain how to mock methods that take arguments.
+<!-- excerpt -->
 
 E.g. to mock the JavaMail Transport class:
 

@@ -12,6 +12,7 @@ tags:
 ---
 
 The following documents installing an actual certificate in on WildFly 20, although these steps have been tested on WildFly 19 as well.
+<!-- excerpt -->
 
 In order to configure WildFly to use HTTPS with an actual certificate, we start by generating a certificate request:
 

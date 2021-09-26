@@ -16,6 +16,7 @@ When converting a Hyper-V VM to KVM (as used in CentOS or RHEL) it is not enough
 to simply convert the disk from vhd to qcow2 using `qemu`.  Doing so will result
 in errors concerning `dracut` timing out.  Instead one must convert the guest OS
 as well by using `virt-v2v`.
+<!-- excerpt -->
 
 Sometimes you will run into the following error when attempting to convert the
 disk:

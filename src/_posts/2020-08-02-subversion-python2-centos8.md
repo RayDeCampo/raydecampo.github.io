@@ -16,6 +16,7 @@ tags:
 ---
 
 I recently needed to install Trac 1.4 on a CentOS 8 server.  Trac 1.4 still uses Python 2 and while CentOS 8 supports Python 2, Python 3 is the default.  I suspect this went into the decision not to offer any Python bindings for Subversion in the CentOS 8 repositories.
+<!-- excerpt -->
 
 I also checked WANDisco, which typically has advanced versions of Subversion packaged for CentOS, but they did not have the Python bindings for Python 2, only Python 3.
 

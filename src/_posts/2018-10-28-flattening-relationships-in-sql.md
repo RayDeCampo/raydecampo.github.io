@@ -10,6 +10,7 @@ tags:
 ---
 
 I've been sitting on this one for a while, finally getting around to publishing.
+<!-- excerpt -->
 
 The idea is you have an object with a number of relationships to other objects
 where there is no correlation between the relationships.  We will use the 
