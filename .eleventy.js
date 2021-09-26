@@ -4,16 +4,10 @@ module.exports = (eleventyConfig) => {
 
   return {
     dir: {
-      input: './',
-      output: './_site',
-      layouts: './_layouts',
+      input: 'src',
+      output: '_site',
+      layouts: '_layouts',
     },
-    templateFormats: [
-      'html',
-      'liquid',
-      'md',
-      'njk',
-    ]
-//    pathPrefix: '/<repo_name>/', // omit this line if using custom domain
+    templateFormats: ['html', 'liquid', 'md', 'njk']
   };
 };
