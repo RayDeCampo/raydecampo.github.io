@@ -2,6 +2,7 @@
 layout: post
 title: Mocking Static Methods in Mockito
 date: '2020-07-31T09:00:00.000-04:00'
+permalink: 2020/07/31/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - mockito

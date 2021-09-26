@@ -2,6 +2,7 @@
 layout: post
 title: Convert Hyper-V disk to KVM
 date: '2020-07-11T15:00:00.000-04:00'
+permalink: 2020/07/11/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - vm

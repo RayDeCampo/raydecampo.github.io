@@ -3,6 +3,7 @@ layout: post
 title: Frame Size Issue with Java HTTP Client
 date: '2021-04-19T16:00:00.000-04:00'
 author: Raymond DeCampo
+permalink: 2021/04/19/{{ page.fileSlug }}.html
 tags:
 - java
 - http

@@ -2,6 +2,7 @@
 layout: post
 title: Compiling Subversion Python 2 Bindings for CentOS 8
 date: '2020-08-02T11:00:00.000-04:00'
+permalink: 2020/08/02/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - CentOS

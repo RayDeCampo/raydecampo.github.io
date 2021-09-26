@@ -2,6 +2,7 @@
 layout: post
 title: SLF4J issue with WildFly
 date: '2020-07-03T14:00:00.000-04:00'
+permalink: 2020/07/03/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - slf4j

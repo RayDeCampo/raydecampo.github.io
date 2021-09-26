@@ -2,6 +2,7 @@
 layout: post
 title: Fixing my Borked Ruby Environment
 date: '2020-07-02T10:00:00.000-04:00'
+permalink: 2020/07/02/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - ruby

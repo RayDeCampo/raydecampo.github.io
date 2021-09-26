@@ -2,6 +2,7 @@
 layout: post
 title: JAX-RS Microservices
 date: '2017-08-19T07:00:00.000-04:00'
+permalink: 2017/08/19/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - java

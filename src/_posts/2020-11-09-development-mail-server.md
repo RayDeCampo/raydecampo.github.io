@@ -2,6 +2,7 @@
 layout: post
 title: Development Mail Server (CentOS 8)
 date: '2020-11-09T16:00:00.000-05:00'
+permalink: 2020/11/09/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - mail

@@ -2,6 +2,7 @@
 layout: post
 title: HTTPS for WildFly 20
 date: '2020-08-09T12:00:00.000-04:00'
+permalink: 2020/08/09/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - WildFly

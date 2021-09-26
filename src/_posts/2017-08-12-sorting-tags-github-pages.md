@@ -2,6 +2,7 @@
 layout: post
 title: Case-insensitive Tag Sorting on GitHub Pages
 date: '2017-08-12T09:00:00.000-04:00'
+permalink: 2017/08/12/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - github pages

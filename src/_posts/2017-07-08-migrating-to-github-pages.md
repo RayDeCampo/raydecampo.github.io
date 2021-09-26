@@ -2,6 +2,7 @@
 layout: post
 title: Migrating to GitHub Pages
 date: '2017-07-08T09:30:00.000-04:00'
+permalink: 2017/07/08/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - github pages

@@ -2,6 +2,7 @@
 layout: post
 title: Flattening Relationships in SQL
 date: '2018-10-28T16:00:00.000-04:00'
+permalink: 2018/10/28/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - sql

@@ -2,6 +2,7 @@
 layout: post
 title: Configuring Wildfly for JWT Authentication
 date: '2019-03-17T08:00:00.000-04:00'
+permalink: 2019/03/17/{{ page.fileSlug }}.html
 author: Raymond DeCampo
 tags:
 - WildFly
