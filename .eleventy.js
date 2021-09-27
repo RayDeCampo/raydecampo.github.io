@@ -9,7 +9,6 @@ module.exports = (eleventyConfig) => {
   eleventyConfig.addPlugin(pluginRss);
   eleventyConfig.addPlugin(syntaxHighlight, {
     init: function({Prism}) {
-      console.log(arguments);
       Prism.languages.none = {};
     }
   });
