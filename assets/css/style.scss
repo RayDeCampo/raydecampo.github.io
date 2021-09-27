@@ -1,10 +1,10 @@
-/** @import "{{ site.theme }}"; */
-
 /* Theme has changes at 960px and 720px */
 $width-small: 960px;
 $width-smaller: 720px;
 // Not from the theme
 $width-smallest: 580px;
+
+$theme-background: #FBFAF7;
 
 .alltags {
   column-count: 4;
@@ -186,6 +186,7 @@ header ul {
 footer {
   float: unset;
   right: 50px;
+  background: $theme-background;
 
   a {
     display: inline;
