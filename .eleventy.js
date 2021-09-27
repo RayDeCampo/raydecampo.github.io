@@ -1,10 +1,17 @@
 const pluginRss = require("@11ty/eleventy-plugin-rss");
+const syntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 
 module.exports = (eleventyConfig) => {
   // Copy the "assets" directory to the compiled "_site" folder.
   eleventyConfig.addPassthroughCopy('assets');
 
   eleventyConfig.addPlugin(pluginRss);
+  eleventyConfig.addPlugin(syntaxHighlight, {
+    init: function({Prism}) {
+      console.log(arguments);
+      Prism.languages.none = {};
+    }
+  });
 
   eleventyConfig.addCollection('posts', function(collections) {
     return collections.getFilteredByGlob('src/_posts/*').reverse();

@@ -107,7 +107,7 @@ Caused by: org.jboss.resteasy.core.NoMessageBodyWriterFoundFailure: Could not fi
 
 Finally what microservice would be complete without a Docker image?  The `Dockerfile` is simple and uses WildFly as the application server, but there is no reason any other compliant server could not be used ([full source](https://github.com/RayDeCampo/rest-xirr/blob/63d284b800c16df35c67fff4c372d446f26a427e/server/Dockerfile)):
 
-```Dockerfile
+```docker
 FROM jboss/wildfly:latest
 ADD target/*.war /opt/jboss/wildfly/standalone/deployments/
 ```

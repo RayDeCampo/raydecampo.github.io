@@ -145,7 +145,7 @@ Finally, once the VM is booted, we should repair the filesystem in case it still
 thinks it has the old size.  To repair filesystem, go into rescue mode, unmount,
 run fsck/xfs_repair, remount and exit:
 
-```console
+```none
 # systemctl rescue
 # umount /dev/mapper/centos_virdisk-home
 # fsck /dev/mapper/centos_virdisk-home
