@@ -34,6 +34,10 @@ module.exports = (eleventyConfig) => {
     excerpt_separator: '<!-- excerpt -->'
   });
 
+  eleventyConfig.addShortcode('millis', function() {
+    return Date.now();
+  });
+
   // TAGS
   eleventyConfig.addCollection('tags', function(collections) {
     const tagSet = new Set();
