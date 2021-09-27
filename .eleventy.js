@@ -1,8 +1,9 @@
+const child_process = require('child_process');
 const pluginRss = require("@11ty/eleventy-plugin-rss");
 const syntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 
 module.exports = (eleventyConfig) => {
-  // Copy the "assets" directory to the compiled "_site" folder.
+  // Copy the "assets" directory to the compiled output folder.
   eleventyConfig.addPassthroughCopy('assets');
   eleventyConfig.addPassthroughCopy({'assets/favicon': '/'});
   eleventyConfig.addPassthroughCopy('CNAME');
@@ -35,8 +36,9 @@ module.exports = (eleventyConfig) => {
     excerpt_separator: '<!-- excerpt -->'
   });
 
-  eleventyConfig.addShortcode('millis', function() {
-    return Date.now();
+  const revision = child_process.execSync('git rev-parse HEAD').toString().trim();
+  eleventyConfig.addShortcode('revision', function() {
+    return revision;
   });
 
   // TAGS
