@@ -5,6 +5,7 @@ module.exports = (eleventyConfig) => {
   // Copy the "assets" directory to the compiled "_site" folder.
   eleventyConfig.addPassthroughCopy('assets');
   eleventyConfig.addPassthroughCopy({'assets/favicon': '/'});
+  eleventyConfig.addPassthroughCopy('CNAME');
 
   eleventyConfig.addPlugin(pluginRss);
   eleventyConfig.addPlugin(syntaxHighlight, {
