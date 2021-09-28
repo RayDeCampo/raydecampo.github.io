@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Ubuntu 12.10: Minidlna on Boot</h1>
+  
+  <div class="date">
+    December 16, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#ubuntu">ubuntu</a>
+  
+    <a href="/tags.html#minidlna">minidlna</a>
+  
+    <a href="/tags.html#upstart">upstart</a>
+  
+    <a href="/tags.html#quantal">quantal</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>A big hat tip to Asaf Shahar for this one.</p>
+<p>I recently upgraded to Ubuntu 12.10 on my main desktop machine from scratch, which means a number of things which had been installed and configured need to be re-done.  One of those things is minidlna, a lightweight DLNA server.</p>
+<p>If you don&#8217;t know, DLNA is a protocol for sharing media to devices.  In my case, I use it to stream music, video and pictures from my desktop to my Blu-Ray player.  It&#8217;s not perfect, at least in that the interface on the Blu-Ray player leaves much to be desired, but it works.</p>
+<p>Minidlna does not come standard with Ubuntu, but it is in the repositories and installation is as easy as <tt>sudo apt-get install minidlna</tt>.  Afterwards you configure <tt>/etc/minidlna.conf</tt> and you are good to go.  The comments inside <tt>/etc/minidlna.conf</tt> are good enough that you won&#8217;t need further guidance from me here.</p>
+<p>While all that was relatively painless, I soon discovered that minidlna was not starting on reboot.  I checked the script in <tt>/etc/init.d</tt> and the symlinks in the various <tt>/etc/rc#.d/</tt> directories and everything was correct.  It started no problem by hand after boot using <tt>sudo service minidlna start</tt>.  It was time to take the fight to google.</p>
+<p>I quickly discovered a <a href="https://bugs.launchpad.net/ubuntu/+source/minidlna/+bug/1053173/">bug report</a> that seemed appropriate.  Apparently minidlna is attempting to start before networking is up and that causes it to error out.  (If you have changed to Ubuntu 12.10 you may have noticed that networking does not start until after the login screen is displayed&#8201;&#8212;&#8201;a curious decision.)</p>
+<p>If you have taken a look at the bug report, you&#8217;ll see a work-around posted by Asaf Shahar.  He created a script using <tt>upstart</tt> to transform minidlna into a service managed by that tool.</p>
+<p>I wasn&#8217;t quite convinced that was the answer for me, because that solution would skip whatever set up occurs in the <tt>/etc/init.d/minidlna</tt> script.  At first I thought I could change his <tt>upstart</tt> script to simply invoke the minidlna script instead of the executable, but <tt>upstart</tt> was not created with that use in mind.  (When creating an <tt>upstart</tt> service, <tt>upstart</tt> expects the executable to fork 1 or 2 times; a script will fork a great number of times and there is no way to tell <tt>upstart</tt> which process is actually the server process.)</p>
+<p>The next natural solution would be to integrate the <tt>/etc/init.d/minidlna</tt> script into Shahar&#8217;s <tt>upstart</tt> script.  But that would mean keeping the script up to date whenever the <tt>/etc/init.d/minidlna</tt> script changed.  That&#8217;s not really something I want to have to do; after all I might even miss the fact that minidlna was updated.  So another solution was needed.</p>
+<p>In the process of researching <tt>upstart</tt> I discovered that one can use it for more than just servers.  It can also execute a task (i.e. a short-lived process expected to finish on its own).  I decided to have <tt>upstart</tt> run the minidlna script once the machine booted and networking was enabled.  Now this is not perfect in that minidlna is still trying to start and failing on the normal boot process, but I can live with that.</p>
+<p>To do this, create a file called <tt>/etc/init/start-minidlna.conf</tt> with the following contents:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># Task to start Minidlna - lightweight DLNA/UPNP media server</font></i><br />
+<i><font color="#9A1900"># Minidlna is not starting correctly on boot, see bug</font></i><br />
+<i><font color="#9A1900"># https://bugs.launchpad.net/ubuntu/+source/minidlna/+bug/1053173</font></i><br />
+<i><font color="#9A1900">#</font></i><br />
+description <font color="#FF0000">"Task to start minidlna"</font><br />
+<br />
+start on <font color="#990000">(</font>local-filesystems and net-device-up IFACE<font color="#990000">!=</font>lo<font color="#990000">)</font><br />
+<br />
+task<br />
+<br />
+<b><font color="#0000FF">exec</font></b> service minidlna start</tt></pre></td></tr></table><p>That&#8217;s all there is to it.  Now minidlna starts on boot.  Once again I want to thank Asaf Shahar for his help.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

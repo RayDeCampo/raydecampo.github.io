@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Additional AJP connectors within SELinux environment</h1>
+  
+  <div class="date">
+    June  9, 2013
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#JBoss">JBoss</a>
+  
+    <a href="/tags.html#SELinux">SELinux</a>
+  
+    <a href="/tags.html#Red Hat">Red Hat</a>
+  
+    <a href="/tags.html#RHEL">RHEL</a>
+  
+    <a href="/tags.html#Apache">Apache</a>
+  
+    <a href="/tags.html#CentOS">CentOS</a>
+  
+    <a href="/tags.html#AJP">AJP</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>I recently went through the exercise of adding an additional JBoss application server to a production CentOS 6.4 server.  The two applications were to be hosted on the same machine using virtual name servers to distinguish requests.  I have covered virtual name servers before in my post on <a href="/2013/01/trac-on-centos-63-part-2.html">install Trac on CentOS 6</a>.  Multiple instances of JBoss can be made to play nice on the same servers by <a href="https://community.jboss.org/wiki/ConfigurePorts">shifting the ports</a> via the switch <tt>&#8209;Djboss.service.binding.set=ports&#8209;01</tt>.</p>
+<p>So, with everything configured we should be done, right?  Not so fast.  Unfortunately I thought I had everything done but I got a 503 error, Service Temporarily Unavailable, when accessing the server via Apache.  Directly accessing the JBoss server worked, so the problem had to be with Apache accessing the AJP connectors.</p>
+<p>The connectors were configured thusly:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">    ProxyPassReverseCookiePath /xyzzy /<br />
+    # Reverse proxy everything under /xyzzy<br />
+    ProxyPass /xyzzy/ ajp://prodas01:8109/xyzzy/<br />
+    ProxyPassReverse /xyzzy/ ajp://prodas01:8109/xyzzy/</pre></td></tr></table><p>Note that we are using port 8109 instead of 8009 since all the JBoss ports have been shifted by 100.  Checking the Apache error log I saw the following:</p>
+<blockquote><p>[Wed Jun 05 13:11:55 2013] [error] (13)Permission denied: proxy: AJP: attempt to connect to 10.0.0.2:8109 (prodas01) failed</p>
+<p align="right"></p>
+</blockquote><p>The problem did not appear to be firewall related since no firewall changes were necessary to get Apache talking to the first JBoss server on port 8009.  Further probing revealed the following entry in the <tt>audit.log</tt>:</p>
+<blockquote><p>type=AVC msg=audit(1370452315.660:2053): avc:  denied  { name_connect } for  pid=27314 comm="httpd" dest=8109 scontext=unconfined_u:system_r:httpd_t:s0 tcontext=system_u:object_r:port_t:s0 tclass=tcp_socket</p>
+<p align="right"></p>
+</blockquote><p>So the problem turned out to be SELinux.  Apparently SELinux puts restrictions on what ports the httpd server can contact.  The following shows the configuration out of the box:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#990000">[</font>root@prodas01 <font color="#990000">/]</font> semanage port -l <font color="#990000">|</font> grep -w http_port_t<br />
+http_port_t                    tcp      <font color="#993399">80</font><font color="#990000">,</font> <font color="#993399">443</font><font color="#990000">,</font> <font color="#993399">488</font><font color="#990000">,</font> <font color="#993399">8008</font><font color="#990000">,</font> <font color="#993399">8009</font><font color="#990000">,</font> <font color="#993399">8443</font></tt></pre></td></tr></table><p>So port 8009 is allowed, but port 8109 is not.  We need to add it to the list:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#990000">[</font>root@prodas01 <font color="#990000">/]</font> semanage port -a -t http_port_t -p tcp <font color="#993399">8109</font><br />
+<font color="#990000">[</font>root@prodas01 <font color="#990000">/]</font> semanage port -l <font color="#990000">|</font> grep http_port_t<br />
+http_port_t                    tcp      <font color="#993399">8109</font><font color="#990000">,</font> <font color="#993399">80</font><font color="#990000">,</font> <font color="#993399">443</font><font color="#990000">,</font> <font color="#993399">488</font><font color="#990000">,</font> <font color="#993399">8008</font><font color="#990000">,</font> <font color="#993399">8009</font><font color="#990000">,</font> <font color="#993399">8443</font></tt></pre></td></tr></table><p>Hat tip to <a href="http://forums.fedoraforum.org/member.php?u=180129">krow oak</a> for <a href="http://forums.fedoraforum.org/showthread.php?t=138850">this helpful forum posting</a>.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Convert Hyper-V disk to KVM</h1>
+  
+  <div class="date">
+    July 11, 2020
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#vm">vm</a>
+  
+    <a href="/tags.html#kvm">kvm</a>
+  
+    <a href="/tags.html#vhd">vhd</a>
+  
+    <a href="/tags.html#qcow2">qcow2</a>
+  
+    <a href="/tags.html#qemu">qemu</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>When converting a Hyper-V VM to KVM (as used in CentOS or RHEL) it is not enough
+to simply convert the disk from vhd to qcow2 using <code>qemu</code>.  Doing so will result
+in errors concerning <code>dracut</code> timing out.  Instead one must convert the guest OS
+as well by using <code>virt-v2v</code>.</p>
+<p>Sometimes you will run into the following error when attempting to convert the
+disk:</p>
+<pre class="language-shell"><code class="language-shell">$ <span class="token function">sudo</span> virt-v2v -i disk /var/images/virdisk.vhd -o <span class="token builtin class-name">local</span> -of qcow2 -os /var/lib/libvirt/images/<br><br>virt-v2v: error: libguestfs error: part_get_parttype: <span class="token function">parted</span> exited with<br>status <span class="token number">1</span>: Error: Can't have a partition outside the disk<span class="token operator">!</span></code></pre>
+<p>In this case for some reason Hyper-V created the partitions on the disk with
+geometry outside the &quot;physical&quot; geometry of the disk.  To repair this we need
+to convert the disk to RAW format in order to operate on the partition table.
+Be warned that the RAW disk image will be as big as the logical size of the
+VHD disk.</p>
+<p>Convert to RAW format:</p>
+<pre class="language-shell"><code class="language-shell">$ qemu-img convert virdisk.vhd -O raw virdisk.raw</code></pre>
+<p>Issue the command <code>fdisk virdisk.raw</code> to operate on the partition table
+with fdisk.  Use <code>p</code> to print the table and <code>v</code> command to verify the issue:</p>
+<pre class="language-shell"><code class="language-shell">$ <span class="token function">fdisk</span> virdisk.raw<br>Command <span class="token punctuation">(</span>m <span class="token keyword">for</span> <span class="token builtin class-name">help</span><span class="token punctuation">)</span>: p<br>Disk virdisk.raw: <span class="token number">64</span> GiB, <span class="token number">68718428160</span> bytes, <span class="token number">134215680</span> sectors<br>Units: sectors of <span class="token number">1</span> * <span class="token number">512</span> <span class="token operator">=</span> <span class="token number">512</span> bytes<br>Sector size <span class="token punctuation">(</span>logical/physical<span class="token punctuation">)</span>: <span class="token number">512</span> bytes / <span class="token number">512</span> bytes<br>I/O size <span class="token punctuation">(</span>minimum/optimal<span class="token punctuation">)</span>: <span class="token number">512</span> bytes / <span class="token number">512</span> bytes<br>Disklabel type: dos<br>Disk identifier: 0x000484cd<br><br>Device       Boot   Start       End   Sectors Size Id Type<br>virdisk.raw1 *       <span class="token number">2048</span>   <span class="token number">2099199</span>   <span class="token number">2097152</span>   1G <span class="token number">83</span> Linux<br>virdisk.raw2      <span class="token number">2099200</span> <span class="token number">134217727</span> <span class="token number">132118528</span>  63G 8e Linux LVM<br><br>Command <span class="token punctuation">(</span>m <span class="token keyword">for</span> <span class="token builtin class-name">help</span><span class="token punctuation">)</span>: <span class="token function">v</span><br>Total allocated sectors <span class="token number">134217728</span> greater than the maximum <span class="token number">134215680</span>.</code></pre>
+<p>Now this part is &quot;dangerous&quot; or would be if you weren't already operating on a
+copy of the virtual disk.  Delete the problematic partition and recreate it with
+the same starting point but with an end point that is proper.  In my case this
+did not destroy any data, your mileage may vary.</p>
+<pre class="language-shell"><code class="language-shell">Command <span class="token punctuation">(</span>m <span class="token keyword">for</span> <span class="token builtin class-name">help</span><span class="token punctuation">)</span>: d<br>Partition number <span class="token punctuation">(</span><span class="token number">1,2</span>, default <span class="token number">2</span><span class="token punctuation">)</span>: <span class="token number">2</span><br><br>Partition <span class="token number">2</span> has been deleted.<br><br>Command <span class="token punctuation">(</span>m <span class="token keyword">for</span> <span class="token builtin class-name">help</span><span class="token punctuation">)</span>: n<br>Partition <span class="token builtin class-name">type</span><br>   p   primary <span class="token punctuation">(</span><span class="token number">1</span> primary, <span class="token number">0</span> extended, <span class="token number">3</span> <span class="token function">free</span><span class="token punctuation">)</span><br>   e   extended <span class="token punctuation">(</span>container <span class="token keyword">for</span> logical partitions<span class="token punctuation">)</span><br>Select <span class="token punctuation">(</span>default p<span class="token punctuation">)</span>: p<br>Partition number <span class="token punctuation">(</span><span class="token number">2</span>-4, default <span class="token number">2</span><span class="token punctuation">)</span>: <span class="token number">2</span><br>First sector <span class="token punctuation">(</span><span class="token number">2099200</span>-134215679, default <span class="token number">2099200</span><span class="token punctuation">)</span>:<br>Last sector, +sectors or +size<span class="token punctuation">{</span>K,M,G,T,P<span class="token punctuation">}</span> <span class="token punctuation">(</span><span class="token number">2099200</span>-134215679, default <span class="token number">134215679</span><span class="token punctuation">)</span>:<br><br>Created a new partition <span class="token number">2</span> of <span class="token builtin class-name">type</span> <span class="token string">'Linux'</span> and of size <span class="token number">63</span> GiB.<br>Partition <span class="token comment">#2 contains a LVM2_member signature.</span><br><br>Do you want to remove the signature? <span class="token punctuation">[</span>Y<span class="token punctuation">]</span>es/<span class="token punctuation">[</span>N<span class="token punctuation">]</span>o: N</code></pre>
+<p>Finally use <code>w</code> to write the new partition table.</p>
+<p>Now convert the raw image:</p>
+<pre class="language-shell"><code class="language-shell">$ <span class="token function">sudo</span> virt-v2v -i disk /var/images/virdisk.raw -o <span class="token builtin class-name">local</span> -of qcow2 -os /var/lib/libvirt/images/<br><span class="token punctuation">[</span>   <span class="token number">0.0</span><span class="token punctuation">]</span> Opening the <span class="token builtin class-name">source</span> -i disk /var/images/virdisk.raw<br><span class="token punctuation">[</span>   <span class="token number">0.0</span><span class="token punctuation">]</span> Creating an overlay to protect the <span class="token builtin class-name">source</span> from being modified<br><span class="token punctuation">[</span>   <span class="token number">0.2</span><span class="token punctuation">]</span> Initializing the target -o <span class="token builtin class-name">local</span> -os /var/lib/libvirt/images/<br><span class="token punctuation">[</span>   <span class="token number">0.2</span><span class="token punctuation">]</span> Opening the overlay<br><span class="token punctuation">[</span>   <span class="token number">5.1</span><span class="token punctuation">]</span> Inspecting the overlay<br><span class="token punctuation">[</span>  <span class="token number">28.7</span><span class="token punctuation">]</span> Checking <span class="token keyword">for</span> sufficient <span class="token function">free</span> disk space <span class="token keyword">in</span> the guest<br><span class="token punctuation">[</span>  <span class="token number">28.7</span><span class="token punctuation">]</span> Estimating space required on target <span class="token keyword">for</span> each disk<br><span class="token punctuation">[</span>  <span class="token number">28.7</span><span class="token punctuation">]</span> Converting CentOS Linux release <span class="token number">7.8</span>.2003 <span class="token punctuation">(</span>Core<span class="token punctuation">)</span> to run on KVM<br>virt-v2v: This guest has virtio drivers installed.<br><span class="token punctuation">[</span> <span class="token number">112.8</span><span class="token punctuation">]</span> Mapping filesystem data to avoid copying unused and blank areas<br><span class="token punctuation">[</span> <span class="token number">114.0</span><span class="token punctuation">]</span> Closing the overlay<br><span class="token punctuation">[</span> <span class="token number">114.3</span><span class="token punctuation">]</span> Checking <span class="token keyword">if</span> the guest needs BIOS or UEFI to boot<br><span class="token punctuation">[</span> <span class="token number">114.3</span><span class="token punctuation">]</span> Assigning disks to buses<br><span class="token punctuation">[</span> <span class="token number">114.3</span><span class="token punctuation">]</span> Copying disk <span class="token number">1</span>/1 to /var/lib/libvirt/images/virdisk-sda <span class="token punctuation">(</span>qcow2<span class="token punctuation">)</span><br>    <span class="token punctuation">(</span><span class="token number">100.00</span>/100%<span class="token punctuation">)</span><br><span class="token punctuation">[</span> <span class="token number">117.4</span><span class="token punctuation">]</span> Creating output metadata<br><span class="token punctuation">[</span> <span class="token number">117.4</span><span class="token punctuation">]</span> Finishing off<br>$ <span class="token function">sudo</span> <span class="token function">ls</span> -l /var/lib/libvirt/images/<br>total <span class="token number">2280904</span><br>-rw-r--r--. <span class="token number">1</span> root root <span class="token number">2335703040</span> Jun <span class="token number">15</span> <span class="token number">14</span>:34 virdisk-sda<br>-rw-r--r--. <span class="token number">1</span> root root       <span class="token number">1270</span> Jun <span class="token number">15</span> <span class="token number">14</span>:34 virdisk.xml</code></pre>
+<p>Congratulations, the disk is converted.</p>
+<p>If you see the following error:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token punctuation">[</span> <span class="token number">113.7</span><span class="token punctuation">]</span> Copying disk <span class="token number">1</span>/1 to /var/lib/libvirt/images/virdisk-sda <span class="token punctuation">(</span>qcow2<span class="token punctuation">)</span><br>virt-v2v: error: libguestfs error: qemu-img:<br>/var/lib/libvirt/images/virdisk-sda: qemu-img exited with error status <span class="token number">1</span>.<br>To see full error messages you may need to <span class="token builtin class-name">enable</span> debugging.<br>Do:<br>  <span class="token builtin class-name">export</span> <span class="token assign-left variable">LIBGUESTFS_DEBUG</span><span class="token operator">=</span><span class="token number">1</span> <span class="token assign-left variable">LIBGUESTFS_TRACE</span><span class="token operator">=</span><span class="token number">1</span><br>and run the <span class="token builtin class-name">command</span> again.  For further information, read:<br>  http://libguestfs.org/guestfs-faq.1.html<span class="token comment">#debugging-libguestfs</span><br>You can also run <span class="token string">'libguestfs-test-tool'</span> and post the *complete* output<br>into a bug report or message to the libguestfs mailing list.<br><br>If reporting bugs, run virt-v2v with debugging enabled and include the<br>complete output:<br><br>  virt-v2v -v -x <span class="token punctuation">[</span><span class="token punctuation">..</span>.<span class="token punctuation">]</span></code></pre>
+<p>It is because the user you are running as does not have permission to write to
+the target directory, in my case <code>/var/lib/libvirt/images</code>.</p>
+<p>Finally, once the VM is booted, we should repair the filesystem in case it still
+thinks it has the old size.  To repair filesystem, go into rescue mode, unmount,
+run fsck/xfs_repair, remount and exit:</p>
+<pre class="language-none"><code class="language-none"># systemctl rescue<br># umount /dev/mapper/centos_virdisk-home<br># fsck /dev/mapper/centos_virdisk-home<br># xfs_repair /dev/mapper/centos_virdisk-home<br># mount /dev/mapper/centos_virdisk-home<br># exit</code></pre>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

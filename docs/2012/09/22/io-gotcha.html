@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Io Gotcha</h1>
+  
+  <div class="date">
+    September 22, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#7languages7weeks">7languages7weeks</a>
+  
+    <a href="/tags.html#gotcha">gotcha</a>
+  
+    <a href="/tags.html#Io">Io</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+ <p>As you are probably aware, I am working my way through <em>Seven Languages in Seven Days</em> by Bruce Tate.  (And if you have ever googled basic questions on the Io language, you will know that I am not the first person to have this idea.)  In any case, I am on Day of Io, but before I get to anything specific there, I wanted to share a gotcha of Io that I encountered.</p>
+<p>Coming from an object-oriented background (like Java) you might find yourself writing code like the following:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>Gotcha <font color="#990000">:=</font> Object clone <b><font color="#0000FF">do</font></b><font color="#990000">(</font><br />
+    conspirators <font color="#990000">::=</font> <b><font color="#000000">list</font></b><font color="#990000">()</font><br />
+<br />
+    conspire <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font>c<font color="#990000">,</font><br />
+        conspirators <b><font color="#000000">push</font></b><font color="#990000">(</font>c<font color="#990000">)</font><br />
+        <b><font color="#0000FF">return</font></b> self<br />
+    <font color="#990000">)</font><br />
+<font color="#990000">)</font><br />
+<br />
+walter <font color="#990000">:=</font> Gotcha clone<br />
+walter <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"jesse"</font><font color="#990000">)</font><br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<br />
+gus <font color="#990000">:=</font> Gotcha clone<br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"mike"</font><font color="#990000">)</font><br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"victor"</font><font color="#990000">)</font><br />
+<br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<font color="#990000">(</font><font color="#FF0000">"   gus: "</font> <font color="#990000">..</font> gus conspirators<font color="#990000">)</font> println</tt></pre></td></tr></table><p>Everything seems fine, we initialize a list and then start adding elements to it.  But here is the output:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">walter: list(jesse)<br />
+walter: list(jesse, mike, victor)<br />
+   gus: list(jesse, mike, victor)</pre></td></tr></table><p>Somehow in the process of creating <tt>gus</tt> and adding his <tt>conspirators</tt> has caused the list of <tt>conspirators</tt> for <tt>walt</tt> to grow.  What is happening here is that <tt>conspirators</tt> is a slot on Gotcha that is never overridden by the clones <tt>walt</tt> and <tt>gus</tt>.  So they are all sharing the same conspirator list.  (Fans of Breaking Bad will realize that this situation cannot be allowed!)</p>
+<p>The solution (well, one solution, there are probably others) is to use the <tt>init</tt> method to set the <tt>conspirators</tt> slot:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>Fixed <font color="#990000">:=</font> Object clone <b><font color="#0000FF">do</font></b><font color="#990000">(</font><br />
+    conspirators <font color="#990000">::=</font> nil<br />
+<br />
+    init <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font><br />
+        <b><font color="#000000">setConspirators</font></b><font color="#990000">(</font><b><font color="#000000">list</font></b><font color="#990000">())</font><br />
+    <font color="#990000">)</font><br />
+<br />
+    conspire <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font>c<font color="#990000">,</font><br />
+        conspirators <b><font color="#000000">push</font></b><font color="#990000">(</font>c<font color="#990000">)</font><br />
+        <b><font color="#0000FF">return</font></b> self<br />
+    <font color="#990000">)</font><br />
+<font color="#990000">)</font><br />
+<br />
+walter <font color="#990000">:=</font> Fixed clone<br />
+walter <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"jesse"</font><font color="#990000">)</font><br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<br />
+gus <font color="#990000">:=</font> Fixed clone<br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"mike"</font><font color="#990000">)</font><br />
+gus <b><font color="#000000">conspire</font></b><font color="#990000">(</font><font color="#FF0000">"victor"</font><font color="#990000">)</font><br />
+<br />
+<font color="#990000">(</font><font color="#FF0000">"walter: "</font> <font color="#990000">..</font> walter conspirators<font color="#990000">)</font> println<br />
+<font color="#990000">(</font><font color="#FF0000">"   gus: "</font> <font color="#990000">..</font> gus conspirators<font color="#990000">)</font> println</tt></pre></td></tr></table><p>Now <tt>walt</tt> and <tt>gus</tt> maintain a separate list of <tt>conspirators</tt> (as Vince Gilligan intended):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">walter: list(jesse)<br />
+walter: list(jesse)<br />
+   gus: list(mike, victor)</pre></td></tr></table><p>If you find yourself making these kinds of gaffes, re-read the Io style guide at <a href="http://en.wikibooks.org/wiki/Io_Programming/Io_Style_Guide">http://en.wikibooks.org/wiki/Io_Programming/Io_Style_Guide</a>.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

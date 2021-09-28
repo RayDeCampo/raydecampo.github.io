@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Connect to Microsoft VPN from Ubuntu 16.04 Xenial Xerus</h1>
+  
+  <div class="date">
+    August 21, 2016
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#xenial">xenial</a>
+  
+    <a href="/tags.html#ubuntu">ubuntu</a>
+  
+    <a href="/tags.html#Windows">Windows</a>
+  
+    <a href="/tags.html#vpn">vpn</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>I recently upgraded from Ubuntu 14.04 on my main desktop machine and discovered that my VPN connection to  Windows 2008 Server no longer worked.  The bugaboo turned out to be the routing table which no longer requires a gateway entry.  Here I have rewritten my post originally written for 12.10 to reflect the new configuration.</p>
+<p>If you have ever tried to configure a linux machine to connect to a Microsoft-based VPN, you know that it is not as straightforward as it could be.  It is more of a voodoo ritual than a science.  I figured it would be a good idea to capture the steps for future reference.</p>
+<p>This first part is adapted from the Ubuntu Wiki for posterity.  You can check out the original at <a href="https://wiki.ubuntu.com/VPN">https://wiki.ubuntu.com/VPN</a> under the heading <em>VPN setup in Ubuntu 9.10</em>.  Apparently this originates from a Ubuntu forums post by user sweisler at <a href="http://ubuntuforums.org/showpost.php?p=8261958&amp;postcount=6">http://ubuntuforums.org/showpost.php?p=8261958&amp;postcount=6</a>.  Thanks sweisler, wherever you are.</p>
+<p>First, there was no need to install any additional packages, apparently everything needed is included by default.</p>
+<ul><li>Open VPN configuration screen: <ul><li>Click on the network icon in the upper right of the desktop </li><li>Go to the <em>VPN Connections</em> menu </li><li>Select <em>Configure VPN&#8230;</em></li></ul></li><li>Add a new PPTP connection </li><li>On the VPN tab, set the following: <ul><li><em>Connection name</em> (whatever you want) </li><li><em>Gateway</em> (this is the VPN server) </li><li><em>User name</em> (for domain-based user accounts, use domain\username) </li><li>Do <strong>not</strong> set <em>Password</em>; <strong>do</strong> change the pulldown to <em>Always Ask</em></li><li>Do <strong>not</strong> set <em>NT Domain</em></li></ul></li><li>PPTP Advanced Options (Advanced button from the VPN tab) <ul><li>Uncheck all authentication methods <strong>except</strong> <em>MSCHAPv2</em></li><li>Check <em>Use Point-to-Point encryption (MPPE)</em></li><li>Leave <em>Security</em> set at <em>All Available (Default)</em></li><li>Check <em>Allow stateful inspection</em></li><li>Uncheck <em>Allow BSD data compression</em></li><li>Uncheck <em>Allow Deflate data compression</em></li><li>Uncheck <em>Use TCP header compression</em></li><li>Uncheck <em>Send PPP echo packets</em> (this setting works either way, check it for debugging purposes) </li></ul></li></ul><p>At this point save it and test it.  Once the VPN connection is working you may want to try to tweak it further as described below.</p>
+<p>One problem with the VPN I connect to is that all traffic ends up using the VPN when I am connected.  This is less than ideal if you are connecting to servers on the internet while the VPN is connected since the traffic goes through the VPN server before coming to you.  The following describes the settings for routing only the proper traffic to the VPN.  (Read them all the way through first to make sure you have all the necessary information.)</p>
+<ul><li>On the <em>IPv4 Settings</em> tab <ul><li>Set <em>Additional DNS servers</em> using the IP address of the DNS server for the VPN.  (You may need to ask your IT guy for this; there should be a way to discover it when connecting as above but it escapes me.) </li><li>Set <em>Additional search domains</em>.  Set this to the domain suffix of the machines on the VPN.  For example, if the machines are named like dbserver.example.com then set it to example.com. </li></ul></li><li>Click the <em>Routes</em> button. <ul><li>Check <em>Use this connection only for resources on its network</em></li><li><em>Add</em> a route: <ul><li>For <em>Address</em>, use the internal IP address of the VPN server applied against the netmask below, e.g. if the VPN server is 10.23.34.89 and the netmask is 255.255.255.0, use 10.23.34.0.  Again, this should be the <strong>internal</strong> IP address for getting to the machine in the intranet, not the external IP address for getting to the machine from the internet. </li><li>For <em>Netmask</em>, use the netmask of your intranet.  (If you are confused, ask your IT guy what to use for both this and the <em>Address</em>.)  For most networks this will be 255.255.255.0, but for many it will be different. </li><li>For <em>Gateway</em>, use 0.0.0.0 or simply leave it blank. </li><li>Do not set the <em>Metric</em> unless you know what you are doing. </li></ul></li></ul></li></ul><p>OK, so now when you connect you should see regular traffic going directly to the internet and intranet traffic directed to the VPN server.  You can test this out with <tt>traceroute</tt> (which you may need to install).  You should also be able to refer to machines on the intranet using their short names (e.g. dbserver instead of dbserver.example.com).</p>
+<p>Let me know how these instructions work for you and what type of systems you&#8217;ve been able to connect.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

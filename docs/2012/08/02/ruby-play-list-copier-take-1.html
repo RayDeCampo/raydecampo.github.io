@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Ruby Play List Copier, Take 1</h1>
+  
+  <div class="date">
+    August  2, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#taglib">taglib</a>
+  
+    <a href="/tags.html#mp3">mp3</a>
+  
+    <a href="/tags.html#ruby">ruby</a>
+  
+    <a href="/tags.html#m3u">m3u</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>So I finally got back to my Ruby play list project.  The next mini-goal would be to parse a play list file and print out the converted file names.  I created a PlayListEntry class and a PlayList class and things were moving along very well:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">require</font></b> <font color="#FF0000">'taglib'</font><br />
+<br />
+<b><font color="#0000FF">class</font></b> PlayListEntry<br />
+<br />
+  SEPARATOR <font color="#990000">=</font> <font color="#FF0000">" - "</font><br />
+  SUFFIX <font color="#990000">=</font> <font color="#FF0000">".mp3"</font><br />
+<br />
+  attr_accessor <font color="#990000">:</font>source<font color="#990000">,</font> <font color="#990000">:</font>dest<font color="#990000">,</font> <font color="#990000">:</font>dest_dir<br />
+<br />
+  <b><font color="#0000FF">def</font></b> initialize<font color="#990000">(</font>source<font color="#990000">)</font><br />
+    <font color="#009900">@source</font> <font color="#990000">=</font> source<br />
+    determine_dest<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> set_dest_dir<font color="#990000">(</font>dest_dir<font color="#990000">)</font><br />
+    <font color="#009900">@dest_dir</font> <font color="#990000">=</font> dest_dir<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> determine_dest<br />
+    TagLib<font color="#990000">::</font>FileRef<font color="#990000">.</font>open<font color="#990000">(</font><font color="#009900">@source</font><font color="#990000">)</font> <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>fileref<font color="#990000">|</font><br />
+      tag <font color="#990000">=</font> fileref<font color="#990000">.</font>tag<br />
+      <b><font color="#0000FF">if</font></b> <b><font color="#0000FF">not</font></b> tag <b><font color="#0000FF">then</font></b><br />
+        puts <font color="#FF0000">"No tags for #{source}"</font><br />
+        <b><font color="#0000FF">next</font></b><br />
+      <b><font color="#0000FF">end</font></b><br />
+      basename <font color="#990000">=</font> tag<font color="#990000">.</font>artist <font color="#990000">+</font> SEPARATOR <font color="#990000">+</font> tag<font color="#990000">.</font>album <font color="#990000">+</font> SEPARATOR <font color="#990000">+</font><br />
+        tag<font color="#990000">.</font>track<font color="#990000">.</font>to_s <font color="#990000">+</font> SEPARATOR <font color="#990000">+</font> tag<font color="#990000">.</font>title <font color="#990000">+</font> SUFFIX<br />
+      <b><font color="#0000FF">if</font></b> dest_dir <b><font color="#0000FF">then</font></b><br />
+        <font color="#009900">@dest</font> <font color="#990000">=</font> File<font color="#990000">.</font>join<font color="#990000">(</font>dest_dir<font color="#990000">,</font> basename<font color="#990000">)</font><br />
+      <b><font color="#0000FF">else</font></b><br />
+        <font color="#009900">@dest</font> <font color="#990000">=</font> basename<br />
+      <b><font color="#0000FF">end</font></b><br />
+    <b><font color="#0000FF">end</font></b><br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">class</font></b> PlayList<br />
+<br />
+  attr_accessor <font color="#990000">:</font>playlist<font color="#990000">,</font> <font color="#990000">:</font>entries<br />
+<br />
+  <b><font color="#0000FF">def</font></b> initialize<font color="#990000">(</font>playlist<font color="#990000">)</font><br />
+    <font color="#009900">@playlist</font> <font color="#990000">=</font> playlist<br />
+    read_playlist<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> read_playlist<br />
+    <font color="#009900">@entries</font> <font color="#990000">=</font> <font color="#990000">[]</font><br />
+<br />
+    File<font color="#990000">.</font>open<font color="#990000">(</font>playlist<font color="#990000">)</font> <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>file<font color="#990000">|</font><br />
+      file<font color="#990000">.</font>readlines<font color="#990000">.</font>each <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>line<font color="#990000">|</font><br />
+        line <font color="#990000">=</font> line<font color="#990000">.</font>strip<br />
+        <b><font color="#0000FF">if</font></b> line<font color="#990000">.</font>empty? <b><font color="#0000FF">or</font></b> line<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">]</font> <font color="#990000">==</font> <font color="#FF0000">'#'</font> <b><font color="#0000FF">then</font></b><br />
+          <b><font color="#0000FF">next</font></b><br />
+        <b><font color="#0000FF">end</font></b><br />
+        <b><font color="#0000FF">if</font></b> File<font color="#990000">.</font>exists?<font color="#990000">(</font>line<font color="#990000">)</font> <b><font color="#0000FF">then</font></b><br />
+          <font color="#009900">@entries</font> <font color="#990000">&lt;&lt;</font> PlayListEntry<font color="#990000">.</font>new<font color="#990000">(</font>line<font color="#990000">)</font><br />
+        <b><font color="#0000FF">else</font></b><br />
+          puts <font color="#FF0000">"File #{line} does not exist"</font><br />
+        <b><font color="#0000FF">end</font></b><br />
+      <b><font color="#0000FF">end</font></b><br />
+    <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">end</font></b><br />
+<br />
+playlist <font color="#990000">=</font> PlayList<font color="#990000">.</font>new<font color="#990000">(</font>ARGV<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">])</font><br />
+playlist<font color="#990000">.</font>entries<font color="#990000">.</font>each <font color="#FF0000">{</font><font color="#990000">|</font>x<font color="#990000">|</font> puts x<font color="#990000">.</font>dest <font color="#FF0000">}</font></tt></pre></td></tr></table><p>That&#8217;s when I realized I am pretty much just doing Java style code in Ruby.  I need to change this up and try to make it more Ruby-like.  Possibilities include using modules or code blocks.  We&#8217;ll see where it goes.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Case-insensitive Tag Sorting on GitHub Pages</h1>
+  
+  <div class="date">
+    August 12, 2017
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#github pages">github pages</a>
+  
+    <a href="/tags.html#jekyll">jekyll</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>GitHub Pages famously does not support the <a href="https://shopify.github.io/liquid/filters/sort_natural/"><code>sort_natural</code></a> filter from the <a href="https://shopify.github.io/liquid/">Liquid</a> templating language used by <a href="https://jekyllrb.com/docs/templates/">Jekyll</a>.  So some chicanery is needed to get a list of tags sorted without regard to case.</p>
+<p>I haven't seen a complete solution on the internet which satisfied me.  Originally I settled on the partial solution by codeinfox: <a href="https://codinfox.github.io/dev/2015/03/06/use-tags-and-categories-in-your-jekyll-based-github-pages/">https://codinfox.github.io/dev/2015/03/06/use-tags-and-categories-in-your-jekyll-based-github-pages/</a>.  But I realized we could do better with a little effort.</p>
+<p>The resulting code is being used by this blog and is therefore available on GitHub: <a href="https://github.com/RayDeCampo/raydecampo.github.io/blob/74a4558e8784350dde019145936d55d906d51599/_includes/tags.html">tags.html</a>.  At a high level, we do the following.  First, create a list of all the tags from all the posts (<code>rawtags</code>).  Second, remove duplicates and blanks (<code>alltags</code>).  Next, convert to lowercase and sort (<code>lowertags</code>).  Then build a new list of tags by iterating over <code>lowertags</code> and picking the un-lowercased version of the tag from <code>alltags</code>.</p>
+<p>It's not super-efficient (O(n^2) but since it's a static site generator I can live with it.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

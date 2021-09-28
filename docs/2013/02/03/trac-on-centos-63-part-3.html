@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Trac on CentOS 6.3, Part 3</h1>
+  
+  <div class="date">
+    February  3, 2013
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#SELinux">SELinux</a>
+  
+    <a href="/tags.html#Red Hat">Red Hat</a>
+  
+    <a href="/tags.html#RHEL">RHEL</a>
+  
+    <a href="/tags.html#Apache">Apache</a>
+  
+    <a href="/tags.html#httpd">httpd</a>
+  
+    <a href="/tags.html#installation">installation</a>
+  
+    <a href="/tags.html#CentOS">CentOS</a>
+  
+    <a href="/tags.html#Trac">Trac</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Now for the exciting conclusion of our three-part series on installing  <a href="http://trac.edgewall.org/trac">Trac</a> on a 64-bit server running CentOS 6.3.  In <a href="/2013/01/trac-on-centos-63-part-1.html">part 1</a> I installed some prerequisite software and Trac itself.  In <a href="/2013/01/trac-on-centos-63-part-2.html">part 2</a>, I installed and configured Apache as a front end to Trac.  In part 3, I will configure Trac to use an Active Directory domain for authentication.</p>
+<p>First a few notes about the server we are targeting.  The server already has Samba installed and has been joined to the Active Directory domain.  Users can log into the machine using their Active Directory accounts.</p>
+<p>With that out of the way, we are ready to install mod_auth_ntlm_winbind for authentication.  A big hat tip to the folks at <a href="http://www.geeklab.info/">http://www.geeklab.info/</a> for doing a lot of the heqavy lifting for me.  See <a href="http://www.geeklab.info/2011/08/install-mod_auth_ntlm_winbind-on-centos-6-0/">http://www.geeklab.info/2011/08/install-mod_auth_ntlm_winbind-on-centos-6-0/</a> for their excellent write up.</p>
+<p>We need a few prerequisites:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>yum install httpd-devel gcc autoconf</tt></pre></td></tr></table><p>Processes that wish to use Samba and winbind for authentication need access to the <tt>/var/lib/samba/winbindd_privileged/</tt> directory.  The simplest solution to allow that access, is to add user apache to the group wbpriv:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>usermod -G wbpriv apache</tt></pre></td></tr></table><p>Furthermore we need to let the SELinux security infrastructure know that Apache is allowed to authenticate via winbind:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>setsebool -P allow_httpd_mod_auth_ntlm_winbind on</tt></pre></td></tr></table><p>There are no prebuilt binaries for mod_aut_ntln_winbind so we will need to download and compile it ourselves:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>svn co svn<font color="#990000">:</font>//svnanon<font color="#990000">.</font>samba<font color="#990000">.</font>org/lorikeet/trunk/mod_auth_ntlm_winbind mod_auth_ntlm_winbind<br />
+cd mod_auth_ntlm_winbind<font color="#990000">/</font><br />
+autoconf<br />
+<font color="#990000">.</font>/configure<br />
+apxs -DAPACHE<font color="#993399">2</font> -c -i mod_auth_ntlm_winbind<font color="#990000">.</font>c</tt></pre></td></tr></table><p>Now the interesting part, configuring Apache.  Make the following changes to <tt>/etc/httpd/conf/httpd.conf</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">LoadModule auth_ntlm_winbind_module /usr/lib64/httpd/modules/mod_auth_ntlm_winbind.so<br />
+KeepAlive On<br />
+MaxKeepAliveRequests 1000<br />
+KeepAliveTimeout 600</pre></td></tr></table><p>Also add the following to <tt>/etc/httpd/conf.d/myproject.mydomain.tld.conf</tt> (if you have forgotten, this is the configuration file we created in part 2 to configure the virtual server for Trac):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">    &lt;Location /login&gt;<br />
+      Options ExecCGI<br />
+      AllowOverride None<br />
+      Order allow,deny<br />
+      Allow from all<br />
+      AuthName "Change to something meaningful"<br />
+      AuthType NTLM<br />
+      Require valid-user<br />
+      NTLMAuth on<br />
+      NTLMAuthHelper "/usr/bin/ntlm_auth --helper-protocol=squid-2.5-ntlmssp"<br />
+      NTLMBasicAuthoritative on<br />
+    &lt;/Location&gt;</pre></td></tr></table><p>All that is left is to restart Apache and you are good to go.</p>
+<p>Your server is now all set up with Trac and configured in a manner that will easily allow you to add additional instances:</p>
+<ol type="1"><li>Initialize another Trac instance. </li><li>Copy (and edit) the <tt>/etc/httpd/conf.d/myproject.mydomain.tld.conf</tt> file. </li><li>Make a new directory under /var/www for the new virtual server </li><li>Export Trac resources using trac-admin deploy and copy them to the new web root. </li></ol>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

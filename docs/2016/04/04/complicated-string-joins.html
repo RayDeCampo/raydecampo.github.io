@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Complicated String Joins</h1>
+  
+  <div class="date">
+    April  4, 2016
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#functional">functional</a>
+  
+    <a href="/tags.html#streams">streams</a>
+  
+    <a href="/tags.html#java">java</a>
+  
+    <a href="/tags.html#lambda">lambda</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>So if you have not been under a rock and have used Java 8, you are surely aware of the new String.join() method and the Collectors.joining() method to concatenate arrays or streams of Strings.  Sometimes however, a simple concatenation with a delimiter is not quite up to the job. </p>
+<p>Consider the following method for example: </p>
+<script src="https://gist.github.com/RayDeCampo/12b98878b0b08fdd60ed23bdd250b90c.js"></script><p>Here our plans for a simple invocation of Collectors.joining() is complicated by the intermediate String literals and the particular format desired for the string representation of the entry. </p>
+<p>At first blush you might attempt to change this to functional style using something like this: </p>
+<script src="https://gist.github.com/RayDeCampo/68768dde668461aa8b68a23f5dc50cfc.js"></script><p>If you are an old salt at Java however, I'm sure your hair is standing on end considering all those temporary String objects being created.  Fortunately, using Stream.of() and Stream.flatMap() there is another way: </p>
+<script src="https://gist.github.com/RayDeCampo/3a2cea7738b74d8ee240eb040bcd8a53.js"></script><p>If you want to play around with this code, it is available on GitHub at <a href="https://github.com/RayDeCampo/lab-notes/blob/23bfa214f8fd830a27529aa9f195013f448998a9/lab-notes/src/main/java/org/decampo/examples/functional/StringJoin.java">StringJoin.java</a></p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

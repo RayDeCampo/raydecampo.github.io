@@ -1,0 +1,2099 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+<article class="page">
+
+  <h1></h1>
+
+  <div class="content">
+    
+<div class="posts">
+  
+    <article class="post">
+
+    <h3><a href="/2021/04/19/java-http-client-frame-size.html">Frame Size Issue with Java HTTP Client</a></h3>
+    
+    <div class="date">
+      April 19, 2021
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#java">java</a>
+    
+      <a href="tags.html#http">http</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+    </div>
+
+    <div class="entry">
+      
+If you hit this error when using the HTTP client built into Java:
+
+    </div>
+
+    <a href="/2021/04/19/java-http-client-frame-size.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/11/09/development-mail-server.html">Development Mail Server (CentOS 8)</a></h3>
+    
+    <div class="date">
+      November  9, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#mail">mail</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#postfix">postfix</a>
+    
+      <a href="tags.html#dovecot">dovecot</a>
+    
+      <a href="tags.html#smtp">smtp</a>
+    
+      <a href="tags.html#imap">imap</a>
+    
+      <a href="tags.html#thunderbird">thunderbird</a>
+    
+      <a href="tags.html#netcat">netcat</a>
+    
+    </div>
+
+    <div class="entry">
+      
+As you are probably aware, any sufficiently developed software application will eventually grow until it implements email.  A frequent stepping stone along that evolutionary path is for an application to gain the ability to send email.  If your application sends email, at a certain point it will become inconvenient to continue to use real email addresses and servers when developing and testing the application.  The solution is to set up a development mail server.
+
+    </div>
+
+    <a href="/2020/11/09/development-mail-server.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/08/09/wildfly-20-https.html">HTTPS for WildFly 20</a></h3>
+    
+    <div class="date">
+      August  9, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#https">https</a>
+    
+      <a href="tags.html#keytool">keytool</a>
+    
+    </div>
+
+    <div class="entry">
+      
+The following documents installing an actual certificate in on WildFly 20, although these steps have been tested on WildFly 19 as well.
+
+    </div>
+
+    <a href="/2020/08/09/wildfly-20-https.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/08/02/subversion-python2-centos8.html">Compiling Subversion Python 2 Bindings for CentOS 8</a></h3>
+    
+    <div class="date">
+      August  2, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#subversion">subversion</a>
+    
+      <a href="tags.html#python">python</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#Trac">Trac</a>
+    
+      <a href="tags.html#RPM">RPM</a>
+    
+      <a href="tags.html#dnf">dnf</a>
+    
+      <a href="tags.html#RPMS">RPMS</a>
+    
+    </div>
+
+    <div class="entry">
+      
+I recently needed to install Trac 1.4 on a CentOS 8 server.  Trac 1.4 still uses Python 2 and while CentOS 8 supports Python 2, Python 3 is the default.  I suspect this went into the decision not to offer any Python bindings for Subversion in the CentOS 8 repositories.
+
+    </div>
+
+    <a href="/2020/08/02/subversion-python2-centos8.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/07/31/mockito-static-methods.html">Mocking Static Methods in Mockito</a></h3>
+    
+    <div class="date">
+      July 31, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#mockito">mockito</a>
+    
+      <a href="tags.html#java">java</a>
+    
+    </div>
+
+    <div class="entry">
+      
+Mockito has been able to mock static methods since version 3.4.0 but the documentation doesn't explain how to mock methods that take arguments.
+
+    </div>
+
+    <a href="/2020/07/31/mockito-static-methods.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/07/11/convert-hyper-v-to-kvm.html">Convert Hyper-V disk to KVM</a></h3>
+    
+    <div class="date">
+      July 11, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#vm">vm</a>
+    
+      <a href="tags.html#kvm">kvm</a>
+    
+      <a href="tags.html#vhd">vhd</a>
+    
+      <a href="tags.html#qcow2">qcow2</a>
+    
+      <a href="tags.html#qemu">qemu</a>
+    
+    </div>
+
+    <div class="entry">
+      
+When converting a Hyper-V VM to KVM (as used in CentOS or RHEL) it is not enough
+to simply convert the disk from vhd to qcow2 using `qemu`.  Doing so will result
+in errors concerning `dracut` timing out.  Instead one must convert the guest OS
+as well by using `virt-v2v`.
+
+    </div>
+
+    <a href="/2020/07/11/convert-hyper-v-to-kvm.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/07/03/wildfly-slf4j-classcastexception.html">SLF4J issue with WildFly</a></h3>
+    
+    <div class="date">
+      July  3, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#slf4j">slf4j</a>
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#shibboleth">shibboleth</a>
+    
+    </div>
+
+    <div class="entry">
+      
+If you are getting the following error on WildFly or JBoss:
+
+    </div>
+
+    <a href="/2020/07/03/wildfly-slf4j-classcastexception.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2020/07/02/fixing-jekyll-environment.html">Fixing my Borked Ruby Environment</a></h3>
+    
+    <div class="date">
+      July  2, 2020
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#gem">gem</a>
+    
+      <a href="tags.html#bundle">bundle</a>
+    
+      <a href="tags.html#jekyll">jekyll</a>
+    
+      <a href="tags.html#github pages">github pages</a>
+    
+      <a href="tags.html#fedora">fedora</a>
+    
+    </div>
+
+    <div class="entry">
+      
+So after a couple of updates and who knows what else, I found myself with an environment (Fedora 32 if you were wondering) that would no longer run jekyll.  This really caused by blogging level to stop completely since I couldn't preview any of the posts.  As the potential posts piled up in my drafts folder, I eventually carved out some time to take care of this.
+
+    </div>
+
+    <a href="/2020/07/02/fixing-jekyll-environment.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2019/03/17/wildfly-jwt-authentication.html">Configuring Wildfly for JWT Authentication</a></h3>
+    
+    <div class="date">
+      March 17, 2019
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#JWT">JWT</a>
+    
+      <a href="tags.html#JEE">JEE</a>
+    
+      <a href="tags.html#CDI">CDI</a>
+    
+    </div>
+
+    <div class="entry">
+      
+In this post we describe how to configure WildFly to access JSON Web Tokens (JWT) via the Authentication header using the Bearer schema.  This allows you to install stateless authenticated REST services on WildFly.
+
+    </div>
+
+    <a href="/2019/03/17/wildfly-jwt-authentication.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2018/10/28/flattening-relationships-in-sql.html">Flattening Relationships in SQL</a></h3>
+    
+    <div class="date">
+      October 28, 2018
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#sql">sql</a>
+    
+      <a href="tags.html#PostgreSQL">PostgreSQL</a>
+    
+    </div>
+
+    <div class="entry">
+      
+I've been sitting on this one for a while, finally getting around to publishing.
+
+    </div>
+
+    <a href="/2018/10/28/flattening-relationships-in-sql.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2017/08/19/jaxrs-microservices.html">JAX-RS Microservices</a></h3>
+    
+    <div class="date">
+      August 19, 2017
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#java">java</a>
+    
+      <a href="tags.html#REST">REST</a>
+    
+      <a href="tags.html#JAX-RS">JAX-RS</a>
+    
+      <a href="tags.html#JEE">JEE</a>
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#xirr">xirr</a>
+    
+      <a href="tags.html#docker">docker</a>
+    
+      <a href="tags.html#Node.js">Node.js</a>
+    
+      <a href="tags.html#grunt">grunt</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+      <a href="tags.html#JavaScript">JavaScript</a>
+    
+      <a href="tags.html#ES6">ES6</a>
+    
+      <a href="tags.html#JSON">JSON</a>
+    
+      <a href="tags.html#CORS">CORS</a>
+    
+    </div>
+
+    <div class="entry">
+      
+An example project where we have taken a Java library ([java-xirr](https://github.com/RayDeCampo/java-xirr)) and expose it as a REST service using JAX-RS.  Then the service is dockerized using the maven dockerfile plugin.  On the client side, we create a separate client using the Node.js connect server in order to illustrate various issues with CORS when utilizing REST services.
+
+    </div>
+
+    <a href="/2017/08/19/jaxrs-microservices.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2017/08/12/sorting-tags-github-pages.html">Case-insensitive Tag Sorting on GitHub Pages</a></h3>
+    
+    <div class="date">
+      August 12, 2017
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#github pages">github pages</a>
+    
+      <a href="tags.html#jekyll">jekyll</a>
+    
+    </div>
+
+    <div class="entry">
+      
+GitHub Pages famously does not support the [`sort_natural`](https://shopify.github.io/liquid/filters/sort_natural/) filter from the [Liquid](https://shopify.github.io/liquid/) templating language used by [Jekyll](https://jekyllrb.com/docs/templates/).  So some chicanery is needed to get a list of tags sorted without regard to case.
+
+    </div>
+
+    <a href="/2017/08/12/sorting-tags-github-pages.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2017/07/08/migrating-to-github-pages.html">Migrating to GitHub Pages</a></h3>
+    
+    <div class="date">
+      July  8, 2017
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#github pages">github pages</a>
+    
+      <a href="tags.html#jekyll">jekyll</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+    </div>
+
+    <div class="entry">
+      
+I finally took the plunge to migrate my old Blogger blog to the more convenient GitHub Pages.  Like everybody else I found when googling this topic discovered, it wasn't as easy as it seemed at first.
+
+    </div>
+
+    <a href="/2017/07/08/migrating-to-github-pages.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2017/04/13/publishing-to-maven-central-repository.html">Publishing to the Maven Central Repository</a></h3>
+    
+    <div class="date">
+      April 13, 2017
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#xirr">xirr</a>
+    
+      <a href="tags.html#newton-raphson">newton-raphson</a>
+    
+      <a href="tags.html#central repository">central repository</a>
+    
+      <a href="tags.html#maven">maven</a>
+    
+      <a href="tags.html#java">java</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>As an exercise in creating a Java library and submitting it to the Central Repository, I created an implementation of the xirr (irregular internal rate of return) function in Java. 
+    </div>
+
+    <a href="/2017/04/13/publishing-to-maven-central-repository.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2017/03/30/xslt-utilities.html">XSLT Utilities</a></h3>
+    
+    <div class="date">
+      March 30, 2017
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#xslt">xslt</a>
+    
+      <a href="tags.html#xsl">xsl</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Some XSLT re-usable templates for posterity:
+    </div>
+
+    <a href="/2017/03/30/xslt-utilities.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2016/11/15/connect-to-microsoft-vpn-from-fedora-24.html">Connect to Microsoft VPN from Fedora 24</a></h3>
+    
+    <div class="date">
+      November 15, 2016
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#fedora">fedora</a>
+    
+      <a href="tags.html#Windows">Windows</a>
+    
+      <a href="tags.html#firewalld">firewalld</a>
+    
+      <a href="tags.html#vpn">vpn</a>
+    
+      <a href="tags.html#pptp">pptp</a>
+    
+      <a href="tags.html#firewall-cmd">firewall-cmd</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>New box, new OS, time for another edition of trying to connect to Microsoft's VPN software.  This time it is Fedora's turn.
+    </div>
+
+    <a href="/2016/11/15/connect-to-microsoft-vpn-from-fedora-24.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2016/09/17/dipping-my-toes-into-nodejs-ecosystem.html">Dipping my toes into the Node.js ecosystem</a></h3>
+    
+    <div class="date">
+      September 17, 2016
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JavaScript">JavaScript</a>
+    
+      <a href="tags.html#xirr">xirr</a>
+    
+      <a href="tags.html#npm">npm</a>
+    
+      <a href="tags.html#ecmascript">ecmascript</a>
+    
+      <a href="tags.html#node">node</a>
+    
+      <a href="tags.html#nodejs">nodejs</a>
+    
+      <a href="tags.html#Node.js">Node.js</a>
+    
+      <a href="tags.html#npmjs">npmjs</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Just to get my feet wet, I published a Node.js module called <a href="https://www.npmjs.com/package/xirr">xirr</a>. 
+    </div>
+
+    <a href="/2016/09/17/dipping-my-toes-into-nodejs-ecosystem.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2016/08/21/connect-to-microsoft-vpn-from-ubuntu.html">Connect to Microsoft VPN from Ubuntu 16.04 Xenial Xerus</a></h3>
+    
+    <div class="date">
+      August 21, 2016
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#xenial">xenial</a>
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#Windows">Windows</a>
+    
+      <a href="tags.html#vpn">vpn</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I recently upgraded from Ubuntu 14.04 on my main desktop machine and discovered that my VPN connection to  Windows 2008 Server no longer worked.  The bugaboo turned out to be the routing table which no longer requires a gateway entry.  Here I have rewritten my post originally written for 12.10 to reflect the new configuration.
+    </div>
+
+    <a href="/2016/08/21/connect-to-microsoft-vpn-from-ubuntu.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2016/04/04/complicated-string-joins.html">Complicated String Joins</a></h3>
+    
+    <div class="date">
+      April  4, 2016
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#functional">functional</a>
+    
+      <a href="tags.html#streams">streams</a>
+    
+      <a href="tags.html#java">java</a>
+    
+      <a href="tags.html#lambda">lambda</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>So if you have not been under a rock and have used Java 8, you are surely aware of the new String.join() method and the Collectors.joining() method to concatenate arrays or streams of Strings.  Sometimes however, a simple concatenation with a delimiter is not quite up to the job. 
+    </div>
+
+    <a href="/2016/04/04/complicated-string-joins.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2016/03/28/creating-custom-collector.html">Creating a custom Collector</a></h3>
+    
+    <div class="date">
+      March 28, 2016
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#functional">functional</a>
+    
+      <a href="tags.html#streams">streams</a>
+    
+      <a href="tags.html#java">java</a>
+    
+      <a href="tags.html#lambda">lambda</a>
+    
+    </div>
+
+    <div class="entry">
+      
+    </div>
+
+    <a href="/2016/03/28/creating-custom-collector.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2015/03/09/jsf-el-implicit-object-reference.html">JSF EL Implicit Object Reference</a></h3>
+    
+    <div class="date">
+      March  9, 2015
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JSF">JSF</a>
+    
+      <a href="tags.html#documentation">documentation</a>
+    
+      <a href="tags.html#EL">EL</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Just collecting the implicit objects defined by the JSF 2.2 specification (section 5.6.2.1, table 5-11) which are available in the EL: 
+    </div>
+
+    <a href="/2015/03/09/jsf-el-implicit-object-reference.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2015/02/13/jquery-ui-initialization-issues.html">jQuery UI Initialization Issues</a></h3>
+    
+    <div class="date">
+      February 13, 2015
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#RequireJS">RequireJS</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+      <a href="tags.html#jQuery">jQuery</a>
+    
+    </div>
+
+    <div class="entry">
+      
+ <p>Every once in a while when using jQuery UI I notice that my widget is not being initialized smoothly.  For example, when using the menu widget I might see the list items behind the menu briefly.  Then the page jumps around and it is a generally unpleasant experience for the user.  Who likes it when your jQuery widgets are jumpy and cause the page to feel like one of those old 'punch the monkey' banner ads? 
+    </div>
+
+    <a href="/2015/02/13/jquery-ui-initialization-issues.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2015/01/17/jsf-add-conversation-id-to-link-or.html">JSF: Add Conversation ID to a link or button</a></h3>
+    
+    <div class="date">
+      January 17, 2015
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JSF">JSF</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>To add the conversation ID parameter <code>cid</code> to a <code>h:link</code> or <code>h:button</code>:
+    </div>
+
+    <a href="/2015/01/17/jsf-add-conversation-id-to-link-or.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2015/01/15/retain-sessions-in-wildfly-8.html">Retain sessions in WildFly 8</a></h3>
+    
+    <div class="date">
+      January 15, 2015
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#configuration">configuration</a>
+    
+      <a href="tags.html#standalone-full.xml">standalone-full.xml</a>
+    
+      <a href="tags.html#documentation">documentation</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Add the <code>persistent-sessions</code> element to your WildFly configuration to keep sessions persistent across redeployments and restarts: 
+    </div>
+
+    <a href="/2015/01/15/retain-sessions-in-wildfly-8.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2015/01/07/wildfly-820-and-java-8-on-centos-66.html">WildFly 8.2.0 and Java 8 on CentOS 6.6</a></h3>
+    
+    <div class="date">
+      January  7, 2015
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#installation">installation</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>This post documents how to install and configure <a href="http://www.wildfly.org/">WildFly</a> 8.2.0 on CentOS 6.6.  We make some changes to move some of the configuration under <tt>/etc</tt> and also place log files under <tt>/var/log</tt> and temp files under <tt>/tmp</tt> just like a well-behaved POSIX application should.  <p>We&#8217;ll start by installing Java; download your desired version as an RPM from Oracle and install:
+    </div>
+
+    <a href="/2015/01/07/wildfly-820-and-java-8-on-centos-66.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2015/01/06/network-issues-with-centos-6x-under.html">Network issues with CentOS 6.x under Hyper-V</a></h3>
+    
+    <div class="date">
+      January  6, 2015
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#Hyper-V">Hyper-V</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#networking">networking</a>
+    
+    </div>
+
+    <div class="entry">
+      
+    </div>
+
+    <a href="/2015/01/06/network-issues-with-centos-6x-under.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2014/10/05/jsf-22-welcome-file.html">JSF 2.2 Welcome File</a></h3>
+    
+    <div class="date">
+      October  5, 2014
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JSF">JSF</a>
+    
+      <a href="tags.html#web.xml">web.xml</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Just a quick post in case you are trying to use a JSF page as a welcome file.  This is what you'll need in your web.xml: 
+    </div>
+
+    <a href="/2014/10/05/jsf-22-welcome-file.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2014/09/28/could-not-find-backup-for-factory.html">Could not find backup for factory javax.faces.context.FacesContextFactory</a></h3>
+    
+    <div class="date">
+      September 28, 2014
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#JEE">JEE</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+      <a href="tags.html#facelets">facelets</a>
+    
+      <a href="tags.html#NetBeans">NetBeans</a>
+    
+      <a href="tags.html#maven">maven</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<div class="paragraph"><p>Recently I was porting a JEE application&#8217;s development environment from an outdated version of IDEA to Maven and NetBeans.  After some effort I got the two builds to yeild pretty much the same EAR files.
+    </div>
+
+    <a href="/2014/09/28/could-not-find-backup-for-factory.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2014/02/16/selinux-and-ssh.html">SELinux and ssh</a></h3>
+    
+    <div class="date">
+      February 16, 2014
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#SELinux">SELinux</a>
+    
+      <a href="tags.html#ssh">ssh</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I've had this one as a draft post for a while and I just ran into the it again, so it's time to to publish it. 
+    </div>
+
+    <a href="/2014/02/16/selinux-and-ssh.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/11/17/reusing-javascript-modules-in-liferay-62.html">Reusing JavaScript Modules in Liferay 6.2</a></h3>
+    
+    <div class="date">
+      November 17, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JavaScript">JavaScript</a>
+    
+      <a href="tags.html#Liferay">Liferay</a>
+    
+      <a href="tags.html#liferay-portlet.xml">liferay-portlet.xml</a>
+    
+      <a href="tags.html#portlet">portlet</a>
+    
+      <a href="tags.html#web.xml">web.xml</a>
+    
+      <a href="tags.html#AlloyUI">AlloyUI</a>
+    
+      <a href="tags.html#portal">portal</a>
+    
+      <a href="tags.html#YUI">YUI</a>
+    
+      <a href="tags.html#modules">modules</a>
+    
+      <a href="tags.html#liferay-hook.xml">liferay-hook.xml</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p><a href="http://www.liferay.com">Liferay</a> is a <a href="http://www.jcp.org/en/jsr/detail?id=286">JSR-286</a> compliant portal server that runs on a variety of different application servers.  Previously I have explained how to get <a href="2013/11/liferay-62-portal-on-jboss-720.html">Liferay working with JBoss 7.2.0</a>.
+    </div>
+
+    <a href="/2013/11/17/reusing-javascript-modules-in-liferay-62.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/11/10/liferay-62-portal-on-jboss-720.html">Liferay 6.2 Portal on JBoss 7.2.0</a></h3>
+    
+    <div class="date">
+      November 10, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#Liferay">Liferay</a>
+    
+      <a href="tags.html#JEE">JEE</a>
+    
+      <a href="tags.html#portal">portal</a>
+    
+      <a href="tags.html#PostgreSQL">PostgreSQL</a>
+    
+      <a href="tags.html#modules">modules</a>
+    
+      <a href="tags.html#standalone-full.xml">standalone-full.xml</a>
+    
+      <a href="tags.html#JDBC">JDBC</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p><a href="http://www.liferay.com">Liferay</a> is a <a href="http://www.jcp.org/en/jsr/detail?id=286">JSR-286</a> (also known as Portal 2.0) compliant portal (and a whole lot more).  Since I am in the market for a portal server for an upcoming project, I figured I needed to check Liferay out.  The folks at Liferay have bundled version 6.2 with a number of different open-source application servers, including JBoss 7.1.1, but what fun would it be to simply download a bundle?  Liferay is also available as a war download for deployment on existing (and closed-source) application servers.  So let&#8217;s see if we can get Liferay running on the JBoss 7.2.0 server <a href="/2013/10/build-and-install-jboss-720-on-centos-64.html">we built previously</a>.
+    </div>
+
+    <a href="/2013/11/10/liferay-62-portal-on-jboss-720.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/11/03/packaging-gatein-javascript-modules-in.html">Packaging GateIn JavaScript Modules in Separate WARs</a></h3>
+    
+    <div class="date">
+      November  3, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JavaScript">JavaScript</a>
+    
+      <a href="tags.html#portlet.xml">portlet.xml</a>
+    
+      <a href="tags.html#gatein-resources.xml">gatein-resources.xml</a>
+    
+      <a href="tags.html#portlet">portlet</a>
+    
+      <a href="tags.html#RequireJS">RequireJS</a>
+    
+      <a href="tags.html#web.xml">web.xml</a>
+    
+      <a href="tags.html#portal">portal</a>
+    
+      <a href="tags.html#GateIn">GateIn</a>
+    
+      <a href="tags.html#modules">modules</a>
+    
+      <a href="tags.html#jQuery">jQuery</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I have been messing around with the <a href="http://www.jboss.org/gatein">GateIn Portal Server</a> in order to evaluate it for an upcoming project.  One nice aspect of the portal is the way JavaScript is handled.  JavaScript in GateIn is split into modules and managed via the <a href="http://requirejs.org/">RequireJS</a> library.  This allows the portlet developer to keep their JavaScript isolated and only include the dependencies they require.  It also allows for re-use of modules defined in one portlet in other portlets.  It doesn&#8217;t take a lot of imagination to picture the disaster JavaScript could become on a portal which doesn&#8217;t provide isolation and re-use, especially if multiple organizations are providing portals.
+    </div>
+
+    <a href="/2013/11/03/packaging-gatein-javascript-modules-in.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/10/27/building-gatein-363.html">Building GateIn 3.6.3</a></h3>
+    
+    <div class="date">
+      October 27, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#GateIn">GateIn</a>
+    
+      <a href="tags.html#mvn">mvn</a>
+    
+      <a href="tags.html#maven">maven</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p><a href="http://www.jboss.org/gatein">GateIn</a> is a <a href="http://www.jcp.org/en/jsr/detail?id=286">JSR-286</a> (also known as Portal 2.0) compatible portal based on the JBoss application server (soon to be known as WildFly).  The latest version of GateIn with a <a href="http://www.jboss.org/gatein/download">provided build</a> is GateIn 3.6.0 and is bundled with JBoss 7.1.1.  (There is also a beta build of Red Hat JBoss Portal 6.1.0 which bundles GateIn with JBoss EAP and thus carries a more restrictive license.)  Note that GateIn is bundled with the application server and is not an add-on to an existing application server.
+    </div>
+
+    <a href="/2013/10/27/building-gatein-363.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/10/20/build-and-install-jboss-720-on-centos-64.html">Build and Install JBoss 7.2.0 on CentOS 6.4</a></h3>
+    
+    <div class="date">
+      October 20, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#WildFly">WildFly</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>As you may or may not be aware, a great many changes have been happening to the JBoss application server since being purchased by Red Hat.  Most importantly, the application server is being rebranded as <a href="http://www.wildfly.org/">WildFly</a> for version 8.  ("Why?" is the first entry on the <a href="http://www.wildfly.org/faq/">WildFly FAQ</a> if you are curious.)  But since WildFly is not quite ready as of this writing (but looks real close), we are going to deal with the latest community release, JBoss AS 7.2.0.
+    </div>
+
+    <a href="/2013/10/20/build-and-install-jboss-720-on-centos-64.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/09/22/restful-web-services-on-jbossas-7.html">RESTful Web Services on JBossAS 7</a></h3>
+    
+    <div class="date">
+      September 22, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#JEE">JEE</a>
+    
+      <a href="tags.html#REST">REST</a>
+    
+      <a href="tags.html#web.xml">web.xml</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Deploying RESTful web services on JBossAS 7 is relatively painless and straightforward.  Thanks to the extensive support of annotations vs configuration in JEE 6, creating RESTful web services is almost XML-free.
+    </div>
+
+    <a href="/2013/09/22/restful-web-services-on-jbossas-7.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/09/20/trac-plugins-vs-python-versions.html">Trac Plugins vs Python Versions</a></h3>
+    
+    <div class="date">
+      September 20, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#python">python</a>
+    
+      <a href="tags.html#Trac">Trac</a>
+    
+    </div>
+
+    <div class="entry">
+      
+    </div>
+
+    <a href="/2013/09/20/trac-plugins-vs-python-versions.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/09/08/joining-centos-server-to-active.html">Joining a CentOS server to Active Directory</a></h3>
+    
+    <div class="date">
+      September  8, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#Active Directory">Active Directory</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#ntp">ntp</a>
+    
+      <a href="tags.html#Windows">Windows</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>As the number of CentOS (or Red Hat) machines in your environment grows, you begin to appreciate the need for a central login mechanism.  Most workplaces already have a such a login for their Windows workstations in the form of an Active Directory domain.  By joining your CentOS machines to the Active Directory domain, you allow users to login with the same credentials as on their Windows machines.  Furthermore you do not need to add or remove users when new people join the team or others drop off the team.
+    </div>
+
+    <a href="/2013/09/08/joining-centos-server-to-active.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/08/18/production-mail-server-for-as.html">Production Mail server for AS</a></h3>
+    
+    <div class="date">
+      August 18, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#SPF">SPF</a>
+    
+      <a href="tags.html#postfix">postfix</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>In the past I have detailed how I set up a <a href="/2013/03/development-mail-server.html">mail server for development application servers</a>.  Today I want to explain how to set up a mail server for a production application server, or one that should interact with real-life mail systems.
+    </div>
+
+    <a href="/2013/08/18/production-mail-server-for-as.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/07/28/ubuntu-1210-installing-taglib-ruby.html">Ubuntu 12.10: Installing taglib-ruby</a></h3>
+    
+    <div class="date">
+      July 28, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#taglib">taglib</a>
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#installation">installation</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#gem">gem</a>
+    
+      <a href="tags.html#quantal">quantal</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Back when I was fooling around with Ruby I <a href="/2012/07/accessing-mp3-tags-in-ruby.html">wrote some code</a> using the ruby-taglib library for manipulating mp3 tags.  Later, I went through the process of <a href="/2012/12/installing-ubuntu-1210-on-ssd-part-1.html">installing Ubuntu 12.10</a> from scratch on my main system.  Eventually I tried running the old on the new system and discovered that I needed to re-install ruby-taglib and ran into some difficulties.
+    </div>
+
+    <a href="/2013/07/28/ubuntu-1210-installing-taglib-ruby.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/07/21/conditional-table-creation-for-oracle.html">Conditional Table Creation for Oracle</a></h3>
+    
+    <div class="date">
+      July 21, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#schema">schema</a>
+    
+      <a href="tags.html#PL\SQL">PL\SQL</a>
+    
+      <a href="tags.html#Oracle">Oracle</a>
+    
+      <a href="tags.html#sql">sql</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>A quick example script for creating a table in an Oracle database only when it does not already exist.
+    </div>
+
+    <a href="/2013/07/21/conditional-table-creation-for-oracle.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/06/0/additional-ajp-connectors-within.html">Additional AJP connectors within SELinux environment</a></h3>
+    
+    <div class="date">
+      June  9, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#SELinux">SELinux</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#Apache">Apache</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#AJP">AJP</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I recently went through the exercise of adding an additional JBoss application server to a production CentOS 6.4 server.  The two applications were to be hosted on the same machine using virtual name servers to distinguish requests.  I have covered virtual name servers before in my post on <a href="/2013/01/trac-on-centos-63-part-2.html">install Trac on CentOS 6</a>.  Multiple instances of JBoss can be made to play nice on the same servers by <a href="https://community.jboss.org/wiki/ConfigurePorts">shifting the ports</a> via the switch <tt>&#8209;Djboss.service.binding.set=ports&#8209;01</tt>.
+    </div>
+
+    <a href="/2013/06/0/additional-ajp-connectors-within.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/03/31/heuristicmixedexception-with-postgresql.html">HeuristicMixedException with PostgreSQL</a></h3>
+    
+    <div class="date">
+      March 31, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#PostgreSQL">PostgreSQL</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Just a quick post in case someone else ever encounters this issue.  I got the following error when migrating an unchanged web application to CentOS 6.3 from an earlier version of CentOS:
+    </div>
+
+    <a href="/2013/03/31/heuristicmixedexception-with-postgresql.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/03/24/development-mail-server.html">Development Mail Server</a></h3>
+    
+    <div class="date">
+      March 24, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#dovecot">dovecot</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#postfix">postfix</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>If you have ever needed to develop a web application you have probably needed to send email from the application.  Frequently in the applications I work on, we end up using the email address as the login, which means we need lots of email addresses for unit test and integration testing, etc.  Using real email addresses for this is not very convenient, so we have used a separate development mail server.  Ideally this mail server will accept mail from any development machine, but will not relay mail to any real addresses (so it won&#8217;t be an open relay).
+    </div>
+
+    <a href="/2013/03/24/development-mail-server.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/02/03/trac-on-centos-63-part-3.html">Trac on CentOS 6.3, Part 3</a></h3>
+    
+    <div class="date">
+      February  3, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#SELinux">SELinux</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#Apache">Apache</a>
+    
+      <a href="tags.html#httpd">httpd</a>
+    
+      <a href="tags.html#installation">installation</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#Trac">Trac</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Now for the exciting conclusion of our three-part series on installing  <a href="http://trac.edgewall.org/trac">Trac</a> on a 64-bit server running CentOS 6.3.  In <a href="/2013/01/trac-on-centos-63-part-1.html">part 1</a> I installed some prerequisite software and Trac itself.  In <a href="/2013/01/trac-on-centos-63-part-2.html">part 2</a>, I installed and configured Apache as a front end to Trac.  In part 3, I will configure Trac to use an Active Directory domain for authentication.
+    </div>
+
+    <a href="/2013/02/03/trac-on-centos-63-part-3.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/01/27/trac-on-centos-63-part-2.html">Trac on CentOS 6.3, Part 2</a></h3>
+    
+    <div class="date">
+      January 27, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#SELinux">SELinux</a>
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#Apache">Apache</a>
+    
+      <a href="tags.html#httpd">httpd</a>
+    
+      <a href="tags.html#installation">installation</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#WSGI">WSGI</a>
+    
+      <a href="tags.html#Trac">Trac</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Recently I had the need to set up a <a href="http://trac.edgewall.org/trac">Trac</a> instance on a 64-bit machine running CentOS 6.3.  In <a href="/2013/01/trac-on-centos-63-part-1.html">part 1</a> I installed some prerequisite software and Trac itself.  In part 2, I will be installing Apache as a front end to Trac.  In <a href="/2013/02/trac-on-centos-63-part-3.html">part 3</a>, I will configure Trac to use an Active Directory domain for authentication.
+    </div>
+
+    <a href="/2013/01/27/trac-on-centos-63-part-2.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/01/20/trac-on-centos-63-part-1.html">Trac on CentOS 6.3, Part 1</a></h3>
+    
+    <div class="date">
+      January 20, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#Red Hat">Red Hat</a>
+    
+      <a href="tags.html#RHEL">RHEL</a>
+    
+      <a href="tags.html#installation">installation</a>
+    
+      <a href="tags.html#CentOS">CentOS</a>
+    
+      <a href="tags.html#python">python</a>
+    
+      <a href="tags.html#subversion">subversion</a>
+    
+      <a href="tags.html#Trac">Trac</a>
+    
+      <a href="tags.html#svn">svn</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Recently I had the need to set up a <a href="http://trac.edgewall.org/trac">Trac</a> instance on a 64-bit machine running CentOS 6.3.  For CentOS and Red Hat 5, someone has done the hard work already and set up RPM files (see <a href="http://trac.edgewall.org/wiki/TracOnRhel5">the Trac documentation on RHEL 5</a> and <a href="http://dag.wieers.com/rpm/">Dag Wieers RPM repository</a> for details) making installing Trac as easy as <tt>yum install trac</tt>.  Unfortunately, our benefactors have not gotten to RHEL 6 yet so I needed to do it myself.
+    </div>
+
+    <a href="/2013/01/20/trac-on-centos-63-part-1.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/01/13/svn-e200031-attempt-to-write-readonly.html">SVN: E200031: attempt to write a readonly database</a></h3>
+    
+    <div class="date">
+      January 13, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#subversion">subversion</a>
+    
+      <a href="tags.html#svn">svn</a>
+    
+    </div>
+
+    <div class="entry">
+      
+    </div>
+
+    <a href="/2013/01/13/svn-e200031-attempt-to-write-readonly.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2013/01/06/nvidia-overscan-in-ubuntu-1210.html">Nvidia Overscan in Ubuntu 12.10</a></h3>
+    
+    <div class="date">
+      January  6, 2013
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#nvidia">nvidia</a>
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#overscan">overscan</a>
+    
+      <a href="tags.html#quantal">quantal</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>A few weeks ago I upgraded my HTPC to Ubuntu 12.10 and was treated to a nasty surprise: the overscan settings for the nvidia driver were no longer recognized.  The HTPC is connected to my television (naturally) which is a 40" LG LCD HDTV.  If you have ever tried to connect your PC to an HDTV before, you probably encountered the problem of that the visible portion of the screen is smaller than the drawable portion of the screen.  The result is that the edges of the screen are not visible.  In my case that meant the dash and the universal menu of Unity could not be seen.  That makes for a less than usable experience.
+    </div>
+
+    <a href="/2013/01/06/nvidia-overscan-in-ubuntu-1210.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/12/23/ubuntu-1210-connect-to-microsoft-vpn.html">Ubuntu 12.10: Connect to Microsoft VPN</a></h3>
+    
+    <div class="date">
+      December 23, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#Windows">Windows</a>
+    
+      <a href="tags.html#quantal">quantal</a>
+    
+      <a href="tags.html#vpn">vpn</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I recently upgraded to Ubuntu 12.10 on my main desktop machine from scratch, which means a number of things which had been installed and configured need to be re-done.  One of those things is my VPN connection to work, which runs Windows 2008 Server for VPN.
+    </div>
+
+    <a href="/2012/12/23/ubuntu-1210-connect-to-microsoft-vpn.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/12/16/ubuntu-1210-minidlna-on-boot.html">Ubuntu 12.10: Minidlna on Boot</a></h3>
+    
+    <div class="date">
+      December 16, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#minidlna">minidlna</a>
+    
+      <a href="tags.html#upstart">upstart</a>
+    
+      <a href="tags.html#quantal">quantal</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>A big hat tip to Asaf Shahar for this one.
+    </div>
+
+    <a href="/2012/12/16/ubuntu-1210-minidlna-on-boot.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/12/09/installing-ubuntu-1210-on-ssd-part-3.html">Installing Ubuntu 12.10 on an SSD, Part 3</a></h3>
+    
+    <div class="date">
+      December  9, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#tmp">tmp</a>
+    
+      <a href="tags.html#ssd">ssd</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Recently I took the plunge and put an SSD drive into my desktop.  Since I needed to re-install the OS, I figured I would install the latest Ubuntu, version 12.10.  I went over my trials and tribulations of getting the OS installed in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-1.html">part 1</a>, and dealt with swap in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-2.html">part 2</a>.  Today we finish up the tweaks for the SSD.
+    </div>
+
+    <a href="/2012/12/09/installing-ubuntu-1210-on-ssd-part-3.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/12/05/installing-ubuntu-1210-on-ssd-part-2.html">Installing Ubuntu 12.10 on an SSD, Part 2</a></h3>
+    
+    <div class="date">
+      December  5, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#swap">swap</a>
+    
+      <a href="tags.html#quantal">quantal</a>
+    
+      <a href="tags.html#ssd">ssd</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Recently I took the plunge and put an SSD drive into my desktop.  Since I needed to re-install the OS, I figured I would install the latest Ubuntu, version 12.10.  I went over my trials and tribulations of getting the OS installed in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-1.html">part 1</a>, today we are going to talk about some changes I made afterwards to support the SSD.
+    </div>
+
+    <a href="/2012/12/05/installing-ubuntu-1210-on-ssd-part-2.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/12/02/installing-ubuntu-1210-on-ssd-part-1.html">Installing Ubuntu 12.10 on an SSD, Part 1</a></h3>
+    
+    <div class="date">
+      December  2, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#ubuntu">ubuntu</a>
+    
+      <a href="tags.html#bios_grub">bios_grub</a>
+    
+      <a href="tags.html#quantal">quantal</a>
+    
+      <a href="tags.html#ssd">ssd</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>Recently I took the plunge and put an SSD drive into my desktop.  Since I needed to re-install the OS, I figured I would install the latest Ubuntu, version 12.10.
+    </div>
+
+    <a href="/2012/12/02/installing-ubuntu-1210-on-ssd-part-1.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/10/24/conditional-component-binding-in-jsf.html">Conditional Component Binding in JSF</a></h3>
+    
+    <div class="date">
+      October 24, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JSF">JSF</a>
+    
+      <a href="tags.html#taglib">taglib</a>
+    
+      <a href="tags.html#taglib.xml">taglib.xml</a>
+    
+      <a href="tags.html#custom tags">custom tags</a>
+    
+      <a href="tags.html#facelets">facelets</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>In the process of converting an application from JSF 1.2 to JSF 2.1, I came across the following structure:
+    </div>
+
+    <a href="/2012/10/24/conditional-component-binding-in-jsf.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/09/30/an-io-guessing-game.html">An Io Guessing Game</a></h3>
+    
+    <div class="date">
+      September 30, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#algorithms">algorithms</a>
+    
+      <a href="tags.html#Io">Io</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>So when I get the chance I am working through Bruce Tate&#8217;s <em>Seven Languages in Seven Weeks</em> (it might end up being seven years in my case) and commenting on it when the mood strikes.  I am currently working through the exercises for Io Day 2 and today I was contemplating the final exercise.
+    </div>
+
+    <a href="/2012/09/30/an-io-guessing-game.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/09/26/os-specific-ant-properties.html">OS-specific ANT properties</a></h3>
+    
+    <div class="date">
+      September 26, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#hibernate">hibernate</a>
+    
+      <a href="tags.html#hibernate tools">hibernate tools</a>
+    
+      <a href="tags.html#ant">ant</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>The ANT build tool for Java does a pretty decent job of abstracting away OS concerns from your build script.  E.g., file paths can always be represented using the / separator and there are tasks for all the typical file system and build operations.
+    </div>
+
+    <a href="/2012/09/26/os-specific-ant-properties.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/09/22/io-gotcha.html">Io Gotcha</a></h3>
+    
+    <div class="date">
+      September 22, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#gotcha">gotcha</a>
+    
+      <a href="tags.html#Io">Io</a>
+    
+    </div>
+
+    <div class="entry">
+      
+ <p>As you are probably aware, I am working my way through <em>Seven Languages in Seven Days</em> by Bruce Tate.  (And if you have ever googled basic questions on the Io language, you will know that I am not the first person to have this idea.)  In any case, I am on Day of Io, but before I get to anything specific there, I wanted to share a gotcha of Io that I encountered.
+    </div>
+
+    <a href="/2012/09/22/io-gotcha.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/09/16/well-i-am-back-to-reading-seven.html">Starting Io</a></h3>
+    
+    <div class="date">
+      September 16, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#Io">Io</a>
+    
+    </div>
+
+    <div class="entry">
+      
+ <p>Well I am back to reading Seven Languages in Seven Days by Bruce Tate and am taking on the chapter on Io.  If you are not familiar, Io is a prototype-based language like JavaScript.  Since I typically work on the server-side and only dabble in JavaScript and HTML, I am looking forward to seeing how learning Io can reflect on my knowledge of JavaScript.
+    </div>
+
+    <a href="/2012/09/16/well-i-am-back-to-reading-seven.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/09/03/absent-code.html">Absent Code</a></h3>
+    
+    <div class="date">
+      September  3, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JBoss">JBoss</a>
+    
+      <a href="tags.html#GlassFish">GlassFish</a>
+    
+      <a href="tags.html#JEE">JEE</a>
+    
+      <a href="tags.html#JUnit">JUnit</a>
+    
+      <a href="tags.html#java">java</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I recently hit an error I had never seen before:
+    </div>
+
+    <a href="/2012/09/03/absent-code.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/08/30/using-ant-hibernate-tools-with.html">Using ANT Hibernate Tools with Hibernate 4</a></h3>
+    
+    <div class="date">
+      August 30, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#jasypt">jasypt</a>
+    
+      <a href="tags.html#hibernate">hibernate</a>
+    
+      <a href="tags.html#hibernate tools">hibernate tools</a>
+    
+      <a href="tags.html#ant">ant</a>
+    
+      <a href="tags.html#slf4j">slf4j</a>
+    
+      <a href="tags.html#java">java</a>
+    
+    </div>
+
+    <div class="entry">
+      
+ <p>Recently I have been upgrading a JEE application to the latest versions of the libraries used.  In particular I was upgrading from Hibernate 3 to Hibernate 4.
+    </div>
+
+    <a href="/2012/08/30/using-ant-hibernate-tools-with.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/08/06/ruby-play-list-copier-take-2.html">Ruby Play List Copier, Take 2</a></h3>
+    
+    <div class="date">
+      August  6, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#taglib">taglib</a>
+    
+      <a href="tags.html#mp3">mp3</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#m3u">m3u</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I finally got back to my little Ruby project over the weekend.  The idea was to write a tool to copy an m3u play list and associated files to my mp3 player since Rhythmbox and Banshee were not up to the task.  I used the ruby-taglib library from <a href="http://robinst.github.com/taglib-ruby/">http://robinst.github.com/taglib-ruby/</a> to access mp3 tags.
+    </div>
+
+    <a href="/2012/08/06/ruby-play-list-copier-take-2.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/08/02/ruby-play-list-copier-take-1.html">Ruby Play List Copier, Take 1</a></h3>
+    
+    <div class="date">
+      August  2, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#taglib">taglib</a>
+    
+      <a href="tags.html#mp3">mp3</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#m3u">m3u</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>So I finally got back to my Ruby play list project.  The next mini-goal would be to parse a play list file and print out the converted file names.  I created a PlayListEntry class and a PlayList class and things were moving along very well:
+    </div>
+
+    <a href="/2012/08/02/ruby-play-list-copier-take-1.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/29/accessing-mp3-tags-in-ruby.html">Accessing MP3 Tags in Ruby</a></h3>
+    
+    <div class="date">
+      July 29, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#taglib">taglib</a>
+    
+      <a href="tags.html#installation">installation</a>
+    
+      <a href="tags.html#mp3">mp3</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#gem">gem</a>
+    
+      <a href="tags.html#id3">id3</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I wanted to explore Ruby a little more so I needed to give myself a project.  I figured I would try to create a script to copy a playlist to my MP3 player, since both Rhythmbox and Banshee had issues with this.
+    </div>
+
+    <a href="/2012/07/29/accessing-mp3-tags-in-ruby.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/21/ruby-wrapping-up.html">Ruby, Wrapping Up</a></h3>
+    
+    <div class="date">
+      July 21, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>My notes on the final section on Ruby from <em>Seven Languages in Seven Days</em> by Bruce Tate.
+    </div>
+
+    <a href="/2012/07/21/ruby-wrapping-up.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/19/ruby-day-3.html">Ruby, Day 3</a></h3>
+    
+    <div class="date">
+      July 19, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#aop">aop</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#modules">modules</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>My notes on Day 3 of Ruby from <em>Seven Languages in Seven Weeks</em> by Bruce Tate follow.
+    </div>
+
+    <a href="/2012/07/19/ruby-day-3.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/16/deleting-old-files-on-windows.html">Deleting old files on Windows</a></h3>
+    
+    <div class="date">
+      July 16, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#JavaScript">JavaScript</a>
+    
+      <a href="tags.html#JScript">JScript</a>
+    
+      <a href="tags.html#Windows">Windows</a>
+    
+      <a href="tags.html#ActiveX">ActiveX</a>
+    
+      <a href="tags.html#Windows Script Host">Windows Script Host</a>
+    
+    </div>
+
+    <div class="entry">
+      
+<p>I ran into a situation today where I wanted to script deletion of folders older than a set number days on an old Windows 2000 machine.  (The culprit is a commercial SMTP spam and virus filter that does not clean up after itself when it updates.  Eventually the drive gets full and no mail comes through.)  I found a solution using <tt>forfiles</tt> but this version of Windows does not have it.  I found myself searching the web and gnashing my teeth over the limitations of Windows batch scripting.
+    </div>
+
+    <a href="/2012/07/16/deleting-old-files-on-windows.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/15/ruby-day-2.html">Ruby, Day 2</a></h3>
+    
+    <div class="date">
+      July 15, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+    </div>
+
+    <div class="entry">
+      
+My notes on day 2 of Ruby from <i>Seven Languages in Seven Weeks</i> by Bruce Tate. 
+    </div>
+
+    <a href="/2012/07/15/ruby-day-2.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/14/ruby-day-1.html">Ruby, Day 1</a></h3>
+    
+    <div class="date">
+      July 14, 2012
+    </div>
+    
+    <div class="tags">
+    
+      <a href="tags.html#env">env</a>
+    
+      <a href="tags.html#7languages7weeks">7languages7weeks</a>
+    
+      <a href="tags.html#ruby">ruby</a>
+    
+      <a href="tags.html#documentation">documentation</a>
+    
+      <a href="tags.html#irb">irb</a>
+    
+    </div>
+
+    <div class="entry">
+      
+Well I have survived day 1 of Ruby in <i>Seven Languages in Seven Days</i> by Bruce Tate. Now I just need to figure out how to do everything I want to do in this blog software.
+
+    </div>
+
+    <a href="/2012/07/14/ruby-day-1.html" class="read-more">Read More</a>
+  </article>
+
+    <article class="post">
+
+    <h3><a href="/2012/07/14/welcome.html">Welcome</a></h3>
+    
+    <div class="date">
+      July 14, 2012
+    </div>
+    
+    <div class="tags">
+    
+    </div>
+
+    <div class="entry">
+      
+I created this blog for two purposes. &nbsp;First, to capture any random notes on problems I have encountered (and hopefully solved). &nbsp;Hopefully next time it happens, I'll remember the blog post or Google will remember it for me.
+    </div>
+
+    <a href="/2012/07/14/welcome.html" class="read-more">Read More</a>
+  </article>
+
+</div>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
