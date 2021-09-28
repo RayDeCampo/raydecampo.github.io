@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>HTTPS for WildFly 20</h1>
+  
+  <div class="date">
+    August  9, 2020
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#WildFly">WildFly</a>
+  
+    <a href="/tags.html#JBoss">JBoss</a>
+  
+    <a href="/tags.html#https">https</a>
+  
+    <a href="/tags.html#keytool">keytool</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>The following documents installing an actual certificate in on WildFly 20, although these steps have been tested on WildFly 19 as well.</p>
+<p>In order to configure WildFly to use HTTPS with an actual certificate, we start by generating a certificate request:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token punctuation">[</span>wildfly@wxyz wildfly<span class="token punctuation">]</span>$ <span class="token function">mkdir</span> httpscert<br><span class="token punctuation">[</span>wildfly@wxyz wildfly<span class="token punctuation">]</span>$ <span class="token builtin class-name">cd</span> httpscert<br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ <span class="token assign-left variable">server</span><span class="token operator">=</span>full.name.of.the.server<br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ keytool -alias tomcat -keyalg RSA -keystore https.keystore -genkey<br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ keytool -alias tomcat -keyalg RSA -keystore https.keystore -certreq -file <span class="token variable">${server}</span>.csr</code></pre>
+<p>Note that the <code>keytool</code> utility comes with the Java distribution.</p>
+<p>Now submit the request to the certificate authority and get the signed certificate back. You may get some intermediate certificates along with the signed certificate, these will need to be imported into your keystore.</p>
+<p>If for some reason the root certificate is not recognized, it will need to be imported as well.  In my case I was using my company certificate authority so I imported the root certificate.</p>
+<pre class="language-shell"><code class="language-shell"><span class="token comment"># Import the root certificate, if necessary:</span><br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ keytool -alias root -keystore https.keystore -import -file ca.cert.pem<br><span class="token comment"># Import any intermediates (use a different alias for each):</span><br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ keytool -alias intermediate -keystore https.keystore -import -file ca-chain.cert.pem<br><span class="token comment"># NOTE: In my case ca-chain.cert.pem has multiple certificates, keytool takes the first one</span><br><span class="token comment"># Import the actual certificate</span><br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ keytool -alias tomcat -keystore https.keystore -import -file <span class="token variable">${server}</span>.cert.pem<br><span class="token comment"># Put the keystore in the right place</span><br><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ <span class="token function">mv</span> https.keystore <span class="token punctuation">..</span>/wildfly/standalone/configuration/</code></pre>
+<p>Next we configure WildFly as in <a href="https://docs.wildfly.org/20/WildFly_Elytron_Security.html#configure-ssltls">https://docs.wildfly.org/20/WildFly_Elytron_Security.html#configure-ssltls</a>.</p>
+<p>Create a <code>configure-https.txt</code> file of commands for the WildFly command line tool:</p>
+<pre class="language-none"><code class="language-none">connect<br>batch<br>/subsystem=elytron/key-store=https-key-store:add(path=https.keystore,relative-to=jboss.server.config.dir,credential-reference={clear-text=yourpassword},type=JKS)<br>/subsystem=elytron/key-manager=https-key-manager:add(key-store=https-key-store,credential-reference={clear-text=itsdifferentnow})<br>/subsystem=elytron/server-ssl-context=https-ssl-context:add(key-manager=https-key-manager,protocols=["TLSv1.2"])<br>/subsystem=undertow/server=default-server/https-listener=https:undefine-attribute(name=security-realm)<br>/subsystem=undertow/server=default-server/https-listener=https:write-attribute(name=ssl-context,value=https-ssl-context)<br>run-batch<br>reload<br>exit</code></pre>
+<p>Note you'll need to substitute in your actual keystore password in the above.</p>
+<p>Then we run the commands:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token punctuation">[</span>wildfly@wxyz httpscert<span class="token punctuation">]</span>$ <span class="token builtin class-name">cd</span> <span class="token punctuation">..</span><br><span class="token punctuation">[</span>wildfly@wxyz wildfly<span class="token punctuation">]</span>$ wildfly/bin/jboss-cli.sh <span class="token operator">&lt;</span>configure-https.txt</code></pre>
+<p>WildFly should be using your new certificate to handle HTTPS requests now.  Note that WildFly by default listens on 8443 for HTTPS.</p>
+<p>If desired, you can forward the default HTTPS port 443 to port 8443 on CentOS or RedHat systems with the following command:</p>
+<pre class="language-none"><code class="language-none">[root@wxyz ~]# firewall-cmd --permanent --add-forward-port=port=443:proto=tcp:toport=8443</code></pre>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

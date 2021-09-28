@@ -1,0 +1,17 @@
+---
+layout: post
+title: 'SVN: E200031: attempt to write a readonly database'
+date: '2013-01-13T09:30:00.000-05:00'
+permalink: 2013/01/13/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- subversion
+- svn
+modified_time: '2013-01-13T09:30:00.534-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-1337010239443429068
+blogger_orig_url: http://labnotes.decampo.org/2013/01/svn-e200031-attempt-to-write-readonly.html
+redirect_from: /2013/01/svn-e200031-attempt-to-write-readonly.html
+excerpt_separator: </p>
+---
+
+<p>Just a quick and dirty note to solving the following error from Subversion: <p> <blockquote>SVN: E200031: attempt to write a readonly database. </blockquote> <p>I found the answer on Tor Henning Uelands blog under the post <a href="http://h3x.no/2010/12/04/svn-gives-attempt-to-write-a-readonly-database-error">http://h3x.no/2010/12/04/svn-gives-attempt-to-write-a-readonly-database-error</a>.  The solution was to fix the permissions on the db/rep-cache.db file in the subversion repository.  See his blog if you need more details.  Thanks Tor. <p/>

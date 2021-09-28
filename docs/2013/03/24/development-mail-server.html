@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Development Mail Server</h1>
+  
+  <div class="date">
+    March 24, 2013
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#dovecot">dovecot</a>
+  
+    <a href="/tags.html#Red Hat">Red Hat</a>
+  
+    <a href="/tags.html#RHEL">RHEL</a>
+  
+    <a href="/tags.html#CentOS">CentOS</a>
+  
+    <a href="/tags.html#postfix">postfix</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>If you have ever needed to develop a web application you have probably needed to send email from the application.  Frequently in the applications I work on, we end up using the email address as the login, which means we need lots of email addresses for unit test and integration testing, etc.  Using real email addresses for this is not very convenient, so we have used a separate development mail server.  Ideally this mail server will accept mail from any development machine, but will not relay mail to any real addresses (so it won&#8217;t be an open relay).</p>
+<p>Up until now we have used a Windows mail server for this purpose but we are in the process of converting much of our infrastructure to linux servers.  So I needed to set something up on CentOS 6.3.  After a little research and a few pointers from the fine denizens of the #centos IRC chat room on freenode.net, I settled on using postfix.</p>
+<p>Postfix was already installed on my server, so all I needed to do was configure it to answer for a virtual mailbox on a fake domain.  First we need a user and corresponding group to own the mailboxes, as well as a directory to hold them:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>groupadd --system --gid <font color="#993399">2525</font> vmail<br />
+useradd --system --uid <font color="#993399">2525</font> <font color="#990000">\</font><br />
+        --comment <font color="#FF0000">"Virtual Mailbox Owner"</font> <font color="#990000">\</font><br />
+        --shell /sbin/nologin <font color="#990000">\</font><br />
+        --home /var/mail/vhosts <font color="#990000">\</font><br />
+        --no-user-group -g vmail vmail<br />
+mkdir /var/mail/vhosts<br />
+mkdir /var/mail/vhosts/example<font color="#990000">.</font>com<br />
+chown -R vmail<font color="#990000">:</font>vmail /var/mail/vhosts</tt></pre></td></tr></table><p>I am using <tt>vmail</tt> as the user and group and <tt>example.com</tt> for the fake domain.</p>
+<p>Next we have some changes to the /etc/postfix/main.cf configuration file</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># Allow postfix to listen on all IP addresses</font></i><br />
+<font color="#009900">inet_interfaces </font><font color="#990000">=</font> all<br />
+<i><font color="#9A1900">#inet_interfaces = localhost</font></i><br />
+<br />
+<i><font color="#9A1900"># Configure postfix to only accept mail for itself and never relay</font></i><br />
+<font color="#009900">smtpd_recipient_restrictions </font><font color="#990000">=</font> reject_unauth_destination<br />
+<br />
+<i><font color="#9A1900"># VIRTUAL DOMAINS</font></i><br />
+<i><font color="#9A1900"># See /usr/share/doc/postfix-2.6.6/README_FILES/VIRTUAL_README</font></i><br />
+<font color="#009900">virtual_mailbox_domains </font><font color="#990000">=</font> example.com<br />
+<font color="#009900">virtual_mailbox_base </font><font color="#990000">=</font> /var/mail/vhosts<br />
+<font color="#009900">virtual_mailbox_maps </font><font color="#990000">=</font> hash:/etc/postfix/vmailbox<br />
+<font color="#009900">virtual_uid_maps </font><font color="#990000">=</font> static:2525<br />
+<font color="#009900">virtual_gid_maps </font><font color="#990000">=</font> static:2525</tt></pre></td></tr></table><p>Next we need to set up users and passwords.  Since we are dealing with a simple development server, we do not need anything too robust like an RDBMS.  We&#8217;ll just use postfix&#8217;s ability to create and use Berkeley databases.  Also, we want to create a bunch of generic accounts, so we&#8217;ll use a script:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>cd /etc/postfix<br />
+<i><font color="#9A1900"># Create accounts userN@example.com for N from 1 to 20</font></i><br />
+<b><font color="#0000FF">for</font></b> i <b><font color="#0000FF">in</font></b> <font color="#009900">$(</font> seq <font color="#993399">1</font> <font color="#993399">20</font> <font color="#990000">)</font><br />
+<b><font color="#0000FF">do</font></b><br />
+    echo -e <font color="#FF0000">"user${i}@example.com</font><font color="#CC33CC">\t</font><font color="#FF0000">example.com/user${i}/Maildir/"</font> <font color="#990000">&gt;&gt;</font>vmailbox<br />
+<b><font color="#0000FF">done</font></b><br />
+<i><font color="#9A1900"># Compile the database and reload the server</font></i><br />
+postmap /etc/postfix/vmailbox<br />
+postfix reload<br />
+<i><font color="#9A1900"># We need a restart because we changed the listen IP address</font></i><br />
+service postfix restart</tt></pre></td></tr></table><p>Now we can test our configuration by using telnet to send some mail.  Connect to postfix via <tt>telnet localhost smtp</tt>and send an email directly.  Use the following example as a guide:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">220 youserver.localdomain ESMTP Postfix<br />
+EHLO YOURSERVER<br />
+250-youserver.localdomain<br />
+250-PIPELINING<br />
+250-SIZE 10240000<br />
+250-VRFY<br />
+250-ETRN<br />
+250-ENHANCEDSTATUSCODES<br />
+250-8BITMIME<br />
+250 DSN<br />
+MAIL FROM:user1@example.com<br />
+250 2.1.0 Ok<br />
+RCPT TO:user2@example.com<br />
+250 2.1.5 Ok<br />
+DATA<br />
+354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;<br />
+Subject:Testing email<br />
+<br />
+This is a test of postfix of our postfix configuration.<br />
+.<br />
+250 2.0.0 Ok: queued as 16CAE260A1D<br />
+QUIT<br />
+221 2.0.0 Bye<br />
+Connection closed by foreign host.</pre></td></tr></table><p>Be sure to check <tt>/var/log/maillog</tt> to ensure the mail is actually delivered.  You may want to just open a terminal and <tt>tail -f /var/log/maillog</tt> for the rest of the way.  You&#8217;ll also want to check that postfix created mail files for user2 under <tt>/var/mail/vhosts/example.com</tt>.</p>
+<p>Before we get to the other side of the equation, reading email, we should configure our firewall to allow other machines to connect via SMTP and IMAP.  First run <tt>iptables -L --line-numbers</tt> to determine the current state of your firewall and determine the number of the last rule.  You&#8217;ll need to change the rule numbers below to that number and one more than that number.  You&#8217;ll also want to change the <tt>--source</tt> argument to match your LAN.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>iptables --insert INPUT <font color="#993399">11</font> <font color="#990000">\</font><br />
+         --match state <font color="#990000">\</font><br />
+         --state NEW <font color="#990000">\</font><br />
+         --protocol tcp <font color="#990000">\</font><br />
+         --destination-port smtp <font color="#990000">\</font><br />
+         --source <font color="#993399">10.0</font><font color="#990000">.</font><font color="#993399">0.0</font><font color="#990000">/</font><font color="#993399">24</font> <font color="#990000">\</font><br />
+         --jump ACCEPT<br />
+iptables --insert INPUT <font color="#993399">12</font> <font color="#990000">\</font><br />
+         --match state <font color="#990000">\</font><br />
+         --state NEW <font color="#990000">\</font><br />
+         --protocol tcp <font color="#990000">\</font><br />
+         --destination-port imap <font color="#990000">\</font><br />
+         --source <font color="#993399">10.0</font><font color="#990000">.</font><font color="#993399">0.0</font><font color="#990000">/</font><font color="#993399">24</font> <font color="#990000">\</font><br />
+         --jump ACCEPT<br />
+iptables -L --line-numbers</tt></pre></td></tr></table><p>Test your firewall configuration by trying the telnet session from another machine.  If everything is working as desired, save configuration via <tt>service iptables save</tt>, otherwise rollback with <tt>service iptables restart</tt>.</p>
+<p>Now we need an IMAP server so that we can read email.  I chose to use dovecot.  I needed to install it using the following:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>yum install dovecot<br />
+chkconfig --levels <font color="#993399">2345</font> dovecot on</tt></pre></td></tr></table><p>Next we configure dovecot to use a simple password file.  Again, we don&#8217;t need anything fancy and all users will have the same unoriginal password, password.  Modify <tt>/etc/dovecot/conf.d/10-auth.conf</tt>, changing lines as follows:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#009900">disable_plaintext_auth </font><font color="#990000">=</font> no<br />
+<i><font color="#9A1900">#!include auth-system.conf.ext</font></i><br />
+<i><font color="#9A1900">!include auth-passwdfile.conf.ext</font></i></tt></pre></td></tr></table><p>Tell dovecot where the mailboxes are by editing <tt>/etc/dovecot/conf.d/10-mail.conf</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#009900">mail_location </font><font color="#990000">=</font> maildir:/var/mail/vhosts/%d/%n/Maildir</tt></pre></td></tr></table><p>Next modify <tt>/etc/dovecot/conf.d/auth-passwdfile.conf.ext</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>passdb {<br />
+<font color="#009900">  driver </font><font color="#990000">=</font> passwd-file<br />
+<font color="#009900">  args </font><font color="#990000">=</font> /etc/dovecot/%d-passdb<br />
+}<br />
+<br />
+userdb {<br />
+<font color="#009900">  driver </font><font color="#990000">=</font> static<br />
+<font color="#009900">  args </font><font color="#990000">=</font><font color="#009900"> uid</font><font color="#990000">=</font><font color="#009900">vmail gid</font><font color="#990000">=</font><font color="#009900">vmail home</font><font color="#990000">=</font>/var/mail/vmail/%d/%n<br />
+}</tt></pre></td></tr></table><p>Create the password file <tt>/etc/dovecot/example.com-passdb</tt> using the script</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>cd /etc/dovecot<br />
+<b><font color="#0000FF">for</font></b> u <b><font color="#0000FF">in</font></b> <font color="#009900">$(</font> cut -f<font color="#993399">1</font> /etc/postfix/vmailbox <font color="#990000">)</font><br />
+<b><font color="#0000FF">do</font></b><br />
+    echo -e <font color="#FF0000">"${u}:{PLAIN}password"</font> <font color="#990000">&gt;&gt;</font>example<font color="#990000">.</font>com-passdb<br />
+<b><font color="#0000FF">done</font></b><br />
+<i><font color="#9A1900">#</font></i><br />
+<i><font color="#9A1900"># Now start dovecot; it shares the /var/log/maillog with postfix so continue</font></i><br />
+<i><font color="#9A1900"># to monitor that log file</font></i><br />
+service dovecot start</tt></pre></td></tr></table><p>You should be able to connect to your server using an IMAP client like Thunderbird.  (Recent versions of Thunderbird seem to want to try to discover the configuration itself, just abort that and configure it by hand.)  Note you&#8217;ll need to use the full email address, <a href="mailto:user1@example.com">user1@example.com</a>, for the login.</p>
+<p>Now simply configure your new web application to use your server as the SMTP server.  As long as it only ever tries to send mail to example.com addresses, you should be set.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

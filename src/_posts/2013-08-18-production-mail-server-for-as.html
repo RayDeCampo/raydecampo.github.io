@@ -1,0 +1,33 @@
+---
+layout: post
+title: Production Mail server for AS
+date: '2013-08-18T09:30:00.000-04:00'
+permalink: 2013/08/18/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- Red Hat
+- RHEL
+- CentOS
+- SPF
+- postfix
+modified_time: '2013-08-18T09:30:01.177-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-4097060227773468454
+blogger_orig_url: http://labnotes.decampo.org/2013/08/production-mail-server-for-as.html
+redirect_from: /2013/08/production-mail-server-for-as.html
+excerpt_separator: </p>
+---
+
+<p>In the past I have detailed how I set up a <a href="/2013/03/development-mail-server.html">mail server for development application servers</a>.  Today I want to explain how to set up a mail server for a production application server, or one that should interact with real-life mail systems.</p>
+<p>The goal for this configuration is to create a mail server that only allows connections from localhost and can relay mail from localhost to other, real mail domains.</p>
+<p>In this example I have configured the application server to send mail from a subdomain, <em>mail.example.com</em>.  In the examples I am using <em>93.184.216.119</em> as the public IP for <em>mail.example.com</em>.  You should replace these with your own values.</p>
+<p>Once again we are working on a CentOS 6 installation.  Postfix was already installed.</p>
+<ol type="1"><li>Configure postfix <ol type="a"><li>Make the following configuration changes to <tt>/etc/postfix/main.cf</tt>: <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#009900">myhostname </font><font color="#990000">=</font> mail.example.com<br />
+<i><font color="#9A1900"># Use the public IP of mail.example.com</font></i><br />
+<font color="#009900">proxy_interfaces </font><font color="#990000">=</font> 93.184.216.119<br />
+<i><font color="#9A1900"># Only accept mail from localhost</font></i><br />
+<font color="#009900">mynetworks_style </font><font color="#990000">=</font> host<br />
+<i><font color="#9A1900"># Never forward mail from strangers</font></i><br />
+<font color="#009900">relay_domains </font><font color="#990000">=</font></tt></pre></td></tr></table><p>See the postfix documentation at <a href="http://www.postfix.org/BASIC_CONFIGURATION_README.html">http://www.postfix.org/BASIC_CONFIGURATION_README.html</a> if you need more information about any of these.</p>
+</li><li>Refresh postfix using the following commands: <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>postfix reload<br />
+service postfix restart</tt></pre></td></tr></table></li></ol></li><li>Next configure your application server to use localhost as the mail server.  Refer to your application server documentation for details. </li><li>Configure your router and/or firewall <ol type="a"><li>Configure the router to use public IP <em>93.184.216.119</em> when the application server machine accesses the internet on port 25. </li><li>If necessary, configure your router so that the application server is allowed to connect to your internal company mail server on port 25.  This was necessary in my case because the application server and the company mail server were on separate subnets (DMZ-type configuration). </li></ol></li><li>Configure DNS <ol type="a"><li>Make sure the MX records for the domain includes the IP for <em>mail.example.com</em>, in this case <em>93.184.216.119</em>. </li><li>If an SPF record for the domain does not already exist, add one by creating a TXT record containing <tt>v=spf1 mx -all</tt>. <p>If you already have an SPF record, you&#8217;ll have to figure out if it needs to be modified to accommodate the new server.  You can test it by sending mail to a GMail account from the application server.  Then view the raw source of the email, GMail will have added headers to the mail indicating whether SPF passed or not.  You can also use this <a href="http://www.kitterman.com/spf/validate.html">SPF validator</a>.  If you need to tweak the record, refer to the documentation at <a href="http://www.openspf.org/">http://www.openspf.org/</a>.</p>
+</li></ol></li></ol><p>At this point you should have a production application server happily sending mail to any address.</p>

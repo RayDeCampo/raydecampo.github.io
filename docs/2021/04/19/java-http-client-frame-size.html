@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Frame Size Issue with Java HTTP Client</h1>
+  
+  <div class="date">
+    April 19, 2021
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#java">java</a>
+  
+    <a href="/tags.html#http">http</a>
+  
+    <a href="/tags.html#gotcha">gotcha</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>If you hit this error when using the HTTP client built into Java:</p>
+<pre class="language-text"><code class="language-text">Caused by: java.io.IOException: protocol error: Frame type(80) length(4740180) exceeds MAX_FRAME_SIZE(16384)<br>        at jdk.internal.net.http.Http2Connection.protocolError(Http2Connection.java:952) ~[java.net.http:?]<br>        at jdk.internal.net.http.Http2Connection.processFrame(Http2Connection.java:714) ~[java.net.http:?]<br>        at jdk.internal.net.http.frame.FramesDecoder.decode(FramesDecoder.java:155) ~[java.net.http:?]</code></pre>
+<p>Try using a client configured for HTTP 1.1:</p>
+<pre class="language-java"><code class="language-java">        client <span class="token operator">=</span> <span class="token class-name">HttpClient</span><span class="token punctuation">.</span><span class="token function">newBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><br>            <span class="token punctuation">.</span><span class="token function">followRedirects</span><span class="token punctuation">(</span><span class="token class-name">HttpClient<span class="token punctuation">.</span>Redirect</span><span class="token punctuation">.</span>ALWAYS<span class="token punctuation">)</span><br>            <span class="token punctuation">.</span><span class="token function">version</span><span class="token punctuation">(</span><span class="token class-name">HttpClient<span class="token punctuation">.</span>Version</span><span class="token punctuation">.</span>HTTP_1_1<span class="token punctuation">)</span><br>            <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

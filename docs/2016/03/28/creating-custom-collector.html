@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Creating a custom Collector</h1>
+  
+  <div class="date">
+    March 28, 2016
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#functional">functional</a>
+  
+    <a href="/tags.html#streams">streams</a>
+  
+    <a href="/tags.html#java">java</a>
+  
+    <a href="/tags.html#lambda">lambda</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Creating a custom implementation of java.stream.Collector seems daunting at first, but once you give it a try, you'll see that it can actually be pretty easy. <p>If you are not used to using lambdas and functional concepts, your first look at the Collector interface will be intimidating.  From a pre-Java 8 perspective, there are four interfaces to implement to create a custom Collector implementation:  java.util.function.BiConsumer, java.util.function.BinaryOperator, java.util.function.Function and java.util.function.Supplier.  Fortunately they are all functional interfaces which will allow us to take some shortcuts with lambdas and functional expressions. <p>The example I chose to implement is a Collector for SetValuedMap from Apache's <a href="https://commons.apache.org/proper/commons-collections/">Common Collections</a> project. We'd like a static method similar to the standard Collectors.toMap() method which will generate a Collector instance yielding a SetValuedMap implementation. <p>There are a lot of moving parts to the Collector in terms of generics.  First, we will have generic parameters for the type in the existing stream &lt;T&gt;, the type of the key in the map &lt;K&gt; and the type of the values in the map &lt;V&gt;.  Then we need to identify the three generic parameters to the Collector interface: &lt;T&gt; is the same as before, the type of objects in the stream; &lt;A&gt;, the accumulation type will be SetValuedMap&lt;K,V&gt;; and &lt;R&gt;, the result type, will also be SetValuedMap&lt;K,V&gt;.  It is frequently the case with Collectors that &lt;A&gt; and &lt;R&gt; are the same. <p>Now that we have our generic ducks in a row, we can start figuring out our Collector implementation.  For the supplier, we can use a constructor of a SetValuedMap implementation, e.g. HashSetValuedHashMap::new. <p>The accumulator will be a lambda function taking in a map and a stream object, it will need to put the stream object in the map.  For that we will need to pass in functions converting the stream objects to keys and values respectively (just like in Collectors.toMap()). <p>The combiner will need to accept two maps and return a map containing entries from both.  Again this can be specified with a lambda function. <p>We don't need anything beyond the identity function for the finisher, which means we ready to create our Collector implementation using the Collector.of() factory method: <p><script src="https://gist.github.com/RayDeCampo/c46ca9a862460693b61d.js"></script><p>This method can be used to create a version of Collectors.groupingBy() which eliminates duplicates simply by passing Function.identity for the valueMapper: <p><script src="https://gist.github.com/RayDeCampo/67563382796446902cd8.js"></script><p>If we wanted to get really fancy we could also pass in a Comparator to use with our set, but I will leave that as an exercise for the reader. <p>See the file <a href="https://github.com/RayDeCampo/lab-notes/blob/66f07f506a6dc41d6f7b3bac71512f8ff8a35b2c/lab-notes/src/test/java/org/decampo/examples/collections/MoreCollectorsTest.java">MoreCollectorsTest.java</a> for some examples of these methods in action. 
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

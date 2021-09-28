@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Migrating to GitHub Pages</h1>
+  
+  <div class="date">
+    July  8, 2017
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#github pages">github pages</a>
+  
+    <a href="/tags.html#jekyll">jekyll</a>
+  
+    <a href="/tags.html#ruby">ruby</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>I finally took the plunge to migrate my old Blogger blog to the more convenient GitHub Pages.  Like everybody else I found when googling this topic discovered, it wasn't as easy as it seemed at first.</p>
+<p>Using the jekyll-importer on the exported data from Blogger was straightforward and fast.</p>
+<p>Trying to follow the various documentation on the GitHub site to get started wasn't very helpful to me.  What ended up being helpful was a tutorial at <a href="https://www.smashingmagazine.com/2014/08/build-blog-jekyll-github-pages/">https://www.smashingmagazine.com/2014/08/build-blog-jekyll-github-pages/</a> and the repository that went with it, <a href="https://github.com/barryclark/jekyll-now">https://github.com/barryclark/jekyll-now</a> both from Barry Clark.  I didn't end up following the tutorial exactly, but I used the working repository as a reference.</p>
+<p>So I did follow the advice from GitHub and use Bundler to manage jekyll and Ruby and the dependencies.  To create the structure I used the command:</p>
+<pre class="language-shell"><code class="language-shell">bundle <span class="token builtin class-name">exec</span> jekyll _3.3.0_ new raydecampo.github.io</code></pre>
+<p>Then the site can be previewed locally with:</p>
+<pre class="language-shell"><code class="language-shell">bundle <span class="token builtin class-name">exec</span> jekyll serve --watch</code></pre>
+<p>I wanted to use a different theme, Dinky, from GitHub but ran into issues when switching.  It seems not all the required layouts are present in the theme or something.  So I had to create a <code>_layouts/post.html</code> file as detailed at <a href="https://github.com/github/pages-gem/issues/416#issuecomment-299772018">https://github.com/github/pages-gem/issues/416#issuecomment-299772018</a>.</p>
+<p>Then I wanted to support tags, so I stole some code from GitHub user <a href="https://github.com/codinfox">codinfox</a> which was posted at <a href="https://codinfox.github.io/dev/2015/03/06/use-tags-and-categories-in-your-jekyll-based-github-pages/">https://codinfox.github.io/dev/2015/03/06/use-tags-and-categories-in-your-jekyll-based-github-pages/</a>.</p>
+<p>I also ended up customizing the theme quite a bit and playing around with excerpts.  Then I wanted to try writing a post in Markdown, and that is how this post was born.</p>
+<p>Finally I added some redirects for the old blogger URLs.  Fortunately the jekyll importer left the old URL in the front matter of the post, so it was easy to create a <code>redirect_from</code> directive in the front matter using JEdit's regex search and replace.  The RSS feed was a different matter, apparently there's no support for an arbitrary redirect on GitHub Pages, so I needed to add the following to my <code>_config.xml</code> to generate the feed in the same location as Blogger did:</p>
+<pre><code>feed:
+  path: /feeds/posts/default
+</code></pre>
+<p>Once this is up and running I will figure out how to use a custom domain.  UPDATE: Using a custom domain turned out to be pretty easy, just a change in the GitHub project Settings and update my DNS and all set.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+{
+    "title": "Lab Notes",
+    "description": "Things I want to remember how to do.",
+    "url": "http://labnotes.decampo.org/",
+    "domain": "labnotes.decampo.org",
+    "feed": {
+        "subtitle": "Technical notes to myself (and you, apparently)",
+        "path": "/feeds/posts/default",
+        "url": "http://labnotes.decampo.org/feeds/posts/default",
+        "id": "http://labnotes.decampo.org/"
+    },
+    "author": {
+        "name": "Ray DeCampo",
+        "email": "ray@decampo.org",
+        "github": "https://github.com/RayDeCampo",
+        "twitter": "https://twitter.com/iamdoingitwrong",
+        "linkedin": "https://www.linkedin.com/in/raymonddecampo/"
+    }
+}

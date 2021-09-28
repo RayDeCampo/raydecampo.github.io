@@ -1,0 +1,54 @@
+---
+layout: post
+title: RESTful Web Services on JBossAS 7
+date: '2013-09-22T09:30:00.000-04:00'
+permalink: 2013/09/22/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- JBoss
+- JEE
+- REST
+- web.xml
+modified_time: '2013-10-25T14:29:06.992-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-6046343302315863750
+blogger_orig_url: http://labnotes.decampo.org/2013/09/restful-web-services-on-jbossas-7.html
+redirect_from: /2013/09/restful-web-services-on-jbossas-7.html
+excerpt_separator: </p>
+---
+
+<p>Deploying RESTful web services on JBossAS 7 is relatively painless and straightforward.  Thanks to the extensive support of annotations vs configuration in JEE 6, creating RESTful web services is almost XML-free.</p>
+<p>Let&#8217;s start with the good stuff: the code you want to run as a web service.  We will use as an example a web service supplying random number as inspired by the classic <a href="http://xkcd.com/221/">xkcd comic</a>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">import</font></b> javax<font color="#990000">.</font>ws<font color="#990000">.</font>rs<font color="#990000">.</font>GET<font color="#990000">;</font><br />
+<b><font color="#000080">import</font></b> javax<font color="#990000">.</font>ws<font color="#990000">.</font>rs<font color="#990000">.</font>Path<font color="#990000">;</font><br />
+<br />
+@<b><font color="#000000">Path</font></b><font color="#990000">(</font><font color="#FF0000">"random"</font><font color="#990000">)</font><br />
+<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">class</font></b> <font color="#008080">RandomResource</font><br />
+<font color="#FF0000">{</font><br />
+    @GET<br />
+    @<b><font color="#000000">Path</font></b><font color="#990000">(</font><font color="#FF0000">"xkcd"</font><font color="#990000">)</font><br />
+    <b><font color="#0000FF">public</font></b> <font color="#008080">String</font> <b><font color="#000000">xkcd</font></b><font color="#990000">()</font><br />
+    <font color="#FF0000">{</font><br />
+        <i><font color="#9A1900">// Chosen by a fair dice roll</font></i><br />
+        <i><font color="#9A1900">// Guaranteed to be random</font></i><br />
+        <b><font color="#0000FF">return</font></b> <font color="#FF0000">"4"</font><font color="#990000">;</font><br />
+    <font color="#FF0000">}</font><br />
+<font color="#FF0000">}</font></tt></pre></td></tr></table><p>Here we have assigned paths both to the entire class and the specific method.  That means the resource will be available at the path "random/xkcd" relative to the path for RESTful web services (more details on that to follow).</p>
+<p>From here we can go in two directions: supply an implementation of <tt>javax.ws.rs.core.Application</tt> and let our web services be found automatically or configure a bunch of things in the <tt>web.xml</tt>.  We&#8217;ll take the easy way:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">import</font></b> javax<font color="#990000">.</font>ws<font color="#990000">.</font>rs<font color="#990000">.</font>ApplicationPath<font color="#990000">;</font><br />
+<b><font color="#000080">import</font></b> javax<font color="#990000">.</font>ws<font color="#990000">.</font>rs<font color="#990000">.</font>core<font color="#990000">.</font>Application<font color="#990000">;</font><br />
+<br />
+@<b><font color="#000000">ApplicationPath</font></b><font color="#990000">(</font><font color="#FF0000">"/jaxrs"</font><font color="#990000">)</font><br />
+<b><font color="#0000FF">public</font></b> <b><font color="#0000FF">class</font></b> <font color="#008080">RestApplication</font> <b><font color="#0000FF">extends</font></b> Application<br />
+<font color="#FF0000">{</font><br />
+<font color="#FF0000">}</font></tt></pre></td></tr></table><p>Note that we do not override the methods in <tt>javax.ws.rs.core.Application</tt>.  The specification indicates that the default implementation will return empty sets; furthermore if an implementation of <tt>Application</tt> returns empty sets then all root resource classes and providers in the WAR will be included.  Which is all a fancy way of saying that this is exactly what we want: the container will scan the WAR and find all the resource classes by annotation.</p>
+<p>Notice we used the <tt>ApplicationPath</tt> annotation; this tells the container the root URI for RESTful web services.  So our <tt>xkcd()</tt> method now has URI "jaxrs/random/xkcd" relative to the deployment of the WAR.</p>
+<p>Finally we have the small piece of XML necessary.  We need to include a <tt>web.xml</tt> file in order to indicate that we are using servlet version 3.0.  If all we have are the RESTful web services in the application, the <tt>web.xml</tt> can be empty aside from the root element:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;web-app</font></b> <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://java.sun.com/xml/ns/javaee"</font><br />
+         <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font><br />
+         <font color="#009900">xsi:schemaLocation</font><font color="#990000">=</font><font color="#FF0000">"http://java.sun.com/xml/ns/javaee</font><br />
+<font color="#FF0000">             http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"</font><br />
+         <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"3.0"</font><b><font color="#0000FF">&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/web-app&gt;</font></b></tt></pre></td></tr></table><p>OK, now we are ready to package it up and deploy to JBossAS 7.  We are going to create a WAR file named <tt>rest.war</tt>.  Just to refresh your memory, the Java classes are compiled and placed in the <tt>WEB-INF/classes</tt> directory and the <tt>web.xml</tt> is placed in the <tt>WEB-INF</tt> directory.  You may also want to include a "Hello world" HTML file in the WAR as well for debugging.</p>
+<p>Copy the <tt>rest.war</tt> file into the <tt>$JBOSS_HOME/standalone/deployments</tt> directory and start JBoss if you have not already.  Now you can get a random number (xkcd-style) via the URL <a href="http://localhost:8080/rest/jaxrs/random/xkcd">http://localhost:8080/rest/jaxrs/random/xkcd</a>.</p>
+<p>Resources:</p>
+<ul><li><a href="https://jsr311.java.net/nonav/releases/1.1/index.html">https://jsr311.java.net/nonav/releases/1.1/index.html</a></li><li><a href="http://jcp.org/aboutJava/communityprocess/mrel/jsr311/index.html">http://jcp.org/aboutJava/communityprocess/mrel/jsr311/index.html</a></li><li><a href="http://docs.jboss.org/resteasy/docs/3.0.4.Final/userguide/html_single/index.html#d4e40">http://docs.jboss.org/resteasy/docs/3.0.4.Final/userguide/html_single/index.html#d4e40</a></li><li><a href="http://xkcd.com/221/">http://xkcd.com/221/</a></li></ul>

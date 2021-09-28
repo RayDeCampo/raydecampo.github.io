@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Mocking Static Methods in Mockito</h1>
+  
+  <div class="date">
+    July 31, 2020
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#mockito">mockito</a>
+  
+    <a href="/tags.html#java">java</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>Mockito has been able to mock static methods since version 3.4.0 but the documentation doesn't explain how to mock methods that take arguments.</p>
+<p>E.g. to mock the JavaMail Transport class:</p>
+<pre class="language-java"><code class="language-java">    messageCaptor <span class="token operator">=</span> <span class="token class-name">ArgumentCaptor</span><span class="token punctuation">.</span><span class="token function">forClass</span><span class="token punctuation">(</span><span class="token class-name">Message</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br><br>    <span class="token keyword">try</span> <span class="token punctuation">(</span><span class="token class-name">MockedStatic</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Transport</span><span class="token punctuation">></span></span> transport <span class="token operator">=</span> <span class="token function">mockStatic</span><span class="token punctuation">(</span><span class="token class-name">Transport</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span><br>    <span class="token punctuation">{</span><br>        <span class="token comment">// mailer.send invokes Transport</span><br>        mailer<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>from<span class="token punctuation">,</span> <span class="token keyword">to</span><span class="token punctuation">,</span> subject<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">;</span><br>        transport<span class="token punctuation">.</span><span class="token function">verify</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token class-name">Transport</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>messageCaptor<span class="token punctuation">.</span><span class="token function">capture</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>        <span class="token comment">// Now we can see what mailer passed to Transport.send()</span><br>        <span class="token keyword">final</span> <span class="token class-name">Message</span> message <span class="token operator">=</span> messageCaptor<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token punctuation">}</span></code></pre>
+<p>or if we want to specify behavior:</p>
+<pre class="language-java"><code class="language-java">    <span class="token keyword">try</span> <span class="token punctuation">(</span><span class="token class-name">MockedStatic</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Transport</span><span class="token punctuation">></span></span> transport <span class="token operator">=</span> <span class="token function">mockStatic</span><span class="token punctuation">(</span><span class="token class-name">Transport</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span><br>    <span class="token punctuation">{</span><br>        transport<span class="token punctuation">.</span><span class="token function">when</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-></span> <span class="token class-name">Transport</span><span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token function">any</span><span class="token punctuation">(</span><span class="token class-name">Message</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><br>            <span class="token punctuation">.</span><span class="token function">thenThrow</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MessagingException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>        mailer<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span>from<span class="token punctuation">,</span> <span class="token keyword">to</span><span class="token punctuation">,</span> subject<span class="token punctuation">,</span> body<span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token punctuation">}</span></code></pre>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

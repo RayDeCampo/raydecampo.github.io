@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Accessing MP3 Tags in Ruby</h1>
+  
+  <div class="date">
+    July 29, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#taglib">taglib</a>
+  
+    <a href="/tags.html#installation">installation</a>
+  
+    <a href="/tags.html#mp3">mp3</a>
+  
+    <a href="/tags.html#ruby">ruby</a>
+  
+    <a href="/tags.html#gem">gem</a>
+  
+    <a href="/tags.html#id3">id3</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>I wanted to explore Ruby a little more so I needed to give myself a project.  I figured I would try to create a script to copy a playlist to my MP3 player, since both Rhythmbox and Banshee had issues with this.</p>
+<p>The first thing is that I would need to get the ID3 tag information from the mp3 files so I could copy them to the right filename on the mp3 player.  (Both Rhythmbox and Banshee use <em>Artist</em> - <em>Album</em> - <em>Track</em> - <em>Title</em>.mp3 so I could that to check for duplicates.)  So I needed to be able to read mp3 tags.</p>
+<p>I started at the ID3 format web site, <a href="http://www.id3.org/">http://www.id3.org/</a>.  They had a helpful section on implementations (<a href="http://www.id3.org/Implementations">http://www.id3.org/Implementations</a>) so I started there.</p>
+<p>The first suggestion, id3lib-ruby was no longer under development.  The site did suggest taglib-ruby but I decided to move to the next one.</p>
+<p>The next one was ruby-mp3info.  I rejected that one on the basis that the installation used Ruby&#8217;s <tt>gem</tt> utility.  (That later turned out to be a mistake.)</p>
+<p>The final one was id3.rb and I did download the gem.  But the documentation was a little thin and it felt too much like a side project for a university student.</p>
+<p>I decided to fire up synaptic and see if there was a package.  Lo and behold, there was one for ruby-taglib.  I installed it and tried the following simple script:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">require</font></b> <font color="#FF0000">'taglib'</font><br />
+<br />
+ARGV<font color="#990000">.</font>each <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>f<font color="#990000">|</font><br />
+  TagLib<font color="#990000">::</font>FileRef<font color="#990000">.</font>open<font color="#990000">(</font>f<font color="#990000">)</font> <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>fileref<font color="#990000">|</font><br />
+    tag <font color="#990000">=</font> fileref<font color="#990000">.</font>tag<br />
+    puts <font color="#FF0000">"#{f}: #{tag.title} by #{tag.artist}; track #{tag.track} on #{tag.album}"</font><br />
+  <b><font color="#0000FF">end</font></b><br />
+<b><font color="#0000FF">end</font></b></tt></pre></td></tr></table><p>Unfortunately the result was: <tt>NameError: uninitialized constant TagLib::FileRef</tt>.  I puzzled over this for a while and examined the documentation and probed the Ruby object to no avail.  Eventually I decided to try installing via the <tt>gem</tt> method.  No luck that way, same result.</p>
+<p>Finally it occurred to me that the two installations might be conflicting.  I uninstalled both and re-installed via <tt>gem install taglib-ruby</tt>.  Now my script worked.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Installing Ubuntu 12.10 on an SSD, Part 1</h1>
+  
+  <div class="date">
+    December  2, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#ubuntu">ubuntu</a>
+  
+    <a href="/tags.html#bios_grub">bios_grub</a>
+  
+    <a href="/tags.html#quantal">quantal</a>
+  
+    <a href="/tags.html#ssd">ssd</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Recently I took the plunge and put an SSD drive into my desktop.  Since I needed to re-install the OS, I figured I would install the latest Ubuntu, version 12.10.</p>
+<p>I had hoped things would go smoother.  When running the installer it would hang after the second screen the first time through (unfortunately I ended up installing a couple of times).  This is the screen where they tell you to verify the computer has enough space and is connected to the internet (see <a href="http://www.debianadmin.com/wp-content/gallery/quantal/3.png">http://www.debianadmin.com/wp-content/gallery/quantal/3.png</a>).  Aftering clicking <em>Continue</em> I would just get the spinning mouse icon.  Fortunately the <em>Quit</em> button worked and dropped me into the sample desktop.  From there running the install again worked more smoothly.</p>
+<p>I kept my old installation around on the old disk for reference.  For example, it would make re-configuring my NFS shares easy.  So I had three disks: my large HDD for /home, my old OS HDD disk mounted on /u1204 and the new SSD which would contain 12.10.  The installation completed and I rebooted.</p>
+<p>And was promptly dropped back into my old installation.  Must be a BIOS issue, I figured.  I rebooted and went into the BIOS set-up.  It took me a while to realize that my BIOS was a little different from what I had been used to (a few months ago I upgraded from an ASUS to a BIOStar mainboard).  For boot order you first set the categories of disks (e.g. DVD-ROM, SATA drives, removable media) then you set the individual disks within the categories.  This is obfuscated by using the first disk of the category when setting the category.  The upshot was after examining all of this it sure seemed like the BIOS had been correctly configured all along (which turned out to be the case).</p>
+<p>Next I figure I would go to the boot menu and select the SSD disk explicitly.  OK, reboot and watch for the key to enter the boot menu.  Oops, there doesn&#8217;t seem to be one.  I finally figured out that the BIOS set-up contains the boot menu within it.  One more mystery solved.  Unfortunately selecting the SSD drive in the boot menu did not help.</p>
+<p>OK, I&#8217;ll boot into my old OS and starting googling the problem.  I log in and am immediately treated with an error message concerning updating the .ICEauthority file and then dropped back to the login screen.  I use Ctrl-Alt-F1 to get to the terminal and log in that way.  Fortunately that works.  I fix the permissions on the .ICEauthority file (which looked fine to begin with) and no luck.  I delete the .ICEauthority file and no luck.  Finally I think to check the permissions on the /home/&lt;user&gt; directory.  That was the problem: I had created myself first on this installation whereas in the old OS I had created a different user first.  The 12.10 changed the owner of the home directory which to the 12.04 is a different user (that is, the UIDs were different for the two users and the file system only tracks the UID).  I fixed the ownership and that did the trick.</p>
+<p>Onto the boot issue.  The consensus on google appears to be to try the Boot Repair utility (<a href="https://help.ubuntu.com/community/Boot-Repair">https://help.ubuntu.com/community/Boot-Repair</a>).  So I booted the Ubuntu Live USB, install Boot Repair, fix the settings and run it.  I got an error message to the effect of: The disk is GPT and the BIOS is non-EFI, so create a Boot BIOS partition on the disk (&lt;1MB, unformatted, with the bios_grub flag).</p>
+<p>A little googling and I find that wikipedia actually has the information I need (<a href="http://en.wikipedia.org/wiki/BIOS_Boot_partition">http://en.wikipedia.org/wiki/BIOS_Boot_partition</a>).  I run GParted from the Live USB, resize the existing partition on the SSD (take space from the end, since it doesn&#8217;t matter where the BIOS boot partition is) and add an unformatted partition at the end.  GParted wouldn&#8217;t let me add the bios_grub flag at creation time, I had to save the partition changes first.</p>
+<p>At this point I figure I would run through the installation again, so I can fix my user issue and get grub installed correctly in one swoop.  This time everything goes well and grub is installed.</p>
+<p>Doing research afterwards for this write up, it looks like there were a couple of other potential solutions.  I could have looked in the BIOS to see if it supports EFI and enable it.  I also could have used GParted to use a different partition table than GPT.  (GPT is apparently the default used by the Ubuntu installer, it never gave me the option for anything else.)</p>
+<p>I ended up filing a bug report on this, we will see what happens: <a href="https://bugs.launchpad.net/ubuntu/+source/ubiquity/+bug/1080726">https://bugs.launchpad.net/ubuntu/+source/ubiquity/+bug/1080726</a></p>
+<p>Next up, for part 2, we get into some of the details for configuring the system for the SSD.</p>
+<p>Resources:</p>
+<ul><li><a href="https://wiki.archlinux.org/index.php/Solid_State_Drives">https://wiki.archlinux.org/index.php/Solid_State_Drives</a></li><li><a href="http://forums.fedoraforum.org/showthread.php?t=256068">http://forums.fedoraforum.org/showthread.php?t=256068</a></li><li><a href="https://help.ubuntu.com/community/Boot-Repair">https://help.ubuntu.com/community/Boot-Repair</a></li><li><a href="http://en.wikipedia.org/wiki/BIOS_Boot_partition">http://en.wikipedia.org/wiki/BIOS_Boot_partition</a></li><li><a href="https://help.ubuntu.com/community/SwapFaq">https://help.ubuntu.com/community/SwapFaq</a></li><li><a href="http://www.kernel.org/doc/Documentation/sysctl/vm.txt">http://www.kernel.org/doc/Documentation/sysctl/vm.txt</a></li></ul>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

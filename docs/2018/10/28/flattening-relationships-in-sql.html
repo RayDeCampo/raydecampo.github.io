@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Flattening Relationships in SQL</h1>
+  
+  <div class="date">
+    October 28, 2018
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#sql">sql</a>
+  
+    <a href="/tags.html#PostgreSQL">PostgreSQL</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>I've been sitting on this one for a while, finally getting around to publishing.</p>
+<p>The idea is you have an object with a number of relationships to other objects
+where there is no correlation between the relationships.  We will use the
+example of a television stations which has owners, managers and employees.</p>
+<p>There may be differing numbers of each relationship and possibly some of the
+relationships are empty.  The idea is to list each station with columns for
+each relationship in the proper order.</p>
+<p>In our example we have three stations, 25, 38 and 56.  Channel 25 had manager Fred, employee Barney and no owner.  Channel 38 has managers Wilma and Pebbles, employees Betty, Dino and Bam-bam and owner Gazoo.  Finally channel 56 has no manager, employee George and owner Cogswell and Spacely.</p>
+<p>Therefore the desired results look something like:</p>
+<pre><code> station_id |   mgr   |   emp   |  owner   
+------------+---------+---------+----------
+         25 | Fred    | Barney  | 
+         34 | Pebbles | Bam-bam | Gazoo
+         34 | Wilma   | Betty   | 
+         34 |         | Dino    | 
+         56 |         | George  | Cogswell
+         56 |         |         | Spacely
+(6 rows)
+</code></pre>
+<p>Notice that each column is sorted within the data for the station.</p>
+<p>To accomplish this we use the PostgreSQL window function <code>rank()</code> to assign
+an occurrence number to each relationship to line them up in the correct order.
+Then it is just a matter of joining the data based on station id and occurrence:</p>
+<pre class="language-sql"><code class="language-sql"><span class="token comment">------------------- DATA --------------------------------------</span><br><span class="token keyword">with</span> stations <span class="token punctuation">(</span>station_id<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- Define the station data</span><br>            <span class="token keyword">select</span> <span class="token number">25</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">34</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">56</span><br><span class="token punctuation">)</span><span class="token punctuation">,</span> station_managers <span class="token punctuation">(</span>station_id<span class="token punctuation">,</span> name<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- Define the manager data</span><br>            <span class="token keyword">select</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token string">'Fred'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token string">'Wilma'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token string">'Pebbles'</span><br><span class="token punctuation">)</span><span class="token punctuation">,</span> station_employees <span class="token punctuation">(</span>station_id<span class="token punctuation">,</span> name<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- Define the employee data</span><br>            <span class="token keyword">select</span> <span class="token number">25</span><span class="token punctuation">,</span> <span class="token string">'Barney'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token string">'Betty'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token string">'Bam-bam'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token string">'Dino'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">56</span><span class="token punctuation">,</span> <span class="token string">'George'</span><br><span class="token punctuation">)</span><span class="token punctuation">,</span> station_owners <span class="token punctuation">(</span>station_id<span class="token punctuation">,</span> name<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- Define the owner data</span><br>            <span class="token keyword">select</span> <span class="token number">34</span><span class="token punctuation">,</span> <span class="token string">'Gazoo'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">56</span><span class="token punctuation">,</span> <span class="token string">'Spacely'</span><br>  <span class="token keyword">union</span> <span class="token keyword">all</span> <span class="token keyword">select</span> <span class="token number">56</span><span class="token punctuation">,</span> <span class="token string">'Cogswell'</span><br><span class="token comment">------------------- END DATA --------------------------------------</span><br><span class="token comment">--</span><br><span class="token punctuation">)</span><span class="token punctuation">,</span> m <span class="token punctuation">(</span>station_id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> occurrence<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- List the managers, using the rank() window function for occurrence</span><br>  <span class="token keyword">select</span> station_id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span> <span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> station_id <span class="token keyword">order</span> <span class="token keyword">by</span> name<span class="token punctuation">)</span><br>  <span class="token keyword">from</span> station_managers<br><span class="token punctuation">)</span><span class="token punctuation">,</span> e <span class="token punctuation">(</span>station_id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> occurrence<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- List the employees, using the rank() window function for occurrence</span><br>  <span class="token keyword">select</span> station_id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span> <span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> station_id <span class="token keyword">order</span> <span class="token keyword">by</span> name<span class="token punctuation">)</span><br>  <span class="token keyword">from</span> station_employees<br><span class="token punctuation">)</span><span class="token punctuation">,</span> o <span class="token punctuation">(</span>station_id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> occurrence<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token punctuation">(</span><br>  <span class="token comment">-- List the employees, using the rank() window function for occurrence</span><br>  <span class="token keyword">select</span> station_id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> rank<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">over</span> <span class="token punctuation">(</span><span class="token keyword">partition</span> <span class="token keyword">by</span> station_id <span class="token keyword">order</span> <span class="token keyword">by</span> name<span class="token punctuation">)</span><br>  <span class="token keyword">from</span> station_owners<br><span class="token punctuation">)</span> <span class="token keyword">select</span> s<span class="token punctuation">.</span>station_id<span class="token punctuation">,</span> m<span class="token punctuation">.</span>name <span class="token keyword">as</span> mgr<span class="token punctuation">,</span> e<span class="token punctuation">.</span>name <span class="token keyword">as</span> emp<span class="token punctuation">,</span> o<span class="token punctuation">.</span>name <span class="token keyword">as</span> owner<br><span class="token keyword">from</span> m<br><span class="token keyword">full</span> <span class="token keyword">outer</span> <span class="token keyword">join</span> e<br>  <span class="token keyword">on</span> e<span class="token punctuation">.</span>station_id <span class="token operator">=</span> m<span class="token punctuation">.</span>station_id <span class="token operator">and</span> e<span class="token punctuation">.</span>occurrence <span class="token operator">=</span> m<span class="token punctuation">.</span>occurrence<br><span class="token keyword">full</span> <span class="token keyword">outer</span> <span class="token keyword">join</span> o<br>  <span class="token keyword">on</span> o<span class="token punctuation">.</span>station_id <span class="token operator">=</span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span>station_id<span class="token punctuation">,</span> e<span class="token punctuation">.</span>station_id<span class="token punctuation">)</span> <br>  <span class="token operator">and</span> o<span class="token punctuation">.</span>occurrence <span class="token operator">=</span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span>occurrence<span class="token punctuation">,</span> e<span class="token punctuation">.</span>occurrence<span class="token punctuation">)</span><br><span class="token keyword">inner</span> <span class="token keyword">join</span> stations s<br>  <span class="token keyword">on</span> s<span class="token punctuation">.</span>station_id <span class="token operator">=</span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span>station_id<span class="token punctuation">,</span> e<span class="token punctuation">.</span>station_id<span class="token punctuation">,</span> o<span class="token punctuation">.</span>station_id<span class="token punctuation">)</span><br><span class="token keyword">order</span> <span class="token keyword">by</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token keyword">coalesce</span><span class="token punctuation">(</span>m<span class="token punctuation">.</span>occurrence<span class="token punctuation">,</span> e<span class="token punctuation">.</span>occurrence<span class="token punctuation">,</span> o<span class="token punctuation">.</span>occurrence<span class="token punctuation">)</span></code></pre>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Trac Plugins vs Python Versions</h1>
+  
+  <div class="date">
+    September 20, 2013
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#python">python</a>
+  
+    <a href="/tags.html#Trac">Trac</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+Just a quick and dirty reminder than when you are trying to make Trac plugins work, you need to make sure you are using the correct python version of the egg. &nbsp;For example, I recently wanted to add the&nbsp;<a href="http://trac-hacks.org/wiki/RegexLinkPlugin" target="_blank">RegexLinkPlugin</a>&nbsp;to one of my Trac instances. &nbsp;However, when I downloaded the provided egg and installed it, nothing happened. &nbsp;Upon further inspection, I realized that the egg was for Python 2.5 and I was running 2.6 on my server. &nbsp;I downloaded the source and recompiled and was rewarded with a (working) Python 2.6 egg.<br />
+<br />
+By the way, the&nbsp;<a href="http://trac-hacks.org/wiki/RegexLinkPlugin" target="_blank">RegexLinkPlugin</a>&nbsp;is a nice way to map wiki text to links in your Trac installation. &nbsp;For example, I am using it on an IT wiki where each server has its own page but the servers are all referred to by all lowercase hostnames. &nbsp;Using&nbsp;<a href="http://trac-hacks.org/wiki/RegexLinkPlugin" target="_blank">RegexLinkPlugin</a>&nbsp;I can map each hostname to link to the page for the server with no extra wiki markup, ensuring my users always generate the links when using the hostnames.
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

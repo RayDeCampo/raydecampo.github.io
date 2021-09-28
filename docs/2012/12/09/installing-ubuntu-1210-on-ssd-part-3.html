@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Installing Ubuntu 12.10 on an SSD, Part 3</h1>
+  
+  <div class="date">
+    December  9, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#ubuntu">ubuntu</a>
+  
+    <a href="/tags.html#tmp">tmp</a>
+  
+    <a href="/tags.html#ssd">ssd</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Recently I took the plunge and put an SSD drive into my desktop.  Since I needed to re-install the OS, I figured I would install the latest Ubuntu, version 12.10.  I went over my trials and tribulations of getting the OS installed in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-1.html">part 1</a>, and dealt with swap in <a href="http://labnotes.decampo.org/2012/12/installing-ubuntu-1210-on-ssd-part-2.html">part 2</a>.  Today we finish up the tweaks for the SSD.</p>
+<p>First we add <tt>noatime</tt> and <tt>discard</tt> to the <tt>/etc/fstab</tt> options for the drive:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">UUID=abc...    /     ext4    errors=remount-ro,noatime,discard 0       1</pre></td></tr></table><p>(Note I cut my UUID for brevity.  Yours should be much longer.)  The <tt>noatime</tt> option keeps the OS from updating the access time of a file every time it is read.  This reduces the number of writes to the SSD drive.  The <tt>discard</tt> option enables the TRIM command on the file system.  There are some details to delve into for this depending on your particular SSD, read about it at <a href="https://wiki.archlinux.org/index.php/Solid_State_Drives">https://wiki.archlinux.org/index.php/Solid_State_Drives</a>.  For most drives you&#8217;ll want it enabled.</p>
+<p>Next we change the I/O scheduler to use the deadline algorithm instead of elevator algorithm.  For a traditional hard disk drive, the data is read from the platter by a head.  The head must be moved to the correct position to read the desired data.  The disk spins, which means the head need only move in one dimension, radially.  For this reason, the scheduling algorithms for hard disk drives are referred to as elevator algorithms.</p>
+<p>The SSD does not have the same limitations as the HDD.  There is no head to move into position in order to read or write the data.  So it is not really important what order the I/O is scheduled.  There is no reason to force some I/O operations to wait while others, requested later, are served as would happen in the elevator algorithm.  So instead we use the deadline algorithm, where each operation is assigned a deadline.</p>
+<p>Since we have a mixed environment, we cannot just set it system wide via grub kernel options.  That is, we can&#8217;t just use the elevator or deadline algorithm for all disks since we have both HDDs and SSDs.  In order to use the correct algorithm with the proper drive type, create a file in /etc/udev/rules.d with contents:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;"># set deadline scheduler for non-rotating disks<br />
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="deadline"<br />
+<br />
+# set cfq scheduler for rotating disks<br />
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="cfq"</pre></td></tr></table><p>I named mine <tt>99-scheduler.rules</tt>.  The files in this directory are automatically processed by <tt>udev</tt>, the device manager for the kernel.  Note that <tt>cfq</tt>, or Completely Fair Queuing, is the default.  For more information, go to <a href="http://en.wikipedia.org/wiki/CFQ">http://en.wikipedia.org/wiki/CFQ</a>.</p>
+<p>The next tweak to make is to do something about the <tt>/tmp</tt> directory.  This is another change that is designed to reduce writes to the SSD (an overblown concern) but you might appreciate the effects on your system in any case.  I decided to mount the <tt>/tmp</tt> directory in RAM.  Add the following to <tt>/etc/fstab</tt> (or replace any existing mount for <tt>/tmp</tt>):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">none /tmp tmpfs defaults 0 0</pre></td></tr></table><p>By default this uses about half the RAM for <tt>/tmp</tt>.  If you want more control, you can use a line like:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">tmpfs /tmp tmpfs nodev,nosuid,size=7G 0 0</pre></td></tr></table><p>Keep in mind that certain operations that write large files to <tt>/tmp</tt> might be adversely affected; for example, burning a large DVD.</p>
+<p>Resources:</p>
+<ul><li><a href="https://wiki.archlinux.org/index.php/Solid_State_Drives">https://wiki.archlinux.org/index.php/Solid_State_Drives</a></li><li><a href="http://forums.fedoraforum.org/showthread.php?t=256068">http://forums.fedoraforum.org/showthread.php?t=256068</a></li><li><a href="https://help.ubuntu.com/community/Boot-Repair">https://help.ubuntu.com/community/Boot-Repair</a></li><li><a href="http://en.wikipedia.org/wiki/BIOS_Boot_partition">http://en.wikipedia.org/wiki/BIOS_Boot_partition</a></li><li><a href="https://help.ubuntu.com/community/SwapFaq">https://help.ubuntu.com/community/SwapFaq</a></li><li><a href="http://www.kernel.org/doc/Documentation/sysctl/vm.txt">http://www.kernel.org/doc/Documentation/sysctl/vm.txt</a></li></ul>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

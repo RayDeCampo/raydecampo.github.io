@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Fixing my Borked Ruby Environment</h1>
+  
+  <div class="date">
+    July  2, 2020
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#ruby">ruby</a>
+  
+    <a href="/tags.html#gem">gem</a>
+  
+    <a href="/tags.html#bundle">bundle</a>
+  
+    <a href="/tags.html#jekyll">jekyll</a>
+  
+    <a href="/tags.html#github pages">github pages</a>
+  
+    <a href="/tags.html#fedora">fedora</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>So after a couple of updates and who knows what else, I found myself with an environment (Fedora 32 if you were wondering) that would no longer run jekyll.  This really caused by blogging level to stop completely since I couldn't preview any of the posts.  As the potential posts piled up in my drafts folder, I eventually carved out some time to take care of this.</p>
+<p>The error I was getting when running jekyll (actually <code>bundle exec jekyll serve</code>) was downright perplexing.  It would complain that a shared library for one of the dependent gems was missing.  The error message gave the full path to the file.  The perplexing thing is that the file existed and my user had permissions to read it.</p>
+<p>The library belonged to the commonmark gem.  I tried reinstalling it via <code>bundle</code> and via <code>gem</code> both as a regular user and as root.  No luck, it refused to find the shared library that was right where it claimed to be looking for it.</p>
+<p>So I figured I'd burn the whole thing down and try again.  First thing was to
+uninstall all gems using <code>gem</code>.  User-level gems were not much of a problem, I just used <code>gem uninstall -aIx</code>.  For system-level gems I had to repeatedly alternate between these commands until there were no more gems remaining:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">sudo</span> gem uninstall -aIx<br><span class="token function">sudo</span> gem uninstall -i /usr/local/share/gems -aIx<br><span class="token function">sudo</span> gem uninstall -i /usr/share/gems -aIx</code></pre>
+<p>With all the gems annihilated from the system, time to reinstall ruby:</p>
+<pre class="language-shell"><code class="language-shell"><span class="token function">sudo</span> dnf reinstall ruby libyaml rubygem-psych rubygems rubygem-openssl <span class="token punctuation">\</span><br>    rubygem-bigdecimal rubygem-io-console rubygem-irb rubygem-json <span class="token punctuation">\</span><br>    rubygem-psych rubygem-rdoc</code></pre>
+<p>At this point I also made a directory for user-level gems and set <code>$GEM_HOME</code> in my <code>.bashrc</code> but unfortunately there's a bug which prevents gem from respecting that setting.  I did eventually use the directory for the install target for bundle however.</p>
+<p>Now we install bundler and use it to install jekyll:</p>
+<pre class="language-shell"><code class="language-shell">gem <span class="token function">install</span> bundler<br><span class="token function">rm</span> -rf .bundle<br>bundle config <span class="token builtin class-name">set</span> path <span class="token string">'/home/dev/gems'</span><br><span class="token comment"># Edit Gemfile to have the correct version of jekyll that github-pages expects</span><br><span class="token function">vi</span> Gemfile<br>bundle <span class="token function">install</span><br><span class="token comment"># Verify it works</span><br>bundle <span class="token builtin class-name">exec</span> jekyll serve<br><span class="token comment"># commit the Gemfile changes</span><br><span class="token function">git</span> <span class="token function">add</span> Gemfile Gemfile.lock<br><span class="token function">git</span> commit<br><span class="token function">git</span> push</code></pre>
+<p>Now that my environment works again I hope to be blogging more.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

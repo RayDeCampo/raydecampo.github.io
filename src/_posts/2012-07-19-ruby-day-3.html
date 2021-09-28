@@ -1,0 +1,61 @@
+---
+layout: post
+title: Ruby, Day 3
+date: '2012-07-19T22:32:00.001-04:00'
+permalink: 2012/07/19/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- 7languages7weeks
+- aop
+- ruby
+- modules
+modified_time: '2012-07-19T22:32:54.859-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-2232302404252256417
+blogger_orig_url: http://labnotes.decampo.org/2012/07/ruby-day-3.html
+redirect_from: /2012/07/ruby-day-3.html
+excerpt_separator: </p>
+---
+
+<p>My notes on Day 3 of Ruby from <em>Seven Languages in Seven Weeks</em> by Bruce Tate follow.</p>
+<p>My knee-jerk reaction to the power of Ruby modules to change the behavior of classes at run-time is probably the typical response of programmers of my generation:  self-modifying code is bad.  Now that I&#8217;ve got that out of my system, let&#8217;s be open-minded and consider what we have.</p>
+<p>Ruby modules remind me a lot of aspect-oriented programming in the sense that you can add behavior to a class (or not) at runtime.  I don&#8217;t see a way right now to do truly aspect-oriented programming with it (i.e. wrapping methods with logging or transaction boundaries) but then I&#8217;m only on my third day with Ruby, I imagine someone clever has already worked it out.</p>
+<p>Pondering the idea a little more, it seems that if, for example, method renaming was viable then one could write a module that renames all (or a targeted subset) of the existing methods then use <tt>method_missing</tt> to provide the desired aspect.  That might get funky when trying to apply multiple aspects but that could likely be worked out.</p>
+<p>I can see the appeal of creating simple data holders at runtime to correspond to tables.  We actually considered doing something like that in Java many moons ago (before Hibernate) using a custom <tt>ClassLoader</tt> but ultimately decided in was too complicated for the relative benefit.  Had we been using Ruby we definitely would have done it.</p>
+<p>Only one exercise this time and it is not too bad.  I did get tripped up briefly not realizing that the argument to <tt>method_missing</tt> is a <tt>Symbol</tt> and not a <tt>String</tt>.  I also briefly thought I would need to create an <tt>Enumerator</tt> but quickly realized code blocks would come to the rescue.  Here&#8217;s the pieces I added to Tate&#8217;s <tt>acts_as_csv_module.rb</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">module</font></b> ActsAsCsv<br />
+<br />
+<i><font color="#9A1900"># snip...</font></i><br />
+<br />
+  <b><font color="#0000FF">module</font></b> InstanceMethods<br />
+<br />
+    <b><font color="#0000FF">def</font></b> read<br />
+      <i><font color="#9A1900"># snip...</font></i><br />
+<br />
+      file<font color="#990000">.</font>each <b><font color="#0000FF">do</font></b> <font color="#990000">|</font>row<font color="#990000">|</font><br />
+        <font color="#009900">@csv_contents</font> <font color="#990000">&lt;&lt;</font> CsvRow<font color="#990000">.</font>new<font color="#990000">(</font>headers<font color="#990000">,</font> row<font color="#990000">.</font>chomp<font color="#990000">.</font>split<font color="#990000">(</font><font color="#FF0000">', '</font><font color="#990000">))</font><br />
+      <b><font color="#0000FF">end</font></b><br />
+    <b><font color="#0000FF">end</font></b><br />
+<br />
+    <b><font color="#0000FF">def</font></b> each<font color="#990000">(&amp;</font>block<font color="#990000">)</font><br />
+      csv_contents<font color="#990000">.</font>each<font color="#990000">(&amp;</font>block<font color="#990000">)</font>                                     <i><font color="#9A1900"># <b>&lt;1&gt;</b></font></i><br />
+    <b><font color="#0000FF">end</font></b><br />
+<br />
+    <i><font color="#9A1900"># snip...</font></i><br />
+<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">end</font></b><br />
+<br />
+<b><font color="#0000FF">class</font></b> CsvRow<br />
+<br />
+  <b><font color="#0000FF">def</font></b> initialize<font color="#990000">(</font>headers<font color="#990000">,</font>data<font color="#990000">)</font><br />
+    <font color="#009900">@headers</font> <font color="#990000">=</font> headers<br />
+    <font color="#009900">@data</font> <font color="#990000">=</font> data<br />
+  <b><font color="#0000FF">end</font></b><br />
+<br />
+  <b><font color="#0000FF">def</font></b> method_missing<font color="#990000">(</font>name<font color="#990000">)</font><br />
+    index <font color="#990000">=</font> <font color="#009900">@headers</font><font color="#990000">.</font>index<font color="#990000">(</font>name<font color="#990000">.</font>to_s<font color="#990000">)</font>                               <i><font color="#9A1900"># <b>&lt;2&gt;</b></font></i><br />
+    <b><font color="#0000FF">return</font></b> <font color="#009900">@data</font><font color="#990000">[</font>index<font color="#990000">]</font> <b><font color="#0000FF">if</font></b> index<br />
+  <b><font color="#0000FF">end</font></b><br />
+<b><font color="#0000FF">end</font></b><br />
+</tt></pre></td></tr></table><ol><li>Code blocks to the rescue. </li><li>Don&#8217;t forget to use <tt>name.to_s</tt></li></ol><p>Nice and compact but powerful.</p>

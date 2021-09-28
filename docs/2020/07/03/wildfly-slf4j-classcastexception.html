@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>SLF4J issue with WildFly</h1>
+  
+  <div class="date">
+    July  3, 2020
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#slf4j">slf4j</a>
+  
+    <a href="/tags.html#WildFly">WildFly</a>
+  
+    <a href="/tags.html#JBoss">JBoss</a>
+  
+    <a href="/tags.html#shibboleth">shibboleth</a>
+  
+  </div>
+  
+  <div class="entry">
+    <p>If you are getting the following error on WildFly or JBoss:</p>
+<blockquote>
+<p>Caused by: java.lang.ClassCastException: class org.slf4j.impl.Slf4jLoggerFactory cannot be cast to class ch.qos.logback.classic.LoggerContext (org.slf4j.impl.Slf4jLoggerFactory is in unnamed module of loader 'org.slf4j.impl@1.0.4.GA' @604f2c4f; ch.qos.logback.classic.LoggerContext is in unnamed module of loader 'deployment.idp.war' @4206bf50)&quot;</p>
+</blockquote>
+<p>Then add a <code>jboss-deployment-structure.xml</code> file to the <code>WEB-INF/</code> directory of your war archive (or the <code>META-INF/</code> in the case of an ear or ejb):</p>
+<pre class="language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>jboss-deployment-structure</span><span class="token punctuation">></span></span><br>    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>deployment</span><span class="token punctuation">></span></span><br>    <span class="token comment">&lt;!-- Exclude server libraries which conflict with ours --></span><br>        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>exclusions</span><span class="token punctuation">></span></span><br>            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>module</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>org.slf4j<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><br>            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>module</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>org.slf4j.impl<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><br>        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>exclusions</span><span class="token punctuation">></span></span><br>    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>deployment</span><span class="token punctuation">></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>jboss-deployment-structure</span><span class="token punctuation">></span></span></code></pre>
+<p>This will prevent WildFly from using the its versions of the SLF4J libraries for the deployed artifact allowing it to use whatever had been packaged instead.</p>
+<p>Note that I encountered this issue when deploying Shibboleth IdP 4.0 on WildFly.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

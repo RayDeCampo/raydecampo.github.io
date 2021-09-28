@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Ruby, Day 1</h1>
+  
+  <div class="date">
+    July 14, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#env">env</a>
+  
+    <a href="/tags.html#7languages7weeks">7languages7weeks</a>
+  
+    <a href="/tags.html#ruby">ruby</a>
+  
+    <a href="/tags.html#documentation">documentation</a>
+  
+    <a href="/tags.html#irb">irb</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+Well I have survived day 1 of Ruby in <i>Seven Languages in Seven Days</i> by Bruce Tate. Now I just need to figure out how to do everything I want to do in this blog software.
+<br />
+<br />
+Finding the Ruby documentation was an easy Google search:<br />
+<br />
+<a href="http://www.ruby-doc.org/">http://www.ruby-doc.org</a><br />
+<br />
+And the free online version of <i>Programming Ruby: The Pragmatic Programmer's Guide</i>:<br />
+<br />
+<a href="http://www.ruby-doc.org/docs/ProgrammingRuby/">http://www.ruby-doc.org/docs/ProgrammingRuby/</a><br />
+<br />
+I am running Ubuntu so I already have ruby installed. Then the question became what version of ruby do I have installed? The answer should have been obvious:<br />
+<br />
+<div class="code">ray@stingray:~/tmp$ ruby -v
+ruby 1.9.3p0 (2011-10-30 revision 33570) [i686-linux]</div><br />
+Let's try to find a substitution method the hard way (i.e. without using the documentation):<br />
+<br />
+<div class="code">irb(main):001:0> 'a string'.methods
+=> [:<=>, :==, :===, :eql?, :hash, :casecmp, :+, :*, :%, :[], :[]=, :insert, :length, :size, :bytesize, :empty?, :=~, :match, :succ, :succ!, :next, :next!, :upto, :index, :rindex, :replace, :clear, :chr, :getbyte, :setbyte, :byteslice, :to_i, :to_f, :to_s, :to_str, :inspect, :dump, :upcase, :downcase, :capitalize, :swapcase, :upcase!, :downcase!, :capitalize!, :swapcase!, :hex, :oct, :split, :lines, :bytes, :chars, :codepoints, :reverse, :reverse!, :concat, :<<, :prepend, :crypt, :intern, :to_sym, :ord, :include?, :start_with?, :end_with?, :scan, :ljust, :rjust, :center, :sub, :gsub, :chop, :chomp, :strip, :lstrip, :rstrip, :sub!, :gsub!, :chop!, :chomp!, :strip!, :lstrip!, :rstrip!, :tr, :tr_s, :delete, :squeeze, :count, :tr!, :tr_s!, :delete!, :squeeze!, :each_line, :each_byte, :each_char, :each_codepoint, :sum, :slice, :slice!, :partition, :rpartition, :encoding, :force_encoding, :valid_encoding?, :ascii_only?, :unpack, :encode, :encode!, :to_r, :to_c, :>, :>=, :<, :<=, :between?, :nil?, :!~, :class, :singleton_class, :clone, :dup, :initialize_dup, :initialize_clone, :taint, :tainted?, :untaint, :untrust, :untrusted?, :trust, :freeze, :frozen?, :methods, :singleton_methods, :protected_methods, :private_methods, :public_methods, :instance_variables, :instance_variable_get, :instance_variable_set, :instance_variable_defined?, :instance_of?, :kind_of?, :is_a?, :tap, :send, :public_send, :respond_to?, :respond_to_missing?, :extend, :display, :method, :public_method, :define_singleton_method, :object_id, :to_enum, :enum_for, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__, :__id__]
+irb(main):002:0> 'a string'.sub
+ArgumentError: wrong number of arguments (0 for 1..2)
+        from (irb):2:in `sub'
+        from (irb):2
+        from /usr/bin/irb:12:in `<main>'
+irb(main):003:0> 'a string'.sub('a')
+ArgumentError: wrong number of arguments (1 for 1..2)
+        from (irb):3:in `sub'
+        from (irb):3
+        from /usr/bin/irb:12:in `<main>'
+irb(main):004:0> 'a string'.sub('a', 'b')
+=> "b string"
+irb(main):005:0></div><br />
+OK, I'm a little confused by the arguments message (1 for 1..2) but it worked out.<br />
+<br />
+The next interesting exercise is print your name ten times. I'm going to cheat and use the sneak peek at some Ruby code in section 2.1. Once I got the range syntax down it was no problem:<br />
+<br />
+<div class="code">irb(main):011:0&gt; (1..10).each {|x| puts 'your name'} </div><br />
+Running a ruby program from a file is easier in linux than Windows. (This probably works on a Mac as well.) Put the following at the beginning of the file:<br />
+<br />
+<div class="code">#!/usr/bin/env ruby </div><br />
+Note: env is a nice little program that allows you not to need to know where ruby is installed on the particular machine. Although you do need to get the path to env right so maybe it doesn't buy you too much.<br />
+<br />
+Then make the file executable with <code>chmod a+x</code> and you can run it right from the command line:<br />
+<br />
+<div class="code">chmod a+x sentence.rb
+./sentence.rb</div><br />
+OK, on to day two...
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

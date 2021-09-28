@@ -1,0 +1,148 @@
+---
+layout: post
+title: An Io Guessing Game
+date: '2012-09-30T12:07:00.000-04:00'
+permalink: 2012/09/30/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- 7languages7weeks
+- algorithms
+- Io
+modified_time: '2012-09-30T12:07:37.327-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-4420809749040990884
+blogger_orig_url: http://labnotes.decampo.org/2012/09/an-io-guessing-game.html
+redirect_from: /2012/09/an-io-guessing-game.html
+excerpt_separator: </p>
+---
+
+<p>So when I get the chance I am working through Bruce Tate&#8217;s <em>Seven Languages in Seven Weeks</em> (it might end up being seven years in my case) and commenting on it when the mood strikes.  I am currently working through the exercises for Io Day 2 and today I was contemplating the final exercise.</p>
+<p>In this task, Tate asks us to write a program that will generate a random number between 1 and 100 and then prompt the user to guess it within ten guesses.  The user is given feedback in the form of <em>hotter</em> or <em>colder</em>.  The task itself was relatively straightforward after discovering how to read input from the console:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>GuessMe <font color="#990000">:=</font> Object clone <b><font color="#0000FF">do</font></b><font color="#990000">(</font><br />
+    min <font color="#990000">::=</font> <font color="#993399">1</font><br />
+    max <font color="#990000">::=</font> <font color="#993399">100</font><br />
+    guessLimit <font color="#990000">::=</font> <font color="#993399">10</font><br />
+    value <font color="#990000">::=</font> nil<br />
+    lastGuess <font color="#990000">::=</font> nil<br />
+    guessesLeft <font color="#990000">::=</font> <font color="#993399">0</font><br />
+<br />
+    start <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font><br />
+        reset<br />
+        value <font color="#990000">=</font> Random <b><font color="#000000">value</font></b><font color="#990000">(</font>min<font color="#990000">,</font> max<font color="#990000">+</font><font color="#993399">1</font><font color="#990000">)</font> floor<br />
+        guessesLeft <font color="#990000">=</font> guessLimit<br />
+    <font color="#990000">)</font><br />
+<br />
+    reset <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font><br />
+        value <font color="#990000">=</font> nil<br />
+        lastGuess <font color="#990000">=</font> nil<br />
+        guessesLeft <font color="#990000">=</font> <font color="#993399">0</font><br />
+    <font color="#990000">)</font><br />
+<br />
+    guess <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font>guess<font color="#990000">,</font><br />
+        guessesLeft <font color="#990000">=</font> guessesLeft <font color="#990000">-</font> <font color="#993399">1</font><br />
+        oldGuess <font color="#990000">:=</font> lastGuess<br />
+        lastGuess <font color="#990000">=</font> guess<br />
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>guess <font color="#990000">==</font> value<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><b><font color="#0000FF">return</font></b> <font color="#FF0000">"Done"</font><font color="#990000">)</font><br />
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>oldGuess <font color="#990000">==</font> nil<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><b><font color="#0000FF">return</font></b> <font color="#FF0000">"Guess again"</font><font color="#990000">)</font><br />
+        lastDelta <font color="#990000">:=</font> <font color="#990000">(</font>value<font color="#990000">-</font>oldGuess<font color="#990000">)</font> abs<br />
+        delta <font color="#990000">:=</font> <font color="#990000">(</font>value<font color="#990000">-</font>guess<font color="#990000">)</font> abs<br />
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>delta <font color="#990000">==</font> lastDelta<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+            <b><font color="#0000FF">return</font></b> <font color="#FF0000">"Same temperature"</font><br />
+        <font color="#990000">)</font> <b><font color="#000000">elseif</font></b> <font color="#990000">(</font>delta <font color="#990000">&lt;</font> lastDelta<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+            <b><font color="#0000FF">return</font></b> <font color="#FF0000">"Hotter"</font><br />
+        <font color="#990000">)</font> <b><font color="#0000FF">else</font></b> <font color="#990000">(</font><br />
+            <b><font color="#0000FF">return</font></b> <font color="#FF0000">"Colder"</font><br />
+        <font color="#990000">)</font><br />
+    <font color="#990000">)</font><br />
+<br />
+    interactive <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font><br />
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>value <font color="#990000">==</font> nil<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font>start<font color="#990000">)</font><br />
+        stdin <font color="#990000">:=</font> File standardInput<br />
+        <b><font color="#0000FF">while</font></b> <font color="#990000">(</font>guessesLeft <font color="#990000">&gt;</font> <font color="#993399">0</font><font color="#990000">,</font><br />
+            <b><font color="#0000FF">in</font></b> <font color="#990000">:=</font> stdin readLine asNumber<br />
+            result <font color="#990000">:=</font> <b><font color="#000000">guess</font></b><font color="#990000">(</font><b><font color="#0000FF">in</font></b><font color="#990000">)</font><br />
+            result println<br />
+            <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>result <font color="#990000">==</font> <font color="#FF0000">"Done"</font><font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><b><font color="#0000FF">break</font></b><font color="#990000">)</font><br />
+        <font color="#990000">)</font><br />
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>guessesLeft <font color="#990000">&lt;=</font> <font color="#993399">0</font><font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+            <font color="#990000">(</font><font color="#FF0000">"No more guesses, the value was "</font> <font color="#990000">..</font> value<font color="#990000">)</font> println<br />
+        <font color="#990000">)</font><br />
+        reset<br />
+    <font color="#990000">)</font><br />
+<font color="#990000">)</font></tt></pre></td></tr></table><p>If you want to try it, save the above in <tt>GuessMe.io</tt> and then run the interpreter in the same directory and use the command <tt>GuessMe clone interactive</tt>.</p>
+<p>So what really intrigued me about this assignment was not the exercise itself but the resulting game.  It gets obvious pretty fast that the standard binary search solution for guessing games would not work; we need to tweak it somehow.  (This is probably an elementary exercise in an algorithms course but it has been a while so it was a fun exercise for me.)</p>
+<p>The solution comes from literally thinking outside the box.  That is, you need to realize that you can guess numbers outside the range of possible values.  So, let&#8217;s say that you start by guessing 1 and that&#8217;s not it.  What should your next guess be?  At this point you know the value is between 2 and 100 inclusive, i.e. [2,100].  You&#8217;d like to cut your range in half, that is, determine if the value is in the range [2,51] or the range [52,100].  What&#8217;s the proper guess?</p>
+<p>We want to make our next guess further away from 51 than 1 is.  At the same time, it should be closer to 52 than 1 is.  In this case the guess is 102, since 51 - 1 = 50 = 102 - 52.  Now if the result is <em>hotter</em>, the new range is [52,100].  If the result of the guess is <em>colder</em>, the new range is [2,51].</p>
+<p>Now that we&#8217;ve seen how we can cut our options in half on every guess (following the first), we can start to create an algorithm.  Suppose the range is [<em>x</em>,<em>y</em>] and the last guess is <em>L</em>.  First, we find the bifurcation point <em>a</em> = floor((<em>x+y</em>)<em>/2</em>).  So we will end up with either [<em>x</em>,<em>a</em>] or [<em>a+1</em>,<em>y</em>].</p>
+<p>What should the guess <em>g</em> be?  If <em>L</em> is less than <em>a</em> then <em>g</em> will be greater than <em>a</em> and we want <em>g - </em>(<em>a+1</em>)<em> = a - L</em>.  This becomes <em>g = 2a - L + 1</em>.  If <em>L</em> was greater than <em>a</em> then we want <em>a - g = L - </em>(<em>a+1</em>) which also reduces to <em>g = 2a - L + 1</em>.</p>
+<p>Now we have enough to write a prototype to solve our game:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>Guesser <font color="#990000">:=</font> Object clone <b><font color="#0000FF">do</font></b><font color="#990000">(</font><br />
+    min <font color="#990000">::=</font> <font color="#993399">0</font><br />
+    max <font color="#990000">::=</font> <font color="#993399">0</font><br />
+    guess <font color="#990000">::=</font> <font color="#993399">0</font><br />
+    result <font color="#990000">::=</font> nil<br />
+<br />
+    report <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font><br />
+        <font color="#FF0000">"Guessed #{guess}: #{result}; [#{min},#{max}]"</font> interpolate println<br />
+    <font color="#990000">)</font><br />
+<br />
+    guessIt <font color="#990000">:=</font> <b><font color="#000000">method</font></b><font color="#990000">(</font>guessMe<font color="#990000">,</font><br />
+        guessMe start<br />
+        min <font color="#990000">=</font> guessMe min<br />
+        max <font color="#990000">=</font> guessMe max<br />
+<br />
+        <i><font color="#9A1900">// Get through the first guess, it is special</font></i><br />
+        guess <font color="#990000">=</font> min<br />
+        result <font color="#990000">=</font> guessMe <b><font color="#000000">guess</font></b><font color="#990000">(</font>guess<font color="#990000">)</font><br />
+        <i><font color="#9A1900">// Assume min wasn't it, no harm if it was</font></i><br />
+        last <font color="#990000">:=</font> min<br />
+        min <font color="#990000">=</font> min <font color="#990000">+</font> <font color="#993399">1</font><br />
+        report<br />
+<br />
+        <b><font color="#0000FF">while</font></b> <font color="#990000">(</font>result <font color="#990000">!=</font> <font color="#FF0000">"Done"</font><font color="#990000">,</font><br />
+            <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>guessMe guessesLeft <font color="#990000">&lt;=</font> <font color="#993399">0</font><font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+                <font color="#FF0000">"No guesses left, the value was #{guessMe value}"</font> interpolate println<br />
+                <b><font color="#0000FF">break</font></b><br />
+            <font color="#990000">)</font><br />
+            avg <font color="#990000">:=</font> <font color="#990000">((</font>min<font color="#990000">+</font>max<font color="#990000">)/</font><font color="#993399">2</font><font color="#990000">)</font> floor<br />
+            guess <font color="#990000">=</font> <b><font color="#0000FF">if</font></b><font color="#990000">(</font>min<font color="#990000">==</font>max<font color="#990000">,</font> min<font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">*</font>avg <font color="#990000">-</font> last <font color="#990000">+</font> <font color="#993399">1</font><font color="#990000">)</font><br />
+            result <font color="#990000">=</font> guessMe <b><font color="#000000">guess</font></b><font color="#990000">(</font>guess<font color="#990000">)</font><br />
+            <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>result <font color="#990000">==</font> <font color="#FF0000">"Colder"</font><font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+                <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>guess <font color="#990000">&lt;</font> last<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+                    min <font color="#990000">=</font> avg <font color="#990000">+</font> <font color="#993399">1</font><br />
+                <font color="#990000">)</font> <b><font color="#0000FF">else</font></b> <font color="#990000">(</font> <i><font color="#9A1900">// last &lt; guess</font></i><br />
+                    max <font color="#990000">=</font> avg<br />
+                <font color="#990000">)</font><br />
+            <font color="#990000">)</font> <b><font color="#000000">elseif</font></b> <font color="#990000">(</font>result <font color="#990000">==</font> <font color="#FF0000">"Hotter"</font><font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+                <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>guess <font color="#990000">&lt;</font> last<font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+                    max <font color="#990000">=</font> avg<br />
+                <font color="#990000">)</font> <b><font color="#0000FF">else</font></b> <font color="#990000">(</font> <i><font color="#9A1900">// last &lt; guess</font></i><br />
+                    min <font color="#990000">=</font> avg <font color="#990000">+</font> <font color="#993399">1</font><br />
+                <font color="#990000">)</font><br />
+            <font color="#990000">)</font> <b><font color="#000000">elseif</font></b> <font color="#990000">(</font>result <font color="#990000">!=</font> <font color="#FF0000">"Done"</font><font color="#990000">)</font> <b><font color="#000000">then</font></b> <font color="#990000">(</font><br />
+                <font color="#FF0000">"Did not understand result"</font> println<br />
+                report<br />
+                <b><font color="#0000FF">break</font></b><br />
+            <font color="#990000">)</font><br />
+            report<br />
+            last <font color="#990000">=</font> guess<br />
+        <font color="#990000">)</font><br />
+    <font color="#990000">)</font><br />
+<font color="#990000">)</font></tt></pre></td></tr></table><p>Here&#8217;s the <tt>Guesser</tt> in action:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>Io<font color="#990000">&gt;</font> gm <font color="#990000">:=</font> GuessMe clone<br />
+<font color="#990000">==&gt;</font>  GuessMe_0xa18e3b8<font color="#990000">:</font><br />
+<br />
+Io<font color="#990000">&gt;</font> guesser <font color="#990000">:=</font> Guesser clone<br />
+<font color="#990000">==&gt;</font>  Guesser_0xa1756d8<font color="#990000">:</font><br />
+<br />
+Io<font color="#990000">&gt;</font> guesser <b><font color="#000000">guessIt</font></b><font color="#990000">(</font>gm<font color="#990000">)</font><br />
+Guessed <font color="#993399">1</font><font color="#990000">:</font> Guess again<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">100</font><font color="#990000">]</font><br />
+Guessed <font color="#993399">102</font><font color="#990000">:</font> Colder<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">51</font><font color="#990000">]</font><br />
+Guessed <font color="#990000">-</font><font color="#993399">49</font><font color="#990000">:</font> Hotter<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">26</font><font color="#990000">]</font><br />
+Guessed <font color="#993399">78</font><font color="#990000">:</font> Hotter<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">15</font><font color="#990000">,</font><font color="#993399">26</font><font color="#990000">]</font><br />
+Guessed <font color="#990000">-</font><font color="#993399">37</font><font color="#990000">:</font> Colder<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">21</font><font color="#990000">,</font><font color="#993399">26</font><font color="#990000">]</font><br />
+Guessed <font color="#993399">84</font><font color="#990000">:</font> Hotter<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">24</font><font color="#990000">,</font><font color="#993399">26</font><font color="#990000">]</font><br />
+Guessed <font color="#990000">-</font><font color="#993399">33</font><font color="#990000">:</font> Hotter<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">24</font><font color="#990000">,</font><font color="#993399">25</font><font color="#990000">]</font><br />
+Guessed <font color="#993399">82</font><font color="#990000">:</font> Colder<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">24</font><font color="#990000">,</font><font color="#993399">24</font><font color="#990000">]</font><br />
+Guessed <font color="#993399">24</font><font color="#990000">:</font> Done<font color="#990000">;</font> <font color="#990000">[</font><font color="#993399">24</font><font color="#990000">,</font><font color="#993399">24</font><font color="#990000">]</font><br />
+<font color="#990000">==&gt;</font> <font color="#993399">24</font></tt></pre></td></tr></table><p>If you enjoyed this post, here are some exercises you may want to think about:</p>
+<ol type="1"><li>What happens if we start our algorithm with 50 instead of 1? </li><li>Will the algorithm always be able to find the value within 10 guesses (when the range is <tt>[1,100]</tt>?  What&#8217;s the largest range it can guarantee finding the answer over given 10 guesses?  Given <em>n</em> guesses? </li><li>Can the algorithm be improved upon? </li><li>What if the game told you if you were hotter or colder than all of your previous guesses?  How would you change the algorithm to use less guesses? </li></ol>

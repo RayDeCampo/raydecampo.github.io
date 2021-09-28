@@ -1,0 +1,50 @@
+---
+layout: post
+title: OS-specific ANT properties
+date: '2012-09-26T20:39:00.000-04:00'
+permalink: 2012/09/26/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- hibernate
+- hibernate tools
+- ant
+modified_time: '2012-09-26T20:39:56.731-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-1064058386947761215
+blogger_orig_url: http://labnotes.decampo.org/2012/09/os-specific-ant-properties.html
+redirect_from: /2012/09/os-specific-ant-properties.html
+excerpt_separator: </p>
+---
+
+<p>The ANT build tool for Java does a pretty decent job of abstracting away OS concerns from your build script.  E.g., file paths can always be represented using the / separator and there are tasks for all the typical file system and build operations.</p>
+<p>However, once in while you may find yourself in a situation where you need ANT to behave differently based on the operating system.  In my case, I needed to specify path to the dot executable within graphviz, a graph drawing tool used by the Hibernate tools ANT package.  Rather than torture my environment, I figured I would set a property based on the OS:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;target</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"schema-doc"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;property</font></b> <font color="#009900">name</font><font color="#990000">=</font><font color="#FF0000">"hibernate.tool.dot.options"</font><br />
+              <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"-Gsplines=true -Edecorate"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">property</font><font color="#990000">=</font><font color="#FF0000">"hibernate.tool.dot.executable"</font> <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"/usr/bin/fdp"</font><b><font color="#0000FF">&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;os</font></b> <font color="#009900">family</font><font color="#990000">=</font><font color="#FF0000">"unix"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/condition&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">property</font><font color="#990000">=</font><font color="#FF0000">"hibernate.tool.dot.executable"</font><br />
+               <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"C:/graphviz/bin/fdp.exe"</font><b><font color="#0000FF">&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;os</font></b> <font color="#009900">family</font><font color="#990000">=</font><font color="#FF0000">"windows"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/condition&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;mkdir</font></b> <font color="#009900">dir</font><font color="#990000">=</font><font color="#FF0000">"${hibernate.tool.target.dir}/doc"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;delete&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;fileset</font></b> <font color="#009900">dir</font><font color="#990000">=</font><font color="#FF0000">"${hibernate.tool.target.dir}/doc"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/delete&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;hibernatetool</font></b> <font color="#009900">destdir</font><font color="#990000">=</font><font color="#FF0000">"${hibernate.tool.target.dir}/doc"</font><b><font color="#0000FF">&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;configuration</font></b> <font color="#009900">configurationfile</font><font color="#990000">=</font><font color="#FF0000">"${basedir}/hibernate-tool.cfg.xml"</font><b><font color="#0000FF">&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;fileset</font></b> <font color="#009900">dir</font><font color="#990000">=</font><font color="#FF0000">"${src}"</font> <font color="#009900">includes</font><font color="#990000">=</font><font color="#FF0000">"**/*.hbm.xml"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;/configuration&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;classpath</font></b> <font color="#009900">refid</font><font color="#990000">=</font><font color="#FF0000">"hibernate.classpath"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;hbm2doc&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;property</font></b> <font color="#009900">key</font><font color="#990000">=</font><font color="#FF0000">"dot.executable"</font><br />
+                      <font color="#009900">value</font><font color="#990000">=</font><font color="#FF0000">"${hibernate.tool.dot.executable} ${hibernate.tool.dot.options}"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;/hbm2doc&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/hibernatetool&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/target&gt;</font></b></tt></pre></td></tr></table><p>The key portion here occurs near the top, using the <tt>&lt;condition&gt;</tt> directive.  Here I&#8217;ve placed in inside the <tt>&lt;target&gt;</tt>, but you can use it outside of a <tt>&lt;target&gt;</tt> as well.  The <tt>&lt;os&gt;</tt> element within the <tt>&lt;condition&gt;</tt> allows you test based on properties of the underlying operating system.  I&#8217;ve chosen to base the test on <tt>family</tt>, but there are also <tt>name</tt>, <tt>version</tt> and <tt>arch</tt> tests as well.</p>
+<p>(As a bonus tip here, I&#8217;ve also shown you how to pass extra arguments to graphviz when running it within Hibernate Tools.)</p>
+<p>Now this is all well and good for one property, which is the situation I was dealing with, but what if you have a whole mess of properties to deal with?  Making multiple <tt>&lt;condition&gt;</tt> tags for each property and OS combination will get old real fast.  In that case, we use the built-in properties ANT supplies:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">&lt;property</font></b> <font color="#009900">file</font><font color="#990000">=</font><font color="#FF0000">"build-${os.name}-${os.version}-${os.arch}.properties"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;property</font></b> <font color="#009900">file</font><font color="#990000">=</font><font color="#FF0000">"build-${os.name}-${os.version}.properties"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;property</font></b> <font color="#009900">file</font><font color="#990000">=</font><font color="#FF0000">"build-${os.name}.properties"</font> <b><font color="#0000FF">/&gt;</font></b><br />
+<b><font color="#0000FF">&lt;property</font></b> <font color="#009900">file</font><font color="#990000">=</font><font color="#FF0000">"build.properties"</font> <b><font color="#0000FF">/&gt;</font></b></tt></pre></td></tr></table><p>Note the order here.  Recall that once a property is defined within ANT it cannot be changed.  So put the defaults in build.properties and then override them in the more specific properties files that are loaded first.  Of course, you may not need to go all the way to the OS architecture level, but now you know how.</p>

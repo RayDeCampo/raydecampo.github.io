@@ -1,0 +1,124 @@
+---
+layout: post
+title: Build and Install JBoss 7.2.0 on CentOS 6.4
+date: '2013-10-20T09:30:00.000-04:00'
+permalink: 2013/10/20/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- JBoss
+- Red Hat
+- WildFly
+- CentOS
+modified_time: '2013-10-20T09:30:00.202-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-7716208439129804874
+blogger_orig_url: http://labnotes.decampo.org/2013/10/build-and-install-jboss-720-on-centos-64.html
+redirect_from: /2013/10/build-and-install-jboss-720-on-centos-64.html
+excerpt_separator: </p>
+---
+
+<p>As you may or may not be aware, a great many changes have been happening to the JBoss application server since being purchased by Red Hat.  Most importantly, the application server is being rebranded as <a href="http://www.wildfly.org/">WildFly</a> for version 8.  ("Why?" is the first entry on the <a href="http://www.wildfly.org/faq/">WildFly FAQ</a> if you are curious.)  But since WildFly is not quite ready as of this writing (but looks real close), we are going to deal with the latest community release, JBoss AS 7.2.0.</p>
+<p>Before the name change to WildFly, there was a split in JBoss into a 7.x community edition and a 6.x EAP edition.  The community edition remains the open source version free to use as before.  The EAP edition requires a subscription to use for production purposes (but is free for development).  The EAP edition is based on the community edition, typically taking the "Final" version of the community edition as the "Alpha" of the corresponding EAP edition (although keep in mind that the community edition versions are 7.x while the EAP is 6.x).  This appears to be a split in the mold of Red Hat Linux begetting Fedora and Red Hat Enterprise.</p>
+<p>Whew, that is a lot of change and I haven&#8217;t even mentioned that JBoss AS 7 appears to be a complete rewrite.  The configuration files and tools are completely different, so if are coming from JBoss 5 or 6, be prepared to invest a little time to get familiar with the new JBoss, er, WildFly.</p>
+<p>OK, we are getting closer to the good stuff.  In addition to all the changes mentioned above, Red Hat (or JBoss.org or WildFly.org whoever is responsible for the community editions of JBoss AS 7) has stopped providing builds of the JBoss AS 7 line after 7.1.1.  Since then there have been versions 7.1.2, 7.1.3 and 7.2.0 but no corresponding build on the <a href="http://www.jboss.org/jbossas/downloads">JBoss AS download page</a>.  Fortunately it is easy to get the source and build JBoss yourself.</p>
+<p>We will be using a new CentOS 6.4 box created using the CentOS minimal DVD.  We&#8217;ll start by installing Java; instead of going to Oracle, I decided to try the OpenJDK from the CentOS repositories to see how that goes:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# yum install java-1.7.0-openjdk java-1.7.0-openjdk-devel wget</pre></td></tr></table><p>You&#8217;ll notice I threw in <tt>wget</tt> since we will need it shortly.</p>
+<p>Next we create a <tt>jboss</tt> user on the server to build and run JBoss as.  (You may want to call the user <tt>jboss-as</tt> since the JBoss scripts reference this user by default.  I already have a convention of using the user <tt>jboss</tt> and I want to stick with it.)</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# useradd --system --comment JBossAS --create-home \<br />
+--home /opt/jboss --user-group jboss</pre></td></tr></table><p>Now we are ready to download the JBoss source.  Fortunately for us, github provides tarballs of tags so we can easily download the JBoss source for 7.2.0:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#990000">[</font>jboss@wxyz <font color="#990000">~]</font>$ wget https<font color="#990000">:</font>//github<font color="#990000">.</font>com/jbossas/jboss-as/archive<font color="#990000">/</font><font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>tar<font color="#990000">.</font>gz<br />
+<font color="#990000">[</font>jboss@wxyz <font color="#990000">~]</font>$ mv <font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final /opt/jboss/JBoss-<font color="#993399">7.2</font><font color="#990000">.</font> <font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>tar<font color="#990000">.</font>gz<br />
+<font color="#990000">[</font>jboss@wxyz <font color="#990000">~]</font>$ mkdir src<br />
+<font color="#990000">[</font>jboss@wxyz <font color="#990000">~]</font>$ cd src<br />
+<font color="#990000">[</font>jboss@wxyz src<font color="#990000">]</font>$ tar xzf JBoss-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>tar<font color="#990000">.</font>gz<br />
+<font color="#990000">[</font>jboss@wxyz src<font color="#990000">]</font>$ cd jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">/</font><br />
+<font color="#990000">[</font>jboss@wxyz jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">]</font>$ <i><font color="#9A1900"># This next command kicks off the build</font></i><br />
+<font color="#990000">[</font>jboss@wxyz jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">]</font>$ <font color="#990000">.</font>/build<font color="#990000">.</font>sh -DskipTests -Drelease<font color="#990000">=</font><b><font color="#0000FF">true</font></b></tt></pre></td></tr></table><p>If you take a look at the <tt>README.md</tt> file in the download there are some basic instructions on how to do the build.  One pleasant surprise is that there is no need to install maven.  We do want a couple of tweaks to the command line they suggest however in order to skip the unit tests and get a release tarball.  After running the command above you will find the tarball in the <tt>dist/target</tt> directory.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#990000">[</font>jboss@wxyz jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">]</font>$ ls dist/target<br />
+archive-tmp  jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final-src<font color="#990000">.</font>tar<font color="#990000">.</font>gz  jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final-src<font color="#990000">.</font>zip<br />
+jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>tar<font color="#990000">.</font>gz  jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>zip<br />
+<font color="#990000">[</font>jboss@wxyz jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">]</font>$ cd<br />
+<font color="#990000">[</font>jboss@wxyz <font color="#990000">~]</font>$ tar zxvf src/jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final/dist/target/jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<font color="#990000">.</font>tar<font color="#990000">.</font>gz</tt></pre></td></tr></table><p>Now that we have a build of JBoss AS 7.2.0 on the system, we need to configure CentOS to treat it like a service.  JBoss comes with some scripts in the <tt>bin/init.d</tt> directory that will help with this.  I am using the standalone server, but it is not difficult to modify the instructions for the domain server.  First up is the <tt>/etc/jboss-as/jboss-as.conf</tt> file.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# cd /etc<br />
+[root@wxyz etc]# mkdir jboss-as<br />
+[root@wxyz etc]# cd jboss-as/<br />
+[root@wxyz jboss-as]# cp /opt/jboss/jboss-as-7.2.0.Final/bin/init.d/jboss-as.conf ./<br />
+[root@wxyz jboss-as]# # We'll just create an empty properties file for now<br />
+[root@wxyz jboss-as]# touch jboss-as.properties</pre></td></tr></table><p>Next edit the file.  We need to define a few environment variables:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># General configuration for the init.d scripts,</font></i><br />
+<i><font color="#9A1900"># not necessarily for JBoss AS itself.</font></i><br />
+<br />
+<i><font color="#9A1900"># The username who should own the process.</font></i><br />
+<i><font color="#9A1900">#</font></i><br />
+<font color="#009900">JBOSS_USER</font><font color="#990000">=</font>jboss<br />
+<br />
+<i><font color="#9A1900"># The amount of time to wait for startup</font></i><br />
+<i><font color="#9A1900">#</font></i><br />
+<i><font color="#9A1900"># STARTUP_WAIT=30</font></i><br />
+<br />
+<i><font color="#9A1900"># The amount of time to wait for shutdown</font></i><br />
+<i><font color="#9A1900">#</font></i><br />
+<i><font color="#9A1900"># SHUTDOWN_WAIT=30</font></i><br />
+<br />
+<i><font color="#9A1900"># Location to keep the console log</font></i><br />
+<i><font color="#9A1900">#</font></i><br />
+<font color="#009900">JBOSS_CONSOLE_LOG</font><font color="#990000">=</font>/var/log/jboss-as/console<font color="#990000">.</font>log<br />
+<br />
+<i><font color="#9A1900"># JBoss installation directory (default is /usr/share/jboss)</font></i><br />
+<font color="#009900">JBOSS_HOME</font><font color="#990000">=</font>/opt/jboss/jboss-as-<font color="#993399">7.2</font><font color="#990000">.</font><font color="#993399">0</font><font color="#990000">.</font>Final<br />
+<br />
+<i><font color="#9A1900"># Server configuration file, using full JEE 6 profile</font></i><br />
+<font color="#009900">JBOSS_CONFIG</font><font color="#990000">=</font>standalone-full<font color="#990000">.</font>xml<br />
+<br />
+<i><font color="#9A1900"># Need to modify the init script to account for these</font></i><br />
+<font color="#009900">JBOSS_OPTS</font><font color="#990000">=</font><font color="#FF0000">"--properties=/etc/jboss-as/jboss-as.properties"</font></tt></pre></td></tr></table><p>Just in case you are confused on the two files, <tt>jboss-as.conf</tt> is a bash script that is sourced by the JBoss init script; use it to set environment variables for the scripts.  As for <tt>jboss-as.properties</tt>, it is a Java properties file that is read by JBoss on start up.  Use it to set JBoss system properties (we will get to an example shortly).</p>
+<p>Next up we will deposit the init script in <tt>/etc/init.d</tt> and set the server to start on boot:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz jboss-as]# cd /etc/ini t.d/<br />
+[root@wxyz init.d]# cp /opt/jboss/jboss-as-7.2.0.Final/bin/init.d/jboss-as-standalone.sh ./<br />
+[root@wxyz init.d]# mv jboss-as-standalone.sh jboss-as<br />
+[root@wxyz init.d]# chkconfig --add jboss-as<br />
+[root@wxyz init.d]# chkconfig --level 345 jboss-as on<br />
+[root@wxyz init.d]# chkconfig --list jboss-as<br />
+jboss-as        0:off   1:off   2:off   3:on    4:on    5:on    6:off</pre></td></tr></table><p>As-is the scripts do not allow passing any additional options to the JBoss process, so we need to edit the <tt>/etc/init.d/jboss-as</tt> script to add the <tt>$JBOSS_OPTS</tt> variable whenever JBoss is starting.  Here is the edited snippet (I&#8217;ve added some line breaks for readability):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>  <b><font color="#0000FF">if</font></b> <font color="#990000">[</font> <font color="#990000">!</font> -z <font color="#FF0000">"$JBOSS_USER"</font> <font color="#990000">];</font> <b><font color="#0000FF">then</font></b><br />
+    <b><font color="#0000FF">if</font></b> <font color="#990000">[</font> -r /etc/rc<font color="#990000">.</font>d/init<font color="#990000">.</font>d/functions <font color="#990000">];</font> <b><font color="#0000FF">then</font></b><br />
+      daemon --user <font color="#009900">$JBOSS_USER</font> <font color="#009900">LAUNCH_JBOSS_IN_BACKGROUND</font><font color="#990000">=</font><font color="#993399">1</font> <font color="#990000">\</font><br />
+        <font color="#009900">JBOSS_PIDFILE</font><font color="#990000">=</font><font color="#009900">$JBOSS_PIDFILE</font> <font color="#009900">$JBOSS_SCRIPT</font> -c <font color="#009900">$JBOSS_CONFIG</font> <font color="#990000">\</font><br />
+        <font color="#009900">$JBOSS_OPTS</font> <font color="#993399">2</font><font color="#990000">&gt;&amp;</font><font color="#993399">1</font> <font color="#990000">&gt;</font> <font color="#009900">$JBOSS_CONSOLE_LOG</font> <font color="#990000">&amp;</font><br />
+    <b><font color="#0000FF">else</font></b><br />
+      su - <font color="#009900">$JBOSS_USER</font> -c <font color="#FF0000">"LAUNCH_JBOSS_IN_BACKGROUND=1 \</font><br />
+<font color="#FF0000">        JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT -c $JBOSS_CONFIG \</font><br />
+<font color="#FF0000">        $JBOSS_OPTS"</font> <font color="#993399">2</font><font color="#990000">&gt;&amp;</font><font color="#993399">1</font> <font color="#990000">&gt;</font> <font color="#009900">$JBOSS_CONSOLE_LOG</font> <font color="#990000">&amp;</font><br />
+    <b><font color="#0000FF">fi</font></b><br />
+  <b><font color="#0000FF">fi</font></b></tt></pre></td></tr></table><p>Next up we create the log directories and redirect the JBoss log directory to <tt>/var/log/jboss-as</tt> and the tmp directory to <tt>/tmp/jboss-as</tt></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# mkdir /var/log/jboss-as<br />
+[root@wxyz ~]# chown jboss:jboss /var/log/jboss-as/</pre></td></tr></table><p>To get JBoss to use these directories, we set the system properties for them in <tt>/etc/jboss-as/jboss-as.properties</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># System properties for jboss-as</font></i><br />
+<font color="#009900">jboss.server.log.dir</font><font color="#990000">=</font>/var/log/jboss-as<br />
+<font color="#009900">jboss.server.temp.dir</font><font color="#990000">=</font>/tmp/jboss-as</tt></pre></td></tr></table><p>At this point you can start the server using the command <tt>service jboss-as start</tt>.  You won&#8217;t be able to do much however, unless you like browsing via <tt>wget</tt> since the server is bound to the localhost interface only (and we are working on a headless server, i.e. no GUI web browser).  So we&#8217;ll need to bind JBoss to all interfaces and open up the CentOS firewall to allow browsing to JBoss and the management console.  Keep in mind that this may not be exactly what you want in a production environment or in environment where unknown users might access your server (like shared hosting).</p>
+<p>First we&#8217;ll edit the <tt>/etc/jboss-as/jboss-as.properties</tt> file:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># System properties for jboss-as</font></i><br />
+<font color="#009900">jboss.bind.address</font><font color="#990000">=</font>0.0.0.0<br />
+<font color="#009900">jboss.bind.address.management</font><font color="#990000">=</font>0.0.0.0<br />
+<font color="#009900">jboss.server.log.dir</font><font color="#990000">=</font>/var/log/jboss-as<br />
+<font color="#009900">jboss.server.temp.dir</font><font color="#990000">=</font>/tmp/jboss-as</tt></pre></td></tr></table><p>Depending on how your local network is setup you may need further configuration for JBoss to be completely happy binding to all interfaces.  If your DNS recognizes the name of the CentOS server you are working on, congratulations, you are all set.  On the other hand, if DNS is not configured for the server, you will need to add an entry to the <tt>/etc/hosts</tt> file pointing the name of the server to the external IP.</p>
+<p>Next we need to open the firewall for ports 8080 (regular JBoss) and 9990 (the management console).  <strong>Be careful</strong> when adjusting the firewall.  The commands below use hard-coded line numbers that may not be appropriate for whatever system you are using.  If you think you have screwed up your firewall use <tt>service iptables restart</tt> to reset it.  Of course, this won&#8217;t work after you issue <tt>service iptables save</tt> so be extra sure before you save the rules.  You will also need to replace 10.0.0.0 with your subnet below.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# # 8080 for JBoss applications<br />
+[root@wxyz ~]# iptables --insert INPUT 5 \<br />
+         --match state \<br />
+         --state NEW \<br />
+         --protocol tcp \<br />
+         --destination-port 8080 \<br />
+         --source 10.0.0.0/24 \<br />
+         --jump ACCEPT<br />
+[root@wxyz ~]# # 9990 for JBoss management<br />
+[root@wxyz ~]# iptables --insert INPUT 6 \<br />
+         --match state \<br />
+         --state NEW \<br />
+         --protocol tcp \<br />
+         --destination-port 9990 \<br />
+         --source 10.0.0.0/24 \<br />
+         --jump ACCEPT<br />
+[root@wxyz ~]# # Verify the state of the firewall<br />
+[root@wxyz ~]# iptables -L --line-numbers<br />
+[root@wxyz ~]# # Go and test it out before doing the following<br />
+[root@wxyz ~]# service iptables save</pre></td></tr></table><p>At this point you should be ready to go.  Start up JBoss and try accessing it from your desktop.</p>

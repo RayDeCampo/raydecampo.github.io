@@ -1,0 +1,31 @@
+---
+layout: default
+---
+
+<div class="posts">
+  {% for post in collections.featuredPosts %}
+  <article class="post">
+    <h1>{{ post.data.title }}</h1>
+
+    <div class="date">
+      {{ post.date | date: "%B %e, %Y" }}
+    </div>
+
+    <div class="tags">
+    {% for tag in post.data.tags %}
+      <a href="tags.html#{{ tag | slugify }}">{{ tag }}</a>
+    {% endfor %}
+    </div>
+    
+    <div class="entry">
+      {{ post.templateContent }}
+    </div>
+
+    <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">Permanent URL</a>
+  </article>
+  {% endfor %}
+  <h2>Other Posts</h2>
+  {% for post in collections.otherPosts %}
+    {% include summary.html %}
+  {% endfor %}
+</div>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>JSF 2.2 Welcome File</h1>
+  
+  <div class="date">
+    October  5, 2014
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#JSF">JSF</a>
+  
+    <a href="/tags.html#web.xml">web.xml</a>
+  
+    <a href="/tags.html#gotcha">gotcha</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Just a quick post in case you are trying to use a JSF page as a welcome file.  This is what you'll need in your web.xml: </p>
+<div class="code">
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;
+            javax.faces.webapp.FacesServlet
+        &lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.xhtml&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+</div>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>jQuery UI Initialization Issues</h1>
+  
+  <div class="date">
+    February 13, 2015
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#RequireJS">RequireJS</a>
+  
+    <a href="/tags.html#gotcha">gotcha</a>
+  
+    <a href="/tags.html#jQuery">jQuery</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+ <p>Every once in a while when using jQuery UI I notice that my widget is not being initialized smoothly.  For example, when using the menu widget I might see the list items behind the menu briefly.  Then the page jumps around and it is a generally unpleasant experience for the user.  Who likes it when your jQuery widgets are jumpy and cause the page to feel like one of those old 'punch the monkey' banner ads? </p>
+<p>This usually means I have done something like this: </p>
+<div class="code">
+require(['jquery', 'jquery-ui/menu'], function($, menu) {
+    $("#navmenu").menu(); }); 
+</div>
+<p>Instead of wrapping the initialization in a function as I should: </p>
+<div class="code">
+require(['jquery', 'jquery-ui/menu'], function($, menu) {
+    $(function() {
+        $("#navmenu").menu();
+    });
+}); 
+</div>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

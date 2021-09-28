@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Ubuntu 12.10: Installing taglib-ruby</h1>
+  
+  <div class="date">
+    July 28, 2013
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#taglib">taglib</a>
+  
+    <a href="/tags.html#ubuntu">ubuntu</a>
+  
+    <a href="/tags.html#installation">installation</a>
+  
+    <a href="/tags.html#ruby">ruby</a>
+  
+    <a href="/tags.html#gem">gem</a>
+  
+    <a href="/tags.html#quantal">quantal</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Back when I was fooling around with Ruby I <a href="/2012/07/accessing-mp3-tags-in-ruby.html">wrote some code</a> using the ruby-taglib library for manipulating mp3 tags.  Later, I went through the process of <a href="/2012/12/installing-ubuntu-1210-on-ssd-part-1.html">installing Ubuntu 12.10</a> from scratch on my main system.  Eventually I tried running the old on the new system and discovered that I needed to re-install ruby-taglib and ran into some difficulties.</p>
+<p>I&#8217;ll start with the punchline for people just looking to get on with it:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ sudo apt-get install ruby-dev libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.7</font>-dev libtag1-dev g<font color="#990000">++</font><br />
+$ sudo gem install taglib-ruby libtag1-dev</tt></pre></td></tr></table><p>What follows is all the gory details with the error messages in the hope that helps the poor soul using Google to solve this issue.  First, I tried it with none of the above packages installed:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ sudo gem install taglib-ruby<br />
+Building native extensions<font color="#990000">.</font>  This could take a <b><font color="#0000FF">while</font></b><font color="#990000">...</font><br />
+ERROR<font color="#990000">:</font>  Error installing taglib-ruby<font color="#990000">:</font><br />
+ ERROR<font color="#990000">:</font> Failed to build gem native extension<font color="#990000">.</font><br />
+<br />
+        /usr/bin/ruby<font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font> extconf<font color="#990000">.</font>rb<br />
+/usr/lib/ruby<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/rubygems/custom_require<font color="#990000">.</font>rb<font color="#990000">:</font><font color="#993399">36</font><font color="#990000">:</font><b><font color="#0000FF">in</font></b> `require<font color="#FF0000">': cannot load such file -- mkmf (LoadError)</font><br />
+<font color="#FF0000"> from /usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'</font><br />
+ from /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font>/ext/extconf_common<font color="#990000">.</font>rb<font color="#990000">:</font><font color="#993399">5</font><font color="#990000">:</font><b><font color="#0000FF">in</font></b> `<font color="#990000">&lt;</font>top <font color="#990000">(</font>required<font color="#990000">)&gt;</font><font color="#FF0000">'</font><br />
+<font color="#FF0000"> from /usr/lib/ruby/1.9.1/rubygems/custom_require.rb:36:in `require'</font><br />
+ from /usr/lib/ruby<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/rubygems/custom_require<font color="#990000">.</font>rb<font color="#990000">:</font><font color="#993399">36</font><font color="#990000">:</font><b><font color="#0000FF">in</font></b> `require<font color="#FF0000">'</font><br />
+<font color="#FF0000"> from extconf.rb:2:in `&lt;main&gt;'</font><br />
+<br />
+<br />
+Gem files will remain installed <b><font color="#0000FF">in</font></b> /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font> <b><font color="#0000FF">for</font></b> inspection<font color="#990000">.</font><br />
+Results logged to /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font>/ext/taglib_base/gem_make<font color="#990000">.</font>out</tt></pre></td></tr></table><p>Next I tried installing the just the <tt>ruby-dev</tt> package:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ sudo apt-get install ruby-dev<br />
+$ sudo gem install taglib-ruby<br />
+Building native extensions<font color="#990000">.</font>  This could take a <b><font color="#0000FF">while</font></b><font color="#990000">...</font><br />
+ERROR<font color="#990000">:</font>  Error installing taglib-ruby<font color="#990000">:</font><br />
+ ERROR<font color="#990000">:</font> Failed to build gem native extension<font color="#990000">.</font><br />
+<br />
+        /usr/bin/ruby<font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font> extconf<font color="#990000">.</font>rb<br />
+checking <b><font color="#0000FF">for</font></b> <b><font color="#000000">main()</font></b> <b><font color="#0000FF">in</font></b> -lstdc<font color="#990000">++...</font> no<br />
+You must have libstdc<font color="#990000">++</font> installed<font color="#990000">.</font><br />
+<font color="#990000">***</font> extconf<font color="#990000">.</font>rb failed <font color="#990000">***</font><br />
+Could not create Makefile due to some reason<font color="#990000">,</font> probably lack of<br />
+necessary libraries and/or headers<font color="#990000">.</font>  Check the mkmf<font color="#990000">.</font>log file <b><font color="#0000FF">for</font></b> more<br />
+details<font color="#990000">.</font>  You may need configuration options<font color="#990000">.</font><br />
+<br />
+Provided configuration options<font color="#990000">:</font><br />
+ --with-opt-dir<br />
+ --with-opt-include<br />
+ --without-opt-include<font color="#990000">=</font><font color="#009900">${opt-dir}</font>/include<br />
+ --with-opt-lib<br />
+ --without-opt-lib<font color="#990000">=</font><font color="#009900">${opt-dir}</font>/lib<br />
+ --with-make-prog<br />
+ --without-make-prog<br />
+ --srcdir<font color="#990000">=.</font><br />
+ --curdir<br />
+ --ruby<font color="#990000">=</font>/usr/bin/ruby<font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font><br />
+ --with-tag-dir<br />
+ --without-tag-dir<br />
+ --with-tag-include<br />
+ --without-tag-include<font color="#990000">=</font><font color="#009900">${tag-dir}</font>/include<br />
+ --with-tag-lib<br />
+ --without-tag-lib<font color="#990000">=</font><font color="#009900">${tag-dir}</font>/lib<br />
+ --with-stdc<font color="#990000">++</font>lib<br />
+ --without-stdc<font color="#990000">++</font>lib<br />
+<br />
+<br />
+Gem files will remain installed <b><font color="#0000FF">in</font></b> /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font> <b><font color="#0000FF">for</font></b> inspection<font color="#990000">.</font><br />
+Results logged to /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font>/ext/taglib_base/gem_make<font color="#990000">.</font>out</tt></pre></td></tr></table><p>This result was confusing because <tt>libstdc++</tt> was installed on the system.  I realized I needed the <tt>libstdc++</tt> development package:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ apt-cache search stdc<font color="#990000">++</font> <font color="#990000">|</font> grep dev<br />
+lib32gmp-dev - Multiprecision arithmetic library developers tools <font color="#990000">(</font>32bit<font color="#990000">)</font><br />
+libgmp-dev - Multiprecision arithmetic library developers tools<br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.4</font>-dev - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.6</font>-dev - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.7</font>-dev - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.5</font>-dev - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.6</font>-dev-armel-cross - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.6</font>-dev-armhf-cross - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.7</font>-dev-armel-cross - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.7</font>-dev-armhf-cross - GNU Standard C<font color="#990000">++</font> Library v3 <font color="#990000">(</font>development files<font color="#990000">)</font><br />
+$ sudo apt-get install libstdc<font color="#990000">++</font><font color="#993399">6</font>-<font color="#993399">4.7</font>-dev<br />
+$ sudo gem install taglib-ruby<br />
+Building native extensions<font color="#990000">.</font>  This could take a <b><font color="#0000FF">while</font></b><font color="#990000">...</font><br />
+ERROR<font color="#990000">:</font>  Error installing taglib-ruby<font color="#990000">:</font><br />
+ ERROR<font color="#990000">:</font> Failed to build gem native extension<font color="#990000">.</font><br />
+<br />
+        /usr/bin/ruby<font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font> extconf<font color="#990000">.</font>rb<br />
+checking <b><font color="#0000FF">for</font></b> <b><font color="#000000">main()</font></b> <b><font color="#0000FF">in</font></b> -lstdc<font color="#990000">++...</font> yes<br />
+checking <b><font color="#0000FF">for</font></b> <b><font color="#000000">main()</font></b> <b><font color="#0000FF">in</font></b> -ltag<font color="#990000">...</font> no<br />
+You must have taglib installed <b><font color="#0000FF">in</font></b> order to use taglib-ruby<font color="#990000">.</font><br />
+<br />
+Debian/Ubuntu<font color="#990000">:</font> sudo apt-get install libtag1-dev<br />
+Fedora/RHEL<font color="#990000">:</font> sudo yum install taglib-devel<br />
+Brew<font color="#990000">:</font> brew install taglib<br />
+MacPorts<font color="#990000">:</font> sudo port install taglib<br />
+<br />
+<font color="#990000">***</font> extconf<font color="#990000">.</font>rb failed <font color="#990000">***</font><br />
+Could not create Makefile due to some reason<font color="#990000">,</font> probably lack of<br />
+necessary libraries and/or headers<font color="#990000">.</font>  Check the mkmf<font color="#990000">.</font>log file <b><font color="#0000FF">for</font></b> more<br />
+details<font color="#990000">.</font>  You may need configuration options<font color="#990000">.</font><br />
+<br />
+Provided configuration options<font color="#990000">:</font><br />
+ --with-opt-dir<br />
+ --with-opt-include<br />
+ --without-opt-include<font color="#990000">=</font><font color="#009900">${opt-dir}</font>/include<br />
+ --with-opt-lib<br />
+ --without-opt-lib<font color="#990000">=</font><font color="#009900">${opt-dir}</font>/lib<br />
+ --with-make-prog<br />
+ --without-make-prog<br />
+ --srcdir<font color="#990000">=.</font><br />
+ --curdir<br />
+ --ruby<font color="#990000">=</font>/usr/bin/ruby<font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font><br />
+ --with-tag-dir<br />
+ --without-tag-dir<br />
+ --with-tag-include<br />
+ --without-tag-include<font color="#990000">=</font><font color="#009900">${tag-dir}</font>/include<br />
+ --with-tag-lib<br />
+ --without-tag-lib<font color="#990000">=</font><font color="#009900">${tag-dir}</font>/lib<br />
+ --with-stdc<font color="#990000">++</font>lib<br />
+ --without-stdc<font color="#990000">++</font>lib<br />
+ --with-taglib<br />
+ --without-taglib<br />
+<br />
+<br />
+Gem files will remain installed <b><font color="#0000FF">in</font></b> /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font> <b><font color="#0000FF">for</font></b> inspection<font color="#990000">.</font><br />
+Results logged to /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font>/ext/taglib_base/gem_make<font color="#990000">.</font>out</tt></pre></td></tr></table><p>And the next piece was the taglib development package:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ sudo apt-get install libtag1-dev<br />
+$ sudo gem install taglib-ruby<br />
+Building native extensions<font color="#990000">.</font>  This could take a <b><font color="#0000FF">while</font></b><font color="#990000">...</font><br />
+ERROR<font color="#990000">:</font>  Error installing taglib-ruby<font color="#990000">:</font><br />
+ ERROR<font color="#990000">:</font> Failed to build gem native extension<font color="#990000">.</font><br />
+<br />
+        /usr/bin/ruby<font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font> extconf<font color="#990000">.</font>rb<br />
+checking <b><font color="#0000FF">for</font></b> <b><font color="#000000">main()</font></b> <b><font color="#0000FF">in</font></b> -lstdc<font color="#990000">++...</font> yes<br />
+checking <b><font color="#0000FF">for</font></b> <b><font color="#000000">main()</font></b> <b><font color="#0000FF">in</font></b> -ltag<font color="#990000">...</font> yes<br />
+creating Makefile<br />
+<br />
+make<br />
+compiling taglib_base_wrap<font color="#990000">.</font>cxx<br />
+make<font color="#990000">:</font> g<font color="#990000">++:</font> Command not found<br />
+make<font color="#990000">:</font> <font color="#990000">***</font> <font color="#990000">[</font>taglib_base_wrap<font color="#990000">.</font>o<font color="#990000">]</font> Error <font color="#993399">127</font><br />
+<br />
+<br />
+Gem files will remain installed <b><font color="#0000FF">in</font></b> /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font> <b><font color="#0000FF">for</font></b> inspection<font color="#990000">.</font><br />
+Results logged to /var/lib/gems<font color="#990000">/</font><font color="#993399">1.9</font><font color="#990000">.</font><font color="#993399">1</font>/gems/taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font>/ext/taglib_base/gem_make<font color="#990000">.</font>out</tt></pre></td></tr></table><p>And finally we need <tt>g++</tt> (how else can we compile C++?):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt>$ sudo apt-get install g<font color="#990000">++</font><br />
+$ sudo gem install taglib-ruby<br />
+Building native extensions<font color="#990000">.</font>  This could take a <b><font color="#0000FF">while</font></b><font color="#990000">...</font><br />
+Successfully installed taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font><br />
+<font color="#993399">1</font> gem installed<br />
+Installing ri documentation <b><font color="#0000FF">for</font></b> taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font><font color="#990000">...</font><br />
+Installing RDoc documentation <b><font color="#0000FF">for</font></b> taglib-ruby-<font color="#993399">0.5</font><font color="#990000">.</font><font color="#993399">2</font><font color="#990000">...</font></tt></pre></td></tr></table>
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

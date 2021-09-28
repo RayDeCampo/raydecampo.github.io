@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>SELinux and ssh</h1>
+  
+  <div class="date">
+    February 16, 2014
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#SELinux">SELinux</a>
+  
+    <a href="/tags.html#ssh">ssh</a>
+  
+    <a href="/tags.html#Red Hat">Red Hat</a>
+  
+    <a href="/tags.html#RHEL">RHEL</a>
+  
+    <a href="/tags.html#gotcha">gotcha</a>
+  
+    <a href="/tags.html#CentOS">CentOS</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>I've had this one as a draft post for a while and I just ran into the it again, so it's time to to publish it. </p>
+<p>I had a Linux server setup that I was getting a new developer to connect to.  Whatever we tried, we could not get him logged in via ssh using keys.  I verified the home directory permissions (at most 755), the <tt>.ssh</tt> directory permissions (700), the permissions of the files in the <tt>.ssh</tt> directory (600).  Other users could connect to the server using keys.  The developer could use the same client to connect to other ssh servers using keys. </p>
+<p>Finally it occurred to me to check the SELinux context on the <tt>.ssh</tt> directory; it was missing the ssh_home_t context.  The repair is simple: <tt>restorecon -r -vv .ssh</tt></p>
+<p>If you don't trust <tt>restorecon</tt> or you are just looking for an alternate fix, you can delete the <tt>.ssh</tt> directory and have the user connect to another ssh server from the target machine.  This will build the <tt>.ssh</tt> directory on the target server when the <tt>known_hosts</tt> file is created. </p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

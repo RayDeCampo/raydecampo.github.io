@@ -1,0 +1,111 @@
+---
+layout: post
+title: WildFly 8.2.0 and Java 8 on CentOS 6.6
+date: '2015-01-07T18:00:00.000-05:00'
+permalink: 2015/01/07/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- Red Hat
+- RHEL
+- WildFly
+- installation
+- CentOS
+modified_time: '2015-04-22T11:45:36.273-04:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-1065699225103910569
+blogger_orig_url: http://labnotes.decampo.org/2015/01/wildfly-820-and-java-8-on-centos-66.html
+redirect_from: /2015/01/wildfly-820-and-java-8-on-centos-66.html
+excerpt_separator: </p>
+---
+
+<p>This post documents how to install and configure <a href="http://www.wildfly.org/">WildFly</a> 8.2.0 on CentOS 6.6.  We make some changes to move some of the configuration under <tt>/etc</tt> and also place log files under <tt>/var/log</tt> and temp files under <tt>/tmp</tt> just like a well-behaved POSIX application should.  <p>We&#8217;ll start by installing Java; download your desired version as an RPM from Oracle and install:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# rpm -ivh jdk-8u25-linux-x64.rpm</pre></td></tr></table><p>This installs the JDK in <tt>/usr/java/jdk1.8.0_25</tt>.  There is no need to make this the default java used by the system, we'll just configure WildFly to use it.</p>
+<p>Next we create a <tt>wildfly</tt> user on the server to build and run WildFly as:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# useradd --system \<br />
+--comment "WildFly Application Server" \<br />
+--create-home --home /opt/wildfly \<br />
+--user-group wildfly</pre></td></tr></table><p>I assume you already have the WildFly tarball downloaded and ready to go:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#990000">[</font>wildfly@wxyz <font color="#990000">~]</font>$ tar zxvf wildfly-8<font color="#990000">.</font>2<font color="#990000">.</font>0<font color="#990000">.</font>Final<font color="#990000">.</font>tar<font color="#990000">.</font>gz</tt></pre></td></tr></table><p>Now that we have WildFly on the system, we need to configure CentOS to treat it like a service.  WildFly comes with some scripts in the <tt>bin/init.d</tt> directory that will help with this.  I am using the standalone server, but it is not difficult to modify the instructions for the domain server.  First up is the <tt>/etc/wildfly/wildfly.conf</tt> file.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# cd /etc<br />
+[root@wxyz etc]# mkdir wildfly<br />
+[root@wxyz etc]# cd wildfly/<br />
+[root@wxyz wildfly]# cp /opt/wildfly/wildfly-8.2.0.Final/bin/init.d/wildfly.conf ./<br />
+[root@wxyz wildfly]# # We'll just create an empty properties file for now<br />
+[root@wxyz wildfly]# touch wildfly.properties</pre></td></tr></table><p>Next edit the file.  We need to define a few environment variables, I am only including the ones I've changed:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># General configuration for the init.d scripts,</font></i><br />
+<i><font color="#9A1900"># not necessarily for JBoss AS itself.</font></i><br />
+<i><font color="#9A1900"># default location: /etc/default/wildfly</font></i><br />
+<br />
+<i><font color="#9A1900">## Location of JDK</font></i><br />
+<font color="#009900">JAVA_HOME</font><font color="#990000">=</font>/usr/java/jdk1.8.0_25<br />
+<br />
+<i><font color="#9A1900">## Location of WildFly</font></i><br />
+<font color="#009900">JBOSS_HOME</font><font color="#990000">=</font>/opt/wildfly/wildfly-8.2.0.Final<br />
+<br />
+<i><font color="#9A1900">## The username who should own the process.</font></i><br />
+<font color="#009900">JBOSS_USER</font><font color="#990000">=</font>wildfly<br />
+<br />
+<i><font color="#9A1900">## Configuration for standalone mode</font></i><br />
+<font color="#009900">JBOSS_CONFIG</font><font color="#990000">=</font>standalone-full.xml<br />
+<br />
+<i><font color="#9A1900">## Location to keep the console log</font></i><br />
+<font color="#009900">JBOSS_CONSOLE_LOG</font><font color="#990000">=</font>"/var/log/wildfly/console.log"<br />
+<br />
+<i><font color="#9A1900"># Need to modify the init script to account for JBOSS_OPTS</font></i><br />
+<i><font color="#9A1900"># Allows us to pass system properties to WildFly</font></i><br />
+<font color="#009900">JBOSS_OPTS</font><font color="#990000">=</font>"--properties=/etc/wildfly/wildfly.properties"<br />
+<br />
+</tt></pre></td></tr></table><p>Next up we will deposit the init script in <tt>/etc/init.d</tt> and set the server to start on boot:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz wildfly]# cd /etc/ini t.d/<br />
+[root@wxyz init.d]# cp /opt/wildfly/wildfly-8.2.0.Final/bin/init.d/wildfly-init-redhat.sh ./wildfly<br />
+[root@wxyz init.d]# chkconfig --add wildfly<br />
+[root@wxyz init.d]# chkconfig --level 345 wildfly on<br />
+[root@wxyz init.d]# chkconfig --list wildfly<br />
+wildfly        0:off   1:off   2:off   3:on    4:on    5:on    6:off</pre></td></tr></table><p>You will need to edit the <tt>wildfly</tt> script in two places; first, to change the default location of the <tt>wildfly.conf</tt> file from <tt>/etc/default/wildfly.conf</tt>, starting at line 19: <table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># Load JBoss AS init.d configuration.</font></i><br />
+<b><font color="#0000FF">if</font></b> <font color="#990000">[</font> -z <font color="#FF0000">"$JBOSS_CONF"</font> <font color="#990000">];</font> <b><font color="#0000FF">then</font></b><br />
+        <font color="#009900">JBOSS_CONF</font><font color="#990000">=</font><font color="#FF0000">"/etc/wildfly/wildfly.conf"</font><br />
+<b><font color="#0000FF">fi</font></b><br />
+</tt></pre></td></tr></table><p>As-is the scripts do not allow passing any additional options to the WildFly process, so we need to edit the <tt>/etc/init.d/wildfly</tt> script to add the <tt>$JBOSS_OPTS</tt> variable whenever WildFly is starting.  Here is the edited snippet for the standalone configuration (I&#8217;ve added some line breaks for readability) starting from line 104:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#0000FF">if</font></b> <font color="#990000">[</font> <font color="#990000">!</font> -z <font color="#FF0000">"$JBOSS_USER"</font> <font color="#990000">];</font> <b><font color="#0000FF">then</font></b><br />
+  <b><font color="#0000FF">if</font></b> <font color="#990000">[</font> <font color="#FF0000">"$JBOSS_MODE"</font> <font color="#990000">=</font> <font color="#FF0000">"standalone"</font> <font color="#990000">];</font> <b><font color="#0000FF">then</font></b><br />
+    <b><font color="#0000FF">if</font></b> <font color="#990000">[</font> -r /etc/rc<font color="#990000">.</font>d/init<font color="#990000">.</font>d/functions <font color="#990000">];</font> <b><font color="#0000FF">then</font></b><br />
+      daemon --user <font color="#009900">$JBOSS_USER</font> <font color="#009900">LAUNCH_JBOSS_IN_BACKGROUND</font><font color="#990000">=</font><font color="#993399">1</font> <font color="#990000">\</font><br />
+      <font color="#009900">JBOSS_PIDFILE</font><font color="#990000">=</font><font color="#009900">$JBOSS_PIDFILE</font> <font color="#009900">$JBOSS_SCRIPT</font> -c <font color="#009900">$JBOSS_CONFIG</font> <font color="#990000">\</font><br />
+      <font color="#009900">$JBOSS_OPTS</font> <font color="#993399">2</font><font color="#990000">&gt;&amp;</font><font color="#993399">1</font> <font color="#990000">&gt;</font> <font color="#009900">$JBOSS_CONSOLE_LOG</font> <font color="#990000">&amp;</font><br />
+    <b><font color="#0000FF">else</font></b><br />
+      su - <font color="#009900">$JBOSS_USER</font> -c <font color="#FF0000">"LAUNCH_JBOSS_IN_BACKGROUND=1 \</font><br />
+<font color="#FF0000">        JBOSS_PIDFILE=$JBOSS_PIDFILE $JBOSS_SCRIPT -c $JBOSS_CONFIG \</font><br />
+<font color="#FF0000">        $JBOSS_OPTS"</font> <font color="#993399">2</font><font color="#990000">&gt;&amp;</font><font color="#993399">1</font> <font color="#990000">&gt;</font> <font color="#009900">$JBOSS_CONSOLE_LOG</font> <font color="#990000">&amp;</font><br />
+    <b><font color="#0000FF">fi</font></b><br />
+  <b><font color="#0000FF">else</font></b></tt></pre></td></tr></table><p>Next up we create the log directories and redirect the JBoss log directory to <tt>/var/log/wildfly</tt> and the tmp directory to <tt>/tmp/wildfly</tt></p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# mkdir /var/log/wildfly<br />
+[root@wxyz ~]# chown wildfly:wildfly /var/log/wildfly/</pre></td></tr></table><p>To get WildFly to use these directories, we set the system properties for them in <tt>/etc/wildfly/wildfly.properties</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># System properties for wildfly</font></i><br />
+<font color="#009900">jboss.server.log.dir</font><font color="#990000">=</font>/var/log/wildfly<br />
+<font color="#009900">jboss.server.temp.dir</font><font color="#990000">=</font>/tmp/wildfly</tt></pre></td></tr></table><p>At this point you can start the server using the command <tt>service wildfly start</tt>.  You won&#8217;t be able to do much however, unless you like browsing via <tt>wget</tt> since the server is bound to the localhost interface only (and we are working on a headless server, i.e. no GUI web browser).  So we&#8217;ll need to bind WildFly to all interfaces and open up the CentOS firewall to allow browsing to WildFly and the management console.  Keep in mind that this may not be exactly what you want in a production environment or in environment where unknown users might access your server (like shared hosting).</p>
+<p>First we&#8217;ll edit the <tt>/etc/wildfly/wildfly.properties</tt> file:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900"># System properties for wildfly</font></i><br />
+<font color="#009900">jboss.bind.address</font><font color="#990000">=</font>0.0.0.0<br />
+<font color="#009900">jboss.bind.address.management</font><font color="#990000">=</font>0.0.0.0<br />
+<font color="#009900">jboss.server.log.dir</font><font color="#990000">=</font>/var/log/wildfly<br />
+<font color="#009900">jboss.server.temp.dir</font><font color="#990000">=</font>/tmp/wildfly</tt></pre></td></tr></table><p>Depending on how your local network is setup you may need further configuration for WildFly to be completely happy binding to all interfaces.  If your DNS recognizes the name of the CentOS server you are working on, congratulations, you are all set.  On the other hand, if DNS is not configured for the server, you will need to add an entry to the <tt>/etc/hosts</tt> file pointing the name of the server to the external IP.</p>
+<p>Next we need to open the firewall for ports 8080 (regular WildFly) and 9990 (the management console).  <strong>Be careful</strong> when adjusting the firewall.  The commands below use hard-coded line numbers that may not be appropriate for whatever system you are using.  If you think you have screwed up your firewall use <tt>service iptables restart</tt> to reset it.  Of course, this won&#8217;t work after you issue <tt>service iptables save</tt> so be extra sure before you save the rules.  You will also need to replace 10.0.0.0 with your subnet below.</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">[root@wxyz ~]# # 8080 for WildFly applications<br />
+[root@wxyz ~]# iptables --insert INPUT 5 \<br />
+         --match state \<br />
+         --state NEW \<br />
+         --protocol tcp \<br />
+         --destination-port 8080 \<br />
+         --source 10.0.0.0/24 \<br />
+         --jump ACCEPT<br />
+[root@wxyz ~]# # 9990 for WildFly management<br />
+[root@wxyz ~]# iptables --insert INPUT 6 \<br />
+         --match state \<br />
+         --state NEW \<br />
+         --protocol tcp \<br />
+         --destination-port 9990 \<br />
+         --source 10.0.0.0/24 \<br />
+         --jump ACCEPT<br />
+[root@wxyz ~]# # Verify the state of the firewall<br />
+[root@wxyz ~]# iptables -L --line-numbers<br />
+[root@wxyz ~]# # Go and test it out before doing the following<br />
+[root@wxyz ~]# service iptables save</pre></td></tr></table><p>At this point you should be ready to go.  Start up WildFly and try accessing it from your desktop.</p>

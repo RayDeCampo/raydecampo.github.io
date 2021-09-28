@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Absent Code</h1>
+  
+  <div class="date">
+    September  3, 2012
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#JBoss">JBoss</a>
+  
+    <a href="/tags.html#GlassFish">GlassFish</a>
+  
+    <a href="/tags.html#JEE">JEE</a>
+  
+    <a href="/tags.html#JUnit">JUnit</a>
+  
+    <a href="/tags.html#java">java</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>I recently hit an error I had never seen before:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.5 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><font color="#008080">Caused</font> by<font color="#990000">:</font> java<font color="#990000">.</font>lang<font color="#990000">.</font>ClassFormatError<font color="#990000">:</font> Absent Code attribute in method that is<br />
+        not <b><font color="#0000FF">native</font></b> or <b><font color="#0000FF">abstract</font></b> in <b><font color="#0000FF">class</font></b> <font color="#008080">file</font> javax<font color="#990000">/</font>servlet<font color="#990000">/</font>http<font color="#990000">/</font>HttpCookie</tt></pre></td></tr></table><p>A little research and I discovered that some versions of the <tt>javaee.jar</tt> contain essentially just the method signatures without any bodies.  This is fine for compiling against but can cause issues when running JUnit, i.e. unit tests.</p>
+<p>The solution turned out to be to use a JEE jar from an application server.  I use JBoss, but they seemed to have the jar scattered all over the place so I turned to GlassFish.  GlassFish didn&#8217;t exactly give me one-stop shopping either but it was easier to put together the implementation jar than with JBoss.</p>
+<p>If you don&#8217;t need the jar in any particular place you can just add it to your classpath.  Otherwise if you are moving it, note that the jar itself contains nothing but a manifest pointing to other jars.  Make sure you copy the other jars and preserve the directory structure.</p>
+<p>Big hat tip to mkyong at <a href="http://www.mkyong.com/">http://www.mkyong.com/</a> who did the leg work for me on this one:</p>
+<p><a href="http://www.mkyong.com/hibernate/java-lang-classformaterror-absent-code-attribute-in-method-that-is-not-native-or-abstract-in-class-file/">http://www.mkyong.com/hibernate/java-lang-classformaterror-absent-code-attribute-in-method-that-is-not-native-or-abstract-in-class-file/</a></p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

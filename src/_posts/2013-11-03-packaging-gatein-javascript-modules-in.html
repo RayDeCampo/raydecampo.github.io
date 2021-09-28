@@ -1,0 +1,133 @@
+---
+layout: post
+title: Packaging GateIn JavaScript Modules in Separate WARs
+date: '2013-11-03T09:30:00.000-05:00'
+permalink: 2013/11/03/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- JavaScript
+- portlet.xml
+- gatein-resources.xml
+- portlet
+- RequireJS
+- web.xml
+- portal
+- GateIn
+- modules
+- jQuery
+modified_time: '2014-01-24T10:51:10.593-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-3034221308022199105
+blogger_orig_url: http://labnotes.decampo.org/2013/11/packaging-gatein-javascript-modules-in.html
+redirect_from: /2013/11/packaging-gatein-javascript-modules-in.html
+excerpt_separator: </p>
+---
+
+<p>I have been messing around with the <a href="http://www.jboss.org/gatein">GateIn Portal Server</a> in order to evaluate it for an upcoming project.  One nice aspect of the portal is the way JavaScript is handled.  JavaScript in GateIn is split into modules and managed via the <a href="http://requirejs.org/">RequireJS</a> library.  This allows the portlet developer to keep their JavaScript isolated and only include the dependencies they require.  It also allows for re-use of modules defined in one portlet in other portlets.  It doesn&#8217;t take a lot of imagination to picture the disaster JavaScript could become on a portal which doesn&#8217;t provide isolation and re-use, especially if multiple organizations are providing portals.</p>
+<p>Starting with the solid foundation provided by GateIn, we just need a couple of tweaks to make things even better.  First, one potential gotcha is that the modules all live in the same namespace across the portal.  So we will borrow the solution from Java and prefix our module names with the inverse of the our domain name.  For the purposes of this post, I will use the prefix com.example.</p>
+<p>The second thing is that modules are defined in portlets.  This could be an issue if you create a re-usable module in portlet X, it gets used in portlet Y and then down the road portlet X is no longer needed and is removed.  The solution is to package our re-usable modules in their our war files separate from the portlets.</p>
+<p>Which leads me to the point of this post, demonstrating how to package a JavaScript module for GateIn in its own war archive.  Originally inspired by <a href="http://thedailywtf.com">the Daily WTF</a>, I was going to create modules for adding unicorns to the portal.  But after going to <a href="http://www.cornify.com">http://www.cornify.com</a> to borrow the JavaScript, I discovered the much cooler http://ninjafy.com.  So we will be adding ninjas to the portal instead.</p>
+<p>Since I originally posted this entry, it has come to my attention that Google is warning users that ninjafy.com may be serving malware.  So the safe thing to do would be to get your own (known safe) ninja pictures and package them with your module.  Then adjust the URL parameters in the script below.</p>
+<p>Just to demonstrate dependencies and module interaction, we will create two modules, <tt>com.example.ninjafy</tt> and <tt>com.example.module</tt>.  Create a <tt>js</tt> directory under the web root of the war and add the file <tt>ninjafy.js</tt>:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><i><font color="#9A1900">// Adapted from http://ninjafy.com/js/ninjafy.js</font></i><br />
+<b><font color="#000000">define</font></b><font color="#990000">(</font><b><font color="#0000FF">function</font></b><font color="#990000">()</font> <font color="#FF0000">{</font><br />
+    <b><font color="#0000FF">return</font></b> <font color="#FF0000">{</font><br />
+        add <font color="#990000">:</font> <b><font color="#0000FF">function</font></b><font color="#990000">()</font> <font color="#FF0000">{</font><br />
+            <b><font color="#0000FF">var</font></b> ninjafy_url <font color="#990000">=</font> <font color="#FF0000">'/path/to/images/'</font><font color="#990000">;</font><br />
+            <b><font color="#0000FF">var</font></b> file <font color="#990000">=</font> <font color="#FF0000">'ninja_'</font><font color="#990000">;</font><br />
+            <b><font color="#0000FF">var</font></b> count <font color="#990000">=</font> <font color="#993399">7</font><font color="#990000">;</font><br />
+            file <font color="#990000">+=</font> Math<font color="#990000">.</font><b><font color="#000000">ceil</font></b><font color="#990000">(</font>Math<font color="#990000">.</font><b><font color="#000000">random</font></b><font color="#990000">()*</font>count<font color="#990000">)</font> <font color="#990000">+</font> <font color="#FF0000">'.gif'</font><font color="#990000">;</font><br />
+            <b><font color="#0000FF">var</font></b> div <font color="#990000">=</font> document<font color="#990000">.</font><b><font color="#000000">createElement</font></b><font color="#990000">(</font><font color="#FF0000">'div'</font><font color="#990000">);</font><br />
+            div<font color="#990000">.</font>style<font color="#990000">.</font>position <font color="#990000">=</font> <font color="#FF0000">'fixed'</font><font color="#990000">;</font><br />
+<br />
+            <b><font color="#0000FF">var</font></b> height <font color="#990000">=</font> Math<font color="#990000">.</font><b><font color="#000000">random</font></b><font color="#990000">()*.</font><font color="#993399">9</font><font color="#990000">;</font><br />
+            <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><b><font color="#0000FF">typeof</font></b><font color="#990000">(</font>window<font color="#990000">.</font>innerHeight<font color="#990000">)</font> <font color="#990000">==</font> <font color="#FF0000">'number'</font><font color="#990000">)</font> <font color="#FF0000">{</font><br />
+                height <font color="#990000">=</font> height<font color="#990000">*</font>window<font color="#990000">.</font>innerHeight<font color="#990000">+</font><font color="#FF0000">'px'</font><font color="#990000">;</font><br />
+            <font color="#FF0000">}</font> <b><font color="#0000FF">else</font></b> <b><font color="#0000FF">if</font></b><font color="#990000">(</font>document<font color="#990000">.</font>documentElement<br />
+                      <font color="#990000">&amp;&amp;</font> document<font color="#990000">.</font>documentElement<font color="#990000">.</font>clientHeight<font color="#990000">)</font> <font color="#FF0000">{</font><br />
+                height <font color="#990000">=</font> height<font color="#990000">+</font>document<font color="#990000">.</font>documentElement<font color="#990000">.</font>clientHeight<font color="#990000">+</font><font color="#FF0000">'px'</font><font color="#990000">;</font><br />
+            <font color="#FF0000">}</font> <b><font color="#0000FF">else</font></b> <font color="#FF0000">{</font><br />
+                height <font color="#990000">=</font> height<font color="#990000">*</font><font color="#993399">100</font><font color="#990000">+</font><font color="#FF0000">'%'</font><font color="#990000">;</font><br />
+            <font color="#FF0000">}</font><br />
+<br />
+            div<font color="#990000">.</font>style<font color="#990000">.</font>top <font color="#990000">=</font> height<font color="#990000">;</font><br />
+            div<font color="#990000">.</font>style<font color="#990000">.</font>left <font color="#990000">=</font> Math<font color="#990000">.</font><b><font color="#000000">random</font></b><font color="#990000">()*</font><font color="#993399">90</font> <font color="#990000">+</font> <font color="#FF0000">'%'</font><font color="#990000">;</font><br />
+            <b><font color="#0000FF">var</font></b> img <font color="#990000">=</font> document<font color="#990000">.</font><b><font color="#000000">createElement</font></b><font color="#990000">(</font><font color="#FF0000">'img'</font><font color="#990000">);</font><br />
+            img<font color="#990000">.</font><b><font color="#000000">setAttribute</font></b><font color="#990000">(</font><font color="#FF0000">'src'</font><font color="#990000">,</font>ninjafy_url<font color="#990000">+</font>file<font color="#990000">);</font><br />
+            <b><font color="#0000FF">var</font></b> body <font color="#990000">=</font> document<font color="#990000">.</font><b><font color="#000000">getElementsByTagName</font></b><font color="#990000">(</font><font color="#FF0000">'body'</font><font color="#990000">)[</font><font color="#993399">0</font><font color="#990000">];</font><br />
+            body<font color="#990000">.</font><b><font color="#000000">appendChild</font></b><font color="#990000">(</font>div<font color="#990000">);</font><br />
+            div<font color="#990000">.</font><b><font color="#000000">appendChild</font></b><font color="#990000">(</font>img<font color="#990000">);</font><br />
+        <font color="#FF0000">}</font><br />
+    <font color="#FF0000">}</font><font color="#990000">;</font><br />
+<font color="#FF0000">}</font><font color="#990000">);</font></tt></pre></td></tr></table><p>Here we have adapted the original ninjafy.js script into a <a href="http://requirejs.org/docs/api.html#define">RequireJS module</a>.  The RequireJS module takes the form of a function that returns the module.  The result of the function is passed to other modules that depend on this one.  We defined one function in the ninjafy module, <tt>add()</tt>.</p>
+<p>(A quick note about licensing - I couldn&#8217;t find any license information on the ninjafy site but the tone of the site certainly implies that re-using their code is encouraged.)</p>
+<p>Next we define our second module, which will use the <tt>com.example.ninjafy</tt> modules.  Create a file named <tt>example-module.js</tt> in the <tt>js</tt> directory:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000000">define</font></b><font color="#990000">([</font><font color="#FF0000">"ninjafy"</font><font color="#990000">],</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>ninjafy<font color="#990000">)</font> <font color="#FF0000">{</font><br />
+    <b><font color="#0000FF">return</font></b> <font color="#FF0000">{</font><br />
+        ninjasOnClick<font color="#990000">:</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>element<font color="#990000">)</font> <font color="#FF0000">{</font><br />
+            element<font color="#990000">.</font>onclick <font color="#990000">=</font> <b><font color="#0000FF">function</font></b><font color="#990000">()</font> <font color="#FF0000">{</font><br />
+                ninjafy<font color="#990000">.</font><b><font color="#000000">add</font></b><font color="#990000">();</font><br />
+                <b><font color="#0000FF">return</font></b> <b><font color="#0000FF">false</font></b><font color="#990000">;</font><br />
+            <font color="#FF0000">}</font><font color="#990000">;</font><br />
+        <font color="#FF0000">}</font><br />
+    <font color="#FF0000">}</font><font color="#990000">;</font><br />
+<font color="#FF0000">}</font><font color="#990000">);</font></tt></pre></td></tr></table><p>Here we can see that the <tt>com.example.ninjafy</tt> module is passed as the variable <tt>ninjafy</tt>.  In this module we define a <tt>ninjasOnClick()</tt> function which adds a ninja-adding <tt>onclick</tt> handler to the given HTML element.</p>
+<p>Next we have everybody&#8217;s favorite part of JEE development: configuring the XML files.  The first two are simple.  Create a <tt>web.xml</tt> that contains only a <tt>displayName</tt> element (see <a href="https://issues.jboss.org/browse/GTNPORTAL-3107">https://issues.jboss.org/browse/GTNPORTAL-3107</a>).  Then create an "empty" <tt>portlet.xml</tt> containing only the top-level <tt>&lt;portlet-app&gt;</tt> element.  These xml files belong in the <tt>WEB-INF</tt> directory of the war of course.</p>
+<p>Next we define the <tt>gatein-resources.xml</tt> file, also in the <tt>WEB-INF</tt> directory.  This file defines the modules and manages their dependencies:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b><br />
+<b><font color="#0000FF">&lt;gatein-resources</font></b><br />
+        <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font><br />
+        <font color="#009900">xsi:schemaLocation</font><font color="#990000">=</font><font color="#FF0000">"http://www.gatein.org/xml/ns/gatein_resources_1_3</font><br />
+<font color="#FF0000">            http://www.gatein.org/xml/ns/gatein_resources_1_3"</font><br />
+        <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://www.gatein.org/xml/ns/gatein_resources_1_3"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;module&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;name&gt;</font></b>com.example.ninjafy<b><font color="#0000FF">&lt;/name&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;script&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;path&gt;</font></b>/js/ninjafy.js<b><font color="#0000FF">&lt;/path&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;/script&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/module&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;module&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;name&gt;</font></b>com.example.module<b><font color="#0000FF">&lt;/name&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;script&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;path&gt;</font></b>/js/example-module.js<b><font color="#0000FF">&lt;/path&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;/script&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;depends&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;module&gt;</font></b>com.example.ninjafy<b><font color="#0000FF">&lt;/module&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;as&gt;</font></b>ninjafy<b><font color="#0000FF">&lt;/as&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;/depends&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/module&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/gatein-resources&gt;</font></b></tt></pre></td></tr></table><p>For the most part this file is self-explanatory.  Note in the <tt>&lt;depends&gt;</tt> tag for the <tt>com.example.module</tt> module we map the <tt>com.example.ninjafy</tt> module to the name <tt>ninjafy</tt>, as expected by the <tt>example-module.js</tt> script.</p>
+<p>Now if you build your war file and deploy it to your GateIn server, you will have a nifty new JavaScript module to play with.  But what fun is a new library if we don&#8217;t actually use it?  Assuming you have a working portlet to start with, I&#8217;ll show you how to use the new modules.</p>
+<p>When creating JavaScript for portlets in GateIn, the recommended way is to define a module for the portlet.  This will not be a re-usable module as before, but a module just for the portlet.  Create a file named <tt>js/portlet.js</tt> (remember we are working inside the war for your portlet now, not the same war we created above to hold the JavaScript modules):</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000000">define</font></b><font color="#990000">([</font><font color="#FF0000">"example"</font><font color="#990000">,</font><font color="#FF0000">"$"</font><font color="#990000">],</font> <b><font color="#0000FF">function</font></b><font color="#990000">(</font>example<font color="#990000">,</font> $<font color="#990000">)</font> <font color="#FF0000">{</font><br />
+    $<font color="#990000">(</font>document<font color="#990000">).</font><b><font color="#000000">ready</font></b><font color="#990000">(</font><b><font color="#0000FF">function</font></b><font color="#990000">()</font><font color="#FF0000">{</font><br />
+        $<font color="#990000">(</font><font color="#FF0000">".ninjame"</font><font color="#990000">).</font><b><font color="#000000">each</font></b><font color="#990000">(</font><b><font color="#0000FF">function</font></b><font color="#990000">(</font>index<font color="#990000">,</font> element<font color="#990000">)</font> <font color="#FF0000">{</font><br />
+            example<font color="#990000">.</font><b><font color="#000000">ninjasOnClick</font></b><font color="#990000">(</font>element<font color="#990000">);</font><br />
+        <font color="#FF0000">}</font><font color="#990000">);</font><br />
+    <font color="#FF0000">}</font><font color="#990000">);</font><br />
+<font color="#FF0000">}</font><font color="#990000">);</font></tt></pre></td></tr></table><p>In this case we are expecting the <tt>com.example.module</tt> module as <tt>example</tt> and <a href="http://www.jquery.com">jQuery</a> as <tt>$</tt>.  GateIn supplies a jQuery module for you.  (You can also use a different version of jQuery if you are picky about it, see the <a href="https://docs.jboss.org/author/display/GTNPORTAL36/JavaScript+Cookbook">GateIn JavaScript documentation</a> for details.)  Our module walks the DOM and invokes our <tt>ninjaOnClick()</tt> function for each HTML element with the class <tt>ninjame</tt>.</p>
+<p>Next you need to configure this module in the <tt>gatein-resources.xml</tt> for your portlet:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" cellpadding="10"><tr><td><!-- Generator: GNU source-highlight 3.1.6 by Lorenzo Bettini http://www.lorenzobettini.it http://www.gnu.org/software/src-highlite --><pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font> <font color="#009900">encoding</font><font color="#990000">=</font><font color="#FF0000">"UTF-8"</font><b><font color="#000080">?&gt;</font></b><br />
+<b><font color="#0000FF">&lt;gatein-resources</font></b><br />
+        <font color="#009900">xmlns:xsi</font><font color="#990000">=</font><font color="#FF0000">"http://www.w3.org/2001/XMLSchema-instance"</font><br />
+        <font color="#009900">xsi:schemaLocation</font><font color="#990000">=</font><font color="#FF0000">"http://www.gatein.org/xml/ns/gatein_resources_1_3</font><br />
+<font color="#FF0000">            http://www.gatein.org/xml/ns/gatein_resources_1_3"</font><br />
+        <font color="#009900">xmlns</font><font color="#990000">=</font><font color="#FF0000">"http://www.gatein.org/xml/ns/gatein_resources_1_3"</font><b><font color="#0000FF">&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;portlet&gt;</font></b><br />
+        <i><font color="#9A1900">&lt;!-- TODO: Replace the following with the actual name. --&gt;</font></i><br />
+        <b><font color="#0000FF">&lt;name&gt;</font></b>Use the name from your portlet.xml<b><font color="#0000FF">&lt;/name&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;module&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;script&gt;</font></b><br />
+                <b><font color="#0000FF">&lt;path&gt;</font></b>/js/portlet.js<b><font color="#0000FF">&lt;/path&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;/script&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;depends&gt;</font></b><br />
+                <b><font color="#0000FF">&lt;module&gt;</font></b>com.example.module<b><font color="#0000FF">&lt;/module&gt;</font></b><br />
+                <b><font color="#0000FF">&lt;as&gt;</font></b>example<b><font color="#0000FF">&lt;/as&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;/depends&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;depends&gt;</font></b><br />
+                <b><font color="#0000FF">&lt;module&gt;</font></b>jquery<b><font color="#0000FF">&lt;/module&gt;</font></b><br />
+                <b><font color="#0000FF">&lt;as&gt;</font></b>$<b><font color="#0000FF">&lt;/as&gt;</font></b><br />
+            <b><font color="#0000FF">&lt;/depends&gt;</font></b><br />
+        <b><font color="#0000FF">&lt;/module&gt;</font></b><br />
+    <b><font color="#0000FF">&lt;/portlet&gt;</font></b><br />
+<b><font color="#0000FF">&lt;/gatein-resources&gt;</font></b></tt></pre></td></tr></table><p>Then you just need to add the CSS class <tt>ninjame</tt> to some elements in your portlet HTML.  Fire up GateIn and your browser and add ninjas to your heart&#8217;s content.</p>
+<p>A couple of final notes: I have found it is sometimes necessary to restart GateIn for changes to modules to take effect.  And it is always necessary to tell your browser to reload the JavaScript after making changes (shift-reload in Firefox).  Finally, GateIn by default will bundle up the shared JavaScript into one merged file which has been minimized.  Adding the flag <tt>-Dexo.product.developing=true</tt> to the arguments when starting GateIn will suppress this and lead to a much better JavaScript debugging experience.</p>

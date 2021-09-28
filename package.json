@@ -1,0 +1,28 @@
+{
+  "name": "raydecampo.github.io",
+  "version": "1.0.0",
+  "description": "Lab notes blog",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf ./docs ./assets/css/style.css",
+    "build": "npm run clean && npm run sass && eleventy",
+    "sass": "sass assets/css/style.scss assets/css/style.css",
+    "start": "eleventy --serve --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RayDeCampo/raydecampo.github.io.git"
+  },
+  "author": "Raymond DeCampo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RayDeCampo/raydecampo.github.io/issues"
+  },
+  "homepage": "https://github.com/RayDeCampo/raydecampo.github.io#readme",
+  "devDependencies": {
+    "@11ty/eleventy": "^0.12.1",
+    "@11ty/eleventy-plugin-rss": "^1.1.1",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^3.1.2"
+  }
+}

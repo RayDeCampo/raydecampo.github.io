@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>Nvidia Overscan in Ubuntu 12.10</h1>
+  
+  <div class="date">
+    January  6, 2013
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#nvidia">nvidia</a>
+  
+    <a href="/tags.html#ubuntu">ubuntu</a>
+  
+    <a href="/tags.html#overscan">overscan</a>
+  
+    <a href="/tags.html#quantal">quantal</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>A few weeks ago I upgraded my HTPC to Ubuntu 12.10 and was treated to a nasty surprise: the overscan settings for the nvidia driver were no longer recognized.  The HTPC is connected to my television (naturally) which is a 40" LG LCD HDTV.  If you have ever tried to connect your PC to an HDTV before, you probably encountered the problem of that the visible portion of the screen is smaller than the drawable portion of the screen.  The result is that the edges of the screen are not visible.  In my case that meant the dash and the universal menu of Unity could not be seen.  That makes for a less than usable experience.</p>
+<p>In the past nvidia included an overscan setting slider in the GUI configuration tool (nvidia-settings).  When I opened it up however, the setting was nowhere to be found.  A short time on google confirmed the worst: nvidia had removed the setting.</p>
+<p>The good news is that the setting can be twiddled via the command line.  Then, once you find the magic numbers that work with your particular graphics card and monitor, you can put them in your <tt>.nvidia-settings-rc</tt> file to automatically apply them on login.  Also, the command is safe: if you try something that would push the screen too far, the driver simply ignores it.</p>
+<p>The first step is to run the command with a bunch of values until you find the values that work best:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">nvidia-settings --assign 0/CurrentMetaMode="DFP-0: 1280x720 { ViewPortIn=12<br />
+80x720, ViewPortOut=1190x680+44+20 }"</pre></td></tr></table><p>The first set of numbers, the <tt>ViewPortIn</tt> and the value before that, are determined by the native resolution of your HDTV.  Mine is a 720p, so the native resolution is 1280x720.  The next set of numbers, the <tt>ViewPortOut</tt>, are the ones you will want to experiment with.  They are telling the driver how to transform the viewport so the screen ends up in the visible area of the HDTV.  The first part, the 1190x680, indicates how much to scale the viewport.  The second part, +44+20, indicates how much to shift the image.</p>
+<p>Once you have the values you want, edit your <tt>~/.nvidia-settings-rc</tt> file adding the following at the end:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">0/CurrentMetaMode=DFP-0: 1280x720 { ViewPortIn=1280x720, ViewPortOut=1190x680+44+20 }</pre></td></tr></table><p>Obviously you will want to use the correct values for your system.</p>
+
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

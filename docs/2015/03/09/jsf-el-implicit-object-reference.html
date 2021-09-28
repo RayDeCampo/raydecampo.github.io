@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    
+    <title>Lab Notes by Ray DeCampo</title>
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" href="/assets/css/prism.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/theme.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <link rel="stylesheet" href="/assets/css/style.css?v=0078bf4d74eb76e1fdbb7162b26b4575c821735e">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <ul>
+          <li><a href="/posts.html">Posts</a></li>
+          <li><a href="/tags.html">Tags</a></li>
+          <li><a href="/feeds/posts/default" title="RSS"><i class="svg-icon rss"></i> RSS</a></li>
+          <li><a href="/about/">About</a></li>
+        </ul>
+        <h1 class="header"><a id="homelink" href="/">Lab Notes</a></h1>
+        <p class="header">Things I want to remember how to do.</p>
+      </header>
+
+      <section>
+        
+
+<article class="post">
+  <h1>JSF EL Implicit Object Reference</h1>
+  
+  <div class="date">
+    March  9, 2015
+  </div>
+
+  <div class="tags">
+  
+    <a href="/tags.html#JSF">JSF</a>
+  
+    <a href="/tags.html#documentation">documentation</a>
+  
+    <a href="/tags.html#EL">EL</a>
+  
+  </div>
+  
+  <div class="entry">
+    
+<p>Just collecting the implicit objects defined by the JSF 2.2 specification (section 5.6.2.1, table 5-11) which are available in the EL: </p>
+ <dl><dt>application</dt><dd>externalContext.getContext()</dd><dt>applicationScope</dt><dd>externalContext.getApplicationMap()</dd><dt>cookie</dt><dd>externalContext.getRequestCookieMap()</dd><dt>facesContext</dt><dd>the FacesContext for this request</dd><dt>component</dt><dd>the top of the stack of UIComponent instances, as pushed via calls to UIComponent.pushComponentToEL(). See Section 3.1.14 “Lifecycle Management Methods”</dd><dt>flowScope</dt><dd>facesContext.getApplication().getFlowHandler().getCurrentFlowScope()</dd><dt>cc</dt><dd>the current composite component relative to the declaring page in which the expression appears.</dd><dt>flash</dt><dd>externalContext.getFlash()</dd><dt>header</dt><dd>externalContext.getRequestHeaderMap()</dd><dt>headerValues</dt><dd>externalContext.getRequestHeaderValuesMap()</dd><dt>initParam</dt><dd>externalContext.getInitParameterMap()</dd><dt>param</dt><dd>externalContext.getRequestParameterMap()</dd><dt>paramValues</dt><dd>externalContext.getRequestParameterValuesMap()</dd><dt>request</dt><dd>externalContext.getRequest()</dd><dt>requestScope</dt><dd>externalContext.getRequestMap()</dd><dt>resource</dt><dd>facesContext.getApplication().getResourceHandler()</dd><dt>session</dt><dd>externalContext.getSession()</dd><dt>sessionScope</dt><dd>externalContext.getSessionMap()</dd><dt>view</dt><dd>facesContext.getViewRoot()</dd><dt>viewScope</dt><dd>facesContext.getViewRoot().getViewMap()</dd><dt>resource</dt><dd>facesContext.getApplication().getResourceHandler()</dd></dl> 
+  </div>
+</article>
+
+      </section>
+
+      <footer>
+        <div>Ray DeCampo</div>
+        <div>
+          <a href="https://github.com/RayDeCampo" title="GitHub"><i class="svg-icon github"></i></a>
+          <a href="https://twitter.com/iamdoingitwrong" title="Twitter"><i class="svg-icon twitter"></i></a>
+          <a href="https://www.linkedin.com/in/raymonddecampo/" title="LinkedIn"><i class="svg-icon linkedin"></i></a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

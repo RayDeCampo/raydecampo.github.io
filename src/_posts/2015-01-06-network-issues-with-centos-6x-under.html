@@ -1,0 +1,18 @@
+---
+layout: post
+title: Network issues with CentOS 6.x under Hyper-V
+date: '2015-01-06T18:00:00.000-05:00'
+permalink: 2015/01/06/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- Hyper-V
+- CentOS
+- networking
+modified_time: '2015-01-06T18:00:00.084-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-1710539927126265836
+blogger_orig_url: http://labnotes.decampo.org/2015/01/network-issues-with-centos-6x-under.html
+redirect_from: /2015/01/network-issues-with-centos-6x-under.html
+excerpt_separator: </p>
+---
+
+<p>I had a number of CentOS instances running under Hyper-V using the standard virtual network interface via integration services.  Post CentOS 6.3 integration services are included in the install and that has been my experience.  However at some point after updating to 6.6, something causes the integration services to no longer work with the virtual network interface. <p>To fix, remove the Network Adapter from the Hyper-V configuration and replace it with a Legacy Network Adapter. <p>Now you need to boot the virtual machine and access it from the Hyper-V console in order to log in.  Backup the file <code>/etc/udev/rules/70.persisent-net.rules</code> and remove it from the <code>/etc/udev/rules</code> directory.  This file tells CentOS to look for the old network interface and assign it to <code>eth0</code>. <p>Second, backup the <code>/etc/sysconfig/network-scripts/ifcfg-eth0</code> file.  Edit the file and remove any reference to <code>UUID</code> or <code>HWADDR</code>. 

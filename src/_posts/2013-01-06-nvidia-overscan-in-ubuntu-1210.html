@@ -1,0 +1,26 @@
+---
+layout: post
+title: Nvidia Overscan in Ubuntu 12.10
+date: '2013-01-06T09:30:00.000-05:00'
+permalink: 2013/01/06/{{ page.fileSlug }}.html
+author: Raymond DeCampo
+tags:
+- nvidia
+- ubuntu
+- overscan
+- quantal
+modified_time: '2013-01-06T09:30:01.531-05:00'
+blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-5950437220826689403
+blogger_orig_url: http://labnotes.decampo.org/2013/01/nvidia-overscan-in-ubuntu-1210.html
+redirect_from: /2013/01/nvidia-overscan-in-ubuntu-1210.html
+excerpt_separator: </p>
+---
+
+<p>A few weeks ago I upgraded my HTPC to Ubuntu 12.10 and was treated to a nasty surprise: the overscan settings for the nvidia driver were no longer recognized.  The HTPC is connected to my television (naturally) which is a 40" LG LCD HDTV.  If you have ever tried to connect your PC to an HDTV before, you probably encountered the problem of that the visible portion of the screen is smaller than the drawable portion of the screen.  The result is that the edges of the screen are not visible.  In my case that meant the dash and the universal menu of Unity could not be seen.  That makes for a less than usable experience.</p>
+<p>In the past nvidia included an overscan setting slider in the GUI configuration tool (nvidia-settings).  When I opened it up however, the setting was nowhere to be found.  A short time on google confirmed the worst: nvidia had removed the setting.</p>
+<p>The good news is that the setting can be twiddled via the command line.  Then, once you find the magic numbers that work with your particular graphics card and monitor, you can put them in your <tt>.nvidia-settings-rc</tt> file to automatically apply them on login.  Also, the command is safe: if you try something that would push the screen too far, the driver simply ignores it.</p>
+<p>The first step is to run the command with a bunch of values until you find the values that work best:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">nvidia-settings --assign 0/CurrentMetaMode="DFP-0: 1280x720 { ViewPortIn=12<br />
+80x720, ViewPortOut=1190x680+44+20 }"</pre></td></tr></table><p>The first set of numbers, the <tt>ViewPortIn</tt> and the value before that, are determined by the native resolution of your HDTV.  Mine is a 720p, so the native resolution is 1280x720.  The next set of numbers, the <tt>ViewPortOut</tt>, are the ones you will want to experiment with.  They are telling the driver how to transform the viewport so the screen ends up in the visible area of the HDTV.  The first part, the 1190x680, indicates how much to scale the viewport.  The second part, +44+20, indicates how much to shift the image.</p>
+<p>Once you have the values you want, edit your <tt>~/.nvidia-settings-rc</tt> file adding the following at the end:</p>
+<table border="0" bgcolor="#e8e8e8" width="100%" style="margin:0.2em 0;"><tr><td style="padding:0.5em;"><pre style="margin:0; padding:0;">0/CurrentMetaMode=DFP-0: 1280x720 { ViewPortIn=1280x720, ViewPortOut=1190x680+44+20 }</pre></td></tr></table><p>Obviously you will want to use the correct values for your system.</p>
