@@ -62,7 +62,7 @@ module.exports = (eleventyConfig) => {
   return {
     dir: {
       input: 'src',
-      output: '_site',
+      output: 'docs',
       layouts: '_layouts',
     },
     templateFormats: ['html', 'liquid', 'md', 'njk']
