@@ -36,11 +36,6 @@ module.exports = (eleventyConfig) => {
     excerpt_separator: '<!-- excerpt -->'
   });
 
-  const revision = child_process.execSync('git rev-parse HEAD').toString().trim();
-  eleventyConfig.addShortcode('revision', function() {
-    return revision;
-  });
-
   // TAGS
   eleventyConfig.addCollection('tags', function(collections) {
     const tagSet = new Set();
