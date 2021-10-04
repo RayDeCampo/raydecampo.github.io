@@ -46,21 +46,12 @@
   </div>
   
   <div class="entry">
-    
- <p>Every once in a while when using jQuery UI I notice that my widget is not being initialized smoothly.  For example, when using the menu widget I might see the list items behind the menu briefly.  Then the page jumps around and it is a generally unpleasant experience for the user.  Who likes it when your jQuery widgets are jumpy and cause the page to feel like one of those old 'punch the monkey' banner ads? </p>
-<p>This usually means I have done something like this: </p>
-<div class="code">
-require(['jquery', 'jquery-ui/menu'], function($, menu) {
-    $("#navmenu").menu(); }); 
-</div>
-<p>Instead of wrapping the initialization in a function as I should: </p>
-<div class="code">
-require(['jquery', 'jquery-ui/menu'], function($, menu) {
-    $(function() {
-        $("#navmenu").menu();
-    });
-}); 
-</div>
+    <p>Every once in a while when using jQuery UI I notice that my widget is not being initialized smoothly.  For example, when using the menu widget I might see the list items behind the menu briefly.  Then the page jumps around and it is a generally unpleasant experience for the user.  Who likes it when your jQuery widgets are jumpy and cause the page to feel like one of those old 'punch the monkey' banner ads?</p>
+<p>This usually means I have done something like this:</p>
+<pre class="language-javascript"><code class="language-javascript"><span class="token function">require</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'jquery'</span><span class="token punctuation">,</span> <span class="token string">'jquery-ui/menu'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">$<span class="token punctuation">,</span> menu</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>    <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">"#navmenu"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">menu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <br><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>Instead of wrapping the initialization in a function as I should:</p>
+<pre class="language-javascript"><code class="language-javascript"><span class="token function">require</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">'jquery'</span><span class="token punctuation">,</span> <span class="token string">'jquery-ui/menu'</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token parameter">$<span class="token punctuation">,</span> menu</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>    <span class="token function">$</span><span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><br>        <span class="token function">$</span><span class="token punctuation">(</span><span class="token string">"#navmenu"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">menu</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br>    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span><br><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span> </code></pre>
+
   </div>
 </article>
 

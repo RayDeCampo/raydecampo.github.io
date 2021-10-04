@@ -44,13 +44,9 @@
   </div>
   
   <div class="entry">
-    
-<p>To add the conversation ID parameter <code>cid</code> to a <code>h:link</code> or <code>h:button</code>:</p>
-<p>
-<div class="code">
-&lt;h:button value="Go" outcome="go">  
-    &lt;f:param name="cid" value="#{javax.enterprise.context.conversation.id}" />
-&lt;/h:button></div>
+    <p>To add the conversation ID parameter <code>cid</code> to a <code>h:link</code> or <code>h:button</code>:</p>
+<pre class="language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">h:</span>button</span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Go<span class="token punctuation">"</span></span> <span class="token attr-name">outcome</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>go<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>  <br>    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span><span class="token namespace">f:</span>param</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>cid<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#{javax.enterprise.context.conversation.id}<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span><span class="token namespace">h:</span>button</span><span class="token punctuation">></span></span></code></pre>
+
   </div>
 </article>
 

@@ -11,12 +11,13 @@ modified_time: '2015-02-13T10:54:29.810-05:00'
 blogger_id: tag:blogger.com,1999:blog-6427287440000636763.post-1235461871660335290
 blogger_orig_url: http://labnotes.decampo.org/2015/01/jsf-add-conversation-id-to-link-or.html
 redirect_from: /2015/01/jsf-add-conversation-id-to-link-or.html
-excerpt_separator: </p>
 ---
 
-<p>To add the conversation ID parameter <code>cid</code> to a <code>h:link</code> or <code>h:button</code>:</p>
-<p>
-<div class="code">
-&lt;h:button value="Go" outcome="go">  
-    &lt;f:param name="cid" value="#{javax.enterprise.context.conversation.id}" />
-&lt;/h:button></div>
+<!-- excerpt -->
+To add the conversation ID parameter `cid` to a `h:link` or `h:button`:
+
+```xml
+<h:button value="Go" outcome="go">  
+    <f:param name="cid" value="#{javax.enterprise.context.conversation.id}" />
+</h:button>
+```

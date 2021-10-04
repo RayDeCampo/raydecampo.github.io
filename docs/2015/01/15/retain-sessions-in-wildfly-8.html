@@ -48,16 +48,9 @@
   </div>
   
   <div class="entry">
-    
-<p>Add the <code>persistent-sessions</code> element to your WildFly configuration to keep sessions persistent across redeployments and restarts: </p>
- 
-<div class="code">
-&lt;servlet-container name="default">
-    &lt;jsp-config/>
-    &lt;persistent-sessions />
-    &lt;websockets/>
-&lt;/servlet-container></div> 
-<p>See <a href="https://docs.jboss.org/author/display/WFLY8/Undertow+%28web%29+subsystem+configuration">https://docs.jboss.org/author/display/WFLY8/Undertow+%28web%29+subsystem+configuration</a> for more information. </p>
+    <p>Add the <code>persistent-sessions</code> element to your WildFly configuration to keep sessions persistent across redeployments and restarts: </p></p>
+<pre class="language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>servlet-container</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>default<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><br>    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>jsp-config</span><span class="token punctuation">/></span></span><br>    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>persistent-sessions</span> <span class="token punctuation">/></span></span><br>    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>websockets</span><span class="token punctuation">/></span></span><br><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>servlet-container</span><span class="token punctuation">></span></span></code></pre>
+<p>See <a href="https://docs.jboss.org/author/display/WFLY8/Undertow+%28web%29+subsystem+configuration">https://docs.jboss.org/author/display/WFLY8/Undertow+(web)+subsystem+configuration</a> for more information.</p>
 
   </div>
 </article>
